@@ -64,7 +64,7 @@
     },
     "computeNodeVMSize": {
       "type": "string",
-      "defaultValue": "Standard_A3",
+      "defaultValue": "Standard_A8",
       "metadata": {
         "description": "The VM size for the compute nodes"
       }
@@ -97,7 +97,7 @@
     },
     "computeNodeImage": {
       "type": "string",
-      "defaultValue": "CentOS_7.0",
+      "defaultValue": "SLES_HPC_12",
       "allowedValues": [
         "CentOS_6.6",
         "CentOS_7.0",
