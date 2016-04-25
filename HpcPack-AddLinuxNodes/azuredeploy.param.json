@@ -1,0 +1,33 @@
+﻿{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+  "parameters": {
+    "clusterName": {
+      "value": ""
+    },
+    "privateDomainName": {
+      "value": "hpc.local"
+    },
+    "computeNodeImage": {
+      "value": "SLES_HPC_12"
+    },
+    "computeNodeNamePrefix": {
+      "value": "SLES-"
+    },
+    "computeNodeNumber": {
+      "value": "1"
+    },
+    "virtualNetworkName": {
+      "value": ""
+    },
+    "computeNodeVMSize": {
+      "value": "Standard_A8"
+    },
+    "adminUsername": {
+      "value": ""
+    },
+    "adminPassword": {
+      "value": ""
+    }
+  }
+}

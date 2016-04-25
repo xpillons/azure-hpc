@@ -1,0 +1,286 @@
+﻿{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "clusterName": {
+      "type": "string",
+      "metadata": {
+        "description": "The HPC Pack cluster name, also used as the host name of the head node. It must contain between 3 and 15 characters with lowercase letters and numbers, and must start with a letter."
+      }
+    },
+    "virtualNetworkName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the virtual network to be created. It must contain between 2 and 63 characters, start with a letter, end with a letter or number, and may contain only letters, numbers, underscores, periods, or hyphens."
+      }
+    },
+    "privateDomainName": {
+      "type": "string",
+      "defaultValue": "hpc.local",
+      "metadata": {
+        "description": "The fully qualified domain name (FQDN) for the private domain forest which will be created by this template, for example 'hpc.local'."
+      }
+    },
+    "storageAccountStartIndex": {
+      "type": "int",
+      "defaultValue": 1,
+      "metadata": {
+        "description": "The start index of the new storage accounts to be created."
+      }
+    },
+    "storageAccountType": {
+      "type": "string",
+      "defaultValue": "Standard_LRS",
+      "allowedValues": [
+        "Standard_LRS",
+        "Standard_GRS",
+        "Standard_RAGRS",
+        "Premium_LRS"
+      ],
+      "metadata": {
+        "description": "The type of the Storage Account created"
+      }
+    },
+    "nbrCNPerStorageAccount": {
+      "type": "int",
+      "defaultValue": 20,
+      "metadata": {
+        "description": "The maximum number of compute nodes in one storage account."
+      }
+    },
+    "computeNodeNamePrefix": {
+      "type": "string",
+      "defaultValue": "IaaSCN-",
+      "metadata": {
+        "description": "The name prefix of the compute nodes. It must be no more than 12 characters, begin with a letter, and contain only letters, numbers and hyphens. For example, if 'IaaSCN-' is specified, the compute node names will be 'IaaSCN-000', 'IaaSCN-001', ..."
+      }
+    },
+    "computeNodeNumber": {
+      "type": "string",
+      "defaultValue": "2",
+      "metadata": {
+        "description": "The number of the compute nodes"
+      }
+    },
+    "computeNodeVMSize": {
+      "type": "string",
+      "defaultValue": "Standard_A3",
+      "metadata": {
+        "description": "The VM size for the compute nodes"
+      }
+    },
+    "adminUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "Administrator user name for the virtual machines and the Active Directory domain."
+      }
+    },
+    "adminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Administrator password for the virtual machines and the Active Directory domain"
+      }
+    },
+    "computeNodePostConfigScript": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Optional URL of a public available PowerShell script you want to run on the compute nodes after they are configured. The script will be run as the Local System account. You can also specify arguments for the script, for example 'http://www.contoso.com/mycnpostscript.ps1 -Arg1 arg1 -Arg2 arg2'."
+      }
+    },
+    "artifactsBaseUrl": {
+      "type": "string",
+      "defaultValue": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/create-hpc-cluster",
+      "metadata": {
+        "description": "Base URL for Marketplace"
+      }
+    },
+    "computeNodeImage": {
+      "type": "string",
+      "defaultValue": "CentOS_7.0",
+      "allowedValues": [
+        "CentOS_6.6",
+        "CentOS_7.0",
+        "SLES_12",
+        "SLES_Premium_12",
+        "SLES_HPC_12",
+        "SLES_HPC_Premium_12",
+        "Ubuntu_14.04",
+        "RHEL_6.7",
+        "RHEL_7.2"
+      ],
+      "metadata": {
+        "description": "The VM image of the compute nodes"
+      }
+    }
+  },
+  "variables": {
+    "apiVersion": "2015-06-15",
+    "computeNodeNumber": "[int(parameters('computeNodeNumber'))]",
+    "cnStorageAccountNumber": "[add(div(sub(variables('computeNodeNumber'), 1), parameters('nbrCNPerStorageAccount')), 1)]",
+    "cnStorageAccountStartIndex": "[add(parameters('storageAccountStartIndex'), 1)]",
+    "storageAccountIndexWidth": "[length(string(sub(add(variables('cnStorageAccountNumber'), variables('cnStorageAccountStartIndex')), 1)))]",
+    "storageAccountNamePrefix": "[toLower(concat('hpc', uniqueString(resourceGroup().id, toLower(parameters('clusterName')))))]",
+    "subnet1Name": "Subnet-1",
+    "subnet1Prefix": "10.0.0.0/22",
+    "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',parameters('virtualNetworkName'))]",
+    "subnetRef": "[concat(variables('vnetID'),'/subnets/',variables('subnet1Name'))]",
+    "publicIPAddressType": "Dynamic",
+    "availabilitySetNamePrefix": "[concat(parameters('clusterName'), '-avset')]",
+    "nbrVMPerAvailabilitySet": 50,
+    "availabilitySetNumber": "[add(div(variables('computeNodeNumber'), variables('nbrVMPerAvailabilitySet')), 1)]",
+    "nicNameSuffix": "-nic",
+    "vmSizeSuffix": "[uniqueString(resourceGroup().id)]",
+    "suffixA8Size": "[concat('Standard_A8', variables('vmSizeSuffix'))]",
+    "suffixA9Size": "[concat('Standard_A9', variables('vmSizeSuffix'))]",
+    "suffixCNSize": "[concat(parameters('computeNodeVMSize'), variables('vmSizeSuffix'))]",
+    "cnRDMACapable": "[replace(replace(replace(variables('suffixCNSize'), variables('suffixA8Size'),'enabled'), variables('suffixA9Size'),'enabled'),variables('suffixCNSize'), 'disabled')]",
+    "cnRDMAState": "[variables('cnRDMACapable')]",
+    "computeNodeImageOsPlatform": "Linux",
+    "computeNodeTemplateUrl": "[concat(parameters('artifactsBaseUrl'), '/', 'linuxnode.json')]",
+    "computeNodeCustomData": "[base64(concat('HPCClusterName=', parameters('clusterName'), '\r\nImageCategory=public\r\nImageName=', variables('currentComputeNodeImage').offer, '-', variables('currentComputeNodeImage').sku, '\r\nVMSize=', parameters('computeNodeVMSize')))]",
+    "adminBase64Password": "[base64(parameters('adminPassword'))]",
+    "iaasInfoArg": "[concat('-SubscriptionId ', subscription().subscriptionId, ' -VNet ', parameters('virtualNetworkName'), ' -Subnet ', variables('subnet1Name'), ' -Location \"', resourceGroup().location, '\"')]",
+    "computeNodeImages": {
+      "CentOS_6.6": {
+        "publisher": "OpenLogic",
+        "offer": "CentOS",
+        "sku": "6.6"
+      },
+      "CentOS_7.0": {
+        "publisher": "OpenLogic",
+        "offer": "CentOS",
+        "sku": "7.0"
+      },
+      "SLES_12": {
+        "publisher": "SUSE",
+        "offer": "SLES",
+        "sku": "12"
+      },
+      "SLES_Premium_12": {
+        "publisher": "SUSE",
+        "offer": "SLES-Priority",
+        "sku": "12"
+      },
+      "SLES_HPC_12": {
+        "publisher": "SUSE",
+        "offer": "SLES-HPC",
+        "sku": "12"
+      },
+      "SLES_HPC_Premium_12": {
+        "publisher": "SUSE",
+        "offer": "SLES-HPC-Priority",
+        "sku": "12"
+      },
+      "Ubuntu_14.04": {
+        "publisher": "Canonical",
+        "offer": "UbuntuServer",
+        "sku": "14.04.3-LTS"
+      },
+      "RHEL_6.7": {
+        "publisher": "RedHat",
+        "offer": "RHEL",
+        "sku": "6.7"
+      },
+      "RHEL_7.2": {
+        "publisher": "RedHat",
+        "offer": "RHEL",
+        "sku": "7.2"
+      }
+    },
+    "currentComputeNodeImage": "[variables('computeNodeImages')[parameters('computeNodeImage')]]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[concat(variables('storageAccountNamePrefix'), padLeft(string(copyIndex(variables('cnStorageAccountStartIndex'))), variables('storageAccountIndexWidth'), '0'))]",
+      "apiVersion": "[variables('apiVersion')]",
+      "location": "[resourceGroup().location]",
+      "copy": {
+        "name": "hpcStorageAccounts",
+        "count": "[variables('cnStorageAccountNumber')]"
+      },
+      "properties": {
+        "accountType": "[parameters('storageAccountType')]"
+      }
+    },
+    {
+      "apiVersion": "2015-01-01",
+      "type": "Microsoft.Resources/deployments",
+      "name": "[concat('create', parameters('computeNodeNamePrefix'), padLeft(string(copyIndex()), 3, '0'))]",
+      "dependsOn": [
+        "[concat('Microsoft.Storage/storageAccounts/', variables('storageAccountNamePrefix'), padLeft(string(add(div(copyIndex(), parameters('nbrCNPerStorageAccount')), variables('cnStorageAccountStartIndex'))), variables('storageAccountIndexWidth'), '0'))]"
+      ],
+      "copy": {
+        "name": "CN",
+        "count": "[variables('computeNodeNumber')]"
+      },
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('computeNodeTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "apiVersion": {
+            "value": "[variables('apiVersion')]"
+          },
+          "location": {
+            "value": "[resourceGroup().location]"
+          },
+          "nicName": {
+            "value": "[concat(parameters('computeNodeNamePrefix'), padLeft(string(copyIndex()), 3, '0'), variables('nicNameSuffix'))]"
+          },
+          "subnetId": {
+            "value": "[variables('subnetRef')]"
+          },
+          "vmName": {
+            "value": "[concat(parameters('computeNodeNamePrefix'), padLeft(string(copyIndex()), 3, '0'))]"
+          },
+          "vmSize": {
+            "value": "[parameters('computeNodeVMSize')]"
+          },
+          "storageAccountName": {
+            "value": "[concat(variables('storageAccountNamePrefix'), padLeft(string(add(div(copyIndex(), parameters('nbrCNPerStorageAccount')), variables('cnStorageAccountStartIndex'))), variables('storageAccountIndexWidth'), '0'))]"
+          },
+          "imgPublisher": {
+            "value": "[variables('currentComputeNodeImage').publisher]"
+          },
+          "imgOffer": {
+            "value": "[variables('currentComputeNodeImage').offer]"
+          },
+          "imgSku": {
+            "value": "[variables('currentComputeNodeImage').sku]"
+          },
+          "imgVersion": {
+            "value": "latest"
+          },
+          "adminUsername": {
+            "value": "[parameters('adminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "availabilitySetName": {
+            "value": "[concat(variables('availabilitySetNamePrefix'), padLeft(string(div(add(copyIndex(), 1), variables('nbrVMPerAvailabilitySet'))), 3, '0'))]"
+          },
+          "customData": {
+            "value": "[variables('computeNodeCustomData')]"
+          },
+          "scriptBaseUri": {
+            "value": "[parameters('artifactsBaseUrl')]"
+          },
+          "clusterName": {
+            "value": "[parameters('clusterName')]"
+          },
+          "privateDomainName": {
+            "value": "[parameters('privateDomainName')]"
+          },
+          "computeNodePostConfigScript": {
+            "value": "[trim(parameters('computeNodePostConfigScript'))]"
+          }
+        }
+      }
+    }
+  ]
+}
