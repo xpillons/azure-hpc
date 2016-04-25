@@ -6,4 +6,6 @@
     <img src="http://armviz.io/visualizebutton.png"/>
 </a>
 
-This template allows you to create Linux nodes that will join an existing HPC Pack cluster.
+This template allows you to create Linux nodes that will join an existing HPC Pack cluster which can be deployed using this template [Create an HPC cluster](https://azure.microsoft.com/documentation/templates/create-hpc-cluster)
+
+ 
