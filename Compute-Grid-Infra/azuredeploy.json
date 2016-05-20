@@ -4,7 +4,7 @@
   "parameters": {
     "computeNodeImage": {
       "type": "string",
-      "defaultValue": "CentOS_7.0",
+      "defaultValue": "CentOS_6.6",
       "allowedValues": [
         "CentOS_6.6",
         "CentOS_7.0",
@@ -58,14 +58,14 @@
     "location": "[resourceGroup().location]",
     "namingInfix": "[toLower(substring(concat(parameters('vmSSPrefix'), uniqueString(resourceGroup().id)), 0, 9))]",
     "longNamingInfix": "[toLower(parameters('vmSSPrefix'))]",
-    "newStorageAccountSuffix": "[concat(variables('namingInfix'), 'sa')]",
+    "newStorageAccountSuffix": "[concat(variables('longNamingInfix'), 'sa')]",
     "masterBoxName": "[concat(variables('namingInfix'), 'master')]",
     "masterBoxSAName": "[concat(uniqueString(concat(resourceGroup().id, variables('newStorageAccountSuffix'), 'masterboxsa')), 'master')]",
     "masterBoxOSDiskName": "[concat(variables('masterBoxName'), 'osdisk')]",
     "masterBoxVHDContainerName": "[concat(variables('masterBoxName'), 'vhd')]",
     "masterBoxIPConfigName": "[concat(variables('masterBoxName'), 'ipconfig')]",
     "masterBoxNicName": "[concat(variables('masterBoxName'), 'nic')]",
-    "masterBoxVMsku": "Standard_A3",
+    "masterBoxVMsku": "Standard_A3", 
     "computeVMsku": "Standard_A3",
     "publicIPAddressName": "[concat(variables('namingInfix'), 'pip')]",
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('vnetName'))]",
