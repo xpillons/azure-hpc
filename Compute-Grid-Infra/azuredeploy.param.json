@@ -1,0 +1,21 @@
+﻿{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vmssName": {
+      "value": "LSF"
+    },
+    "computeNodeImage": {
+      "value": "CentOS_7.0"
+    },
+    "instanceCount": {
+      "value": 4
+    },
+    "adminUsername": {
+      "value": "[ADMIN]"
+    },
+    "adminPassword": {
+      "value": "[PASSWORD]"
+    }
+  }
+}

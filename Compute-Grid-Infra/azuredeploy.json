@@ -1,0 +1,332 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "computeNodeImage": {
+      "type": "string",
+      "defaultValue": "CentOS_7.0",
+      "allowedValues": [
+        "CentOS_6.6",
+        "CentOS_7.0",
+        "RHEL_6.7",
+        "RHEL_7.2",
+        "CentOS_HPC_65",
+        "CentOS_HPC_71"
+      ],
+      "metadata": {
+        "description": "The VM image of the compute nodes"
+      }
+    },
+    "vmSSPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Base string for naming resources (max length of 8)"
+      },
+      "maxLength": 8
+    },
+    "instanceCountPerVMSS": {
+      "type": "int",
+      "metadata": {
+        "description": "Number of VM instances (100 or less)."
+      },
+      "defaultValue": 4,
+      "maxValue": 100
+    },
+    "numberOfVMSS": {
+      "type": "int",
+      "defaultValue": 1,
+      "maxValue": 10,
+      "metadata": {
+        "description": "Number of VMSSes to deploy (max of 10)"
+      }
+    },
+    "adminUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "Admin username on all VMs."
+      }
+    },
+    "adminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Admin password on all VMs."
+      }
+    }
+  },
+  "variables": {
+    "storageAccountType": "Standard_LRS",
+    "location": "[resourceGroup().location]",
+    "namingInfix": "[toLower(substring(concat(parameters('vmSSPrefix'), uniqueString(resourceGroup().id)), 0, 9))]",
+    "longNamingInfix": "[toLower(parameters('vmSSPrefix'))]",
+    "newStorageAccountSuffix": "[concat(variables('namingInfix'), 'sa')]",
+    "masterBoxName": "[concat(variables('namingInfix'), 'master')]",
+    "masterBoxSAName": "[concat(uniqueString(concat(resourceGroup().id, variables('newStorageAccountSuffix'), 'masterboxsa')), 'master')]",
+    "masterBoxOSDiskName": "[concat(variables('masterBoxName'), 'osdisk')]",
+    "masterBoxVHDContainerName": "[concat(variables('masterBoxName'), 'vhd')]",
+    "masterBoxIPConfigName": "[concat(variables('masterBoxName'), 'ipconfig')]",
+    "masterBoxNicName": "[concat(variables('masterBoxName'), 'nic')]",
+    "masterBoxVMsku": "Standard_A3",
+    "computeVMsku": "Standard_A3",
+    "publicIPAddressName": "[concat(variables('namingInfix'), 'pip')]",
+    "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('vnetName'))]",
+    "infraSubnetRef": "[concat(variables('vnetID'),'/subnets/',variables('infraSubnet'))]",
+    "vnetName": "grid-vnet",
+    "computeSubnet": "computeSubnet",
+    "infraSubnet": "infraSubnet",
+    "gatewaySubnet": "GatewaySubnet",
+    "addressPrefix": "10.0.0.0/20",
+    "computeSubnetPrefix": "10.0.0.0/21",
+    "infraSubnetPrefix": "10.0.8.0/28",
+    "gatewaySubnetPrefix": "10.0.9.0/29",
+    "computeNodeImages": {
+      "CentOS_6.6": {
+        "publisher": "OpenLogic",
+        "offer": "CentOS",
+        "sku": "6.6",
+        "version": "latest"
+      },
+      "CentOS_7.0": {
+        "publisher": "OpenLogic",
+        "offer": "CentOS",
+        "sku": "7.0",
+        "version": "latest"
+      },
+      "CentOS_HPC_65": {
+        "publisher": "OpenLogic",
+        "offer": "CentOS-HPC",
+        "sku": "6.5",
+        "version": "latest"
+      },
+      "CentOS_HPC_71": {
+        "publisher": "OpenLogic",
+        "offer": "CentOS-HPC",
+        "sku": "7.1",
+        "version": "latest"
+      },
+      "SLES_12": {
+        "publisher": "SUSE",
+        "offer": "SLES",
+        "sku": "12",
+        "version": "latest"
+      },
+      "SLES_Premium_12": {
+        "publisher": "SUSE",
+        "offer": "SLES-Priority",
+        "sku": "12",
+        "version": "latest"
+      },
+      "SLES_HPC_12": {
+        "publisher": "SUSE",
+        "offer": "SLES-HPC",
+        "sku": "12",
+        "version": "latest"
+      },
+      "SLES_HPC_Premium_12": {
+        "publisher": "SUSE",
+        "offer": "SLES-HPC-Priority",
+        "sku": "12",
+        "version": "latest"
+      },
+      "Ubuntu_14.04": {
+        "publisher": "Canonical",
+        "offer": "UbuntuServer",
+        "sku": "14.04.3-LTS",
+        "version": "latest"
+      },
+      "RHEL_6.7": {
+        "publisher": "RedHat",
+        "offer": "RHEL",
+        "sku": "6.7",
+        "version": "latest"
+      },
+      "RHEL_7.2": {
+        "publisher": "RedHat",
+        "offer": "RHEL",
+        "sku": "7.2",
+        "version": "latest"
+      }
+    },
+    "imageReference": "[variables('computeNodeImages')[parameters('computeNodeImage')]]",
+    "computeApiVersion": "2016-03-30",
+    "networkApiVersion": "2016-03-30",
+    "storageApiVersion": "2015-06-15",
+    "deploymentApiVersion": "2015-11-01",
+    "baseTemplateUri": "https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/base.json"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "[variables('vnetName')]",
+      "location": "[variables('location')]",
+      "apiVersion": "[variables('networkApiVersion')]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[variables('addressPrefix')]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "[variables('computeSubnet')]",
+            "properties": {
+              "addressPrefix": "[variables('computeSubnetPrefix')]"
+            }
+          },
+          {
+            "name": "[variables('infraSubnet')]",
+            "properties": {
+              "addressPrefix": "[variables('infraSubnetPrefix')]"
+            }
+          },
+          {
+            "name": "[variables('gatewaySubnet')]",
+            "properties": {
+              "addressPrefix": "[variables('gatewaySubnetPrefix')]"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[variables('masterBoxSAName')]",
+      "location": "[variables('location')]",
+      "apiVersion": "[variables('storageApiVersion')]",
+      "properties": {
+        "accountType": "[variables('storageAccountType')]"
+      }
+    },
+    {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "name": "[variables('publicIPAddressName')]",
+      "location": "[variables('location')]",
+      "apiVersion": "[variables('networkApiVersion')]",
+      "properties": {
+        "publicIPAllocationMethod": "Dynamic",
+        "dnsSettings": {
+          "domainNameLabel": "[variables('namingInfix')]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[variables('masterBoxNicName')]",
+      "location": "[variables('location')]",
+      "apiVersion": "[variables('networkApiVersion')]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]",
+        "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "[variables('masterBoxIPConfigName')]",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
+              },
+              "subnet": {
+                "id": "[variables('infraSubnetRef')]"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[variables('masterBoxName')]",
+      "location": "[variables('location')]",
+      "apiVersion": "[variables('computeApiVersion')]",
+      "dependsOn": [
+        "[concat('Microsoft.Storage/storageAccounts/', variables('masterBoxSAName'))]",
+        "[concat('Microsoft.Network/networkInterfaces/', variables('masterBoxNicName'))]"
+      ],
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[variables('masterBoxVMsku')]"
+        },
+        "osProfile": {
+          "computerName": "[variables('masterBoxName')]",
+          "adminUsername": "[parameters('adminUsername')]",
+          "adminPassword": "[parameters('adminPassword')]"
+        },
+        "storageProfile": {
+          "imageReference": "[variables('imageReference')]",
+          "osDisk": {
+            "name": "[variables('masterBoxOSDiskName')]",
+            "vhd": {
+              "uri": "[concat('http://',variables('masterBoxSAName'),'.blob.core.windows.net/',variables('masterBoxVHDContainerName'),'/',variables('masterBoxOSDiskName'),'.vhd')]"
+            },
+            "caching": "ReadWrite",
+            "createOption": "FromImage"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('masterBoxNicName'))]"
+            }
+          ]
+        },
+        "diagnosticsProfile": {
+          "bootDiagnostics": {
+            "enabled": "true",
+            "storageUri": "[concat('http://',variables('masterBoxSAName'),'.blob.core.windows.net')]"
+          }
+        }
+      }
+    },
+    {
+      "name": "[concat('clusterSet', copyindex())]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "[variables('deploymentApiVersion')]",
+      "copy": {
+        "name": "deploymentLoop",
+        "count": "[parameters('numberOfVMSS')]"
+      },
+      "dependsOn": [
+        "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('baseTemplateUri')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "vmSSName": {
+            "value": "[concat(parameters('vmSSPrefix'), padLeft(copyindex(), 2, '0'))]"
+          },
+          "instanceCount": {
+            "value": "[parameters('instanceCountPerVMSS')]"
+          },
+          "newStorageAccountSuffix": {
+            "value": "[concat(variables('newStorageAccountSuffix'), padLeft(copyindex(), 2, '0'))]"
+          },
+          "vnetName": {
+            "value": "[variables('vnetName')]"
+          },
+          "subnetName": {
+            "value": "[variables('computeSubnet')]"
+          },
+          "adminUsername": {
+            "value": "[parameters('adminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "computeNodeImage": {
+            "value": "[parameters('computeNodeImage')]"
+          },
+          "vmSku": {
+            "value": "[variables('computeVMsku')]"
+          }
+        }
+      }
+    }
+
+  ]
+}
+
