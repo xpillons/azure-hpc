@@ -4,7 +4,7 @@
   "parameters": {
     "computeNodeImage": {
       "type": "string",
-      "defaultValue": "CentOS_6.6",
+      "defaultValue": "CentOS_6.7",
       "allowedValues": [
         "CentOS_6.7",
         "CentOS_7.0",
@@ -65,8 +65,8 @@
     "masterBoxVHDContainerName": "[concat(variables('masterBoxName'), 'vhd')]",
     "masterBoxIPConfigName": "[concat(variables('masterBoxName'), 'ipconfig')]",
     "masterBoxNicName": "[concat(variables('masterBoxName'), 'nic')]",
-    "masterBoxVMsku": "Standard_D5v2",
-    "computeVMsku": "Standard_D5v2",
+    "masterBoxVMsku": "Standard_D5_v2",
+    "computeVMsku": "Standard_D5_v2",
     "publicIPAddressName": "[concat(variables('namingInfix'), 'pip')]",
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('vnetName'))]",
     "infraSubnetRef": "[concat(variables('vnetID'),'/subnets/',variables('infraSubnet'))]",

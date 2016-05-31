@@ -4,14 +4,14 @@
   "parameters": {
     "vmSku": {
       "type": "string",
-      "defaultValue": "Standard_D5v2",
+      "defaultValue": "Standard_D5_v2",
       "metadata": {
         "description": "Size of VMs in the VM Scale Set."
       }
     },
     "computeNodeImage": {
       "type": "string",
-      "defaultValue": "RHEL_7.2",
+      "defaultValue": "CentOS_6.7",
       "allowedValues": [
         "CentOS_6.7",
         "CentOS_7.0",
