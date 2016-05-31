@@ -6,7 +6,7 @@
       "type": "string",
       "defaultValue": "CentOS_6.6",
       "allowedValues": [
-        "CentOS_6.6",
+        "CentOS_6.7",
         "CentOS_7.0",
         "RHEL_6.7",
         "RHEL_7.2",
@@ -65,8 +65,8 @@
     "masterBoxVHDContainerName": "[concat(variables('masterBoxName'), 'vhd')]",
     "masterBoxIPConfigName": "[concat(variables('masterBoxName'), 'ipconfig')]",
     "masterBoxNicName": "[concat(variables('masterBoxName'), 'nic')]",
-    "masterBoxVMsku": "Standard_A3", 
-    "computeVMsku": "Standard_A3",
+    "masterBoxVMsku": "Standard_D5v2",
+    "computeVMsku": "Standard_D5v2",
     "publicIPAddressName": "[concat(variables('namingInfix'), 'pip')]",
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('vnetName'))]",
     "infraSubnetRef": "[concat(variables('vnetID'),'/subnets/',variables('infraSubnet'))]",
@@ -79,10 +79,10 @@
     "infraSubnetPrefix": "10.0.8.0/28",
     "gatewaySubnetPrefix": "10.0.9.0/29",
     "computeNodeImages": {
-      "CentOS_6.6": {
+      "CentOS_6.7": {
         "publisher": "OpenLogic",
         "offer": "CentOS",
-        "sku": "6.6",
+        "sku": "6.7",
         "version": "latest"
       },
       "CentOS_7.0": {

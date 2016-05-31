@@ -4,7 +4,7 @@
   "parameters": {
     "vmSku": {
       "type": "string",
-      "defaultValue": "Standard_A3",
+      "defaultValue": "Standard_D5v2",
       "metadata": {
         "description": "Size of VMs in the VM Scale Set."
       }
@@ -13,7 +13,7 @@
       "type": "string",
       "defaultValue": "RHEL_7.2",
       "allowedValues": [
-        "CentOS_6.6",
+        "CentOS_6.7",
         "CentOS_7.0",
         "RHEL_6.7",
         "RHEL_7.2",
@@ -86,10 +86,10 @@
     "nicName": "[concat(variables('namingInfix'), 'nic')]",
     "ipConfigName": "[concat(variables('namingInfix'), 'ipconfig')]",
     "computeNodeImages": {
-      "CentOS_6.6": {
+      "CentOS_6.7": {
         "publisher": "OpenLogic",
         "offer": "CentOS",
-        "sku": "6.6",
+        "sku": "6.7",
         "version": "latest"
       },
       "CentOS_7.0": {
