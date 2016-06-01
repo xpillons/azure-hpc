@@ -150,8 +150,10 @@
     "computeApiVersion": "2016-03-30",
     "networkApiVersion": "2016-03-30",
     "storageApiVersion": "2015-06-15",
+    "extensionApiVersion": "2015-06-15",
     "deploymentApiVersion": "2015-11-01",
-    "baseTemplateUri": "https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/base.json"
+    "baseTemplateUri": "https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/",
+    "masterSetupScript": "master-setup.sh"
   },
   "resources": [
     {
@@ -276,7 +278,33 @@
             "storageUri": "[concat('http://',variables('masterBoxSAName'),'.blob.core.windows.net')]"
           }
         }
-      }
+      },
+        "resources": [
+          {
+            "name": "masterExtension",
+            "type": "extensions",
+            "location": "[variables('location')]",
+            "apiVersion": "[variables('storageApiVersion')]",
+            "dependsOn": [
+              "[concat('Microsoft.Compute/virtualMachines/', variables('masterBoxName'))]"
+            ],
+            "tags": {
+              "displayName": "masterExtension"
+            },
+            "properties": {
+              "publisher": "Microsoft.OSTCExtensions",
+              "type": "CustomScriptForLinux",
+              "typeHandlerVersion": "1.4",
+              "autoUpgradeMinorVersion": true,
+              "settings": {
+                "fileUris": [
+                  "[concat(variables('baseTemplateUri'), variables('masterSetupScript'))]"
+                ],
+                "commandToExecute": "[concat('sh ', variables('masterSetupScript'))]"
+              }
+            }
+          }
+        ]
     },
     {
       "name": "[concat('clusterSet', copyindex())]",
@@ -292,7 +320,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[variables('baseTemplateUri')]",
+          "uri": "[concat(variables('baseTemplateUri'),'base.json')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
