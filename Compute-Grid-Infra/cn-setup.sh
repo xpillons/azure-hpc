@@ -1,2 +1,2 @@
 #bash 
-yum update
+yum update -y
