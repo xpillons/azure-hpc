@@ -126,7 +126,9 @@
     "imageReference": "[variables('computeNodeImages')[parameters('computeNodeImage')]]",
     "computeApiVersion": "2016-03-30",
     "networkApiVersion": "2016-03-30",
-    "storageApiVersion": "2015-06-15"
+    "storageApiVersion": "2015-06-15",
+    "baseTemplateUri": "https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/",
+    "cnSetupScript": "cn-setup.sh"
   },
   "resources": [
     {
@@ -200,6 +202,25 @@
               "caching": "ReadOnly",
               "createOption": "FromImage"
             }
+          },
+          "extensionProfile": {
+              "extensions": [
+                {
+                  "name": "installCN",
+                  "properties": {
+                      "publisher": "Microsoft.OSTCExtensions",
+                      "type": "CustomScriptForLinux",
+                      "typeHandlerVersion": "1.4",
+                      "autoUpgradeMinorVersion": true,
+                    "settings": {
+                      "fileUris": [
+                        "[concat(variables('baseTemplateUri'), variables('cnSetupScript'))]"
+                      ],
+                      "commandToExecute": "[concat('sh ', variables('cnSetupScript'))]"
+                    }
+                  }
+                }
+              ]
           }
         }
       }
