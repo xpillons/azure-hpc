@@ -54,6 +54,12 @@
         "description": "Admin password on all VMs."
       }
     },
+    "RGvnetName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the RG of the virtual network to use."
+      }
+    },
     "vnetName": {
       "type": "string",
       "metadata": {
@@ -84,7 +90,7 @@
     "virtualNetworkName": "[parameters('vnetName')]",
     "subnetName": "[parameters('subnetName')]",
 
-    "vnetID": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
+    "vnetID": "[resourceId(parameters('RGvnetName'), 'Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
     "subnetRef": "[concat(variables('vnetID'),'/subnets/', parameters('subnetName'))]",
 
     "nicName": "[concat(variables('namingInfix'), 'nic')]",
