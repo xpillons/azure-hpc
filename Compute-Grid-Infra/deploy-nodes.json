@@ -1,0 +1,118 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "computeNodeImage": {
+      "type": "string",
+      "defaultValue": "CentOS_6.7",
+      "allowedValues": [
+        "CentOS_6.7",
+        "CentOS_7.0",
+        "RHEL_6.7",
+        "RHEL_7.2",
+        "CentOS_HPC_65",
+        "CentOS_HPC_71"
+      ],
+      "metadata": {
+        "description": "The VM image of the compute nodes"
+      }
+    },
+    "vmSSPrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "Base string for naming resources (max length of 8)"
+      },
+      "maxLength": 8
+    },
+    "instanceCountPerVMSS": {
+      "type": "int",
+      "metadata": {
+        "description": "Number of VM instances (100 or less)."
+      },
+      "defaultValue": 4,
+      "maxValue": 100
+    },
+    "numberOfVMSS": {
+      "type": "int",
+      "defaultValue": 1,
+      "maxValue": 10,
+      "metadata": {
+        "description": "Number of VMSSes to deploy (max of 10)"
+      }
+    },
+    "adminUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "Admin username on all VMs."
+      }
+    },
+    "adminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Admin password on all VMs."
+      }
+    }
+  },
+  "variables": {
+    "location": "[resourceGroup().location]",
+    "namingInfix": "[toLower(substring(concat(parameters('vmSSPrefix'), uniqueString(resourceGroup().id)), 0, 9))]",
+    "longNamingInfix": "[toLower(parameters('vmSSPrefix'))]",
+    "newStorageAccountSuffix": "[concat(variables('longNamingInfix'), 'sa')]",
+    "computeVMsku": "Standard_DS5_v2",
+    "vnetName": "grid-vnet",
+    "computeSubnet": "computeSubnet",
+    "deploymentApiVersion": "2015-11-01",
+    "baseTemplateUri": "https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/"
+  },
+  "resources": [
+    {
+      "name": "[concat('clusterSet', copyindex())]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "[variables('deploymentApiVersion')]",
+      "copy": {
+        "name": "deploymentLoop",
+        "count": "[parameters('numberOfVMSS')]"
+      },
+      "dependsOn": [
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[concat(variables('baseTemplateUri'),'base.json')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "vmSSName": {
+            "value": "[concat(parameters('vmSSPrefix'), padLeft(copyindex(), 2, '0'))]"
+          },
+          "instanceCount": {
+            "value": "[parameters('instanceCountPerVMSS')]"
+          },
+          "newStorageAccountSuffix": {
+            "value": "[concat(variables('newStorageAccountSuffix'), padLeft(copyindex(), 2, '0'))]"
+          },
+          "vnetName": {
+            "value": "[variables('vnetName')]"
+          },
+          "subnetName": {
+            "value": "[variables('computeSubnet')]"
+          },
+          "adminUsername": {
+            "value": "[parameters('adminUsername')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
+          },
+          "computeNodeImage": {
+            "value": "[parameters('computeNodeImage')]"
+          },
+          "vmSku": {
+            "value": "[variables('computeVMsku')]"
+          }
+        }
+      }
+    }
+
+  ]
+}
+
