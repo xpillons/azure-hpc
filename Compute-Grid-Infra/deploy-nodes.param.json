@@ -6,13 +6,16 @@
       "value": "LSF"
     },
     "computeNodeImage": {
-      "value": "CentOS_6.6"
+      "value": "CentOS_6.7"
     },
     "numberOfVMSS": {
       "value": 4
     },
     "instanceCountPerVMSS": {
-      "value": 2
+      "value": 1
+    },
+    "RGvnetName": {
+      "value": "lsf-master-sus"
     },
     "adminUsername": {
       "value": ""
