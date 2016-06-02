@@ -61,6 +61,7 @@
     "newStorageAccountSuffix": "[concat(variables('longNamingInfix'), 'sa')]",
     "masterBoxName": "[concat(variables('longNamingInfix'), 'master')]",
     "masterBoxSAName": "[concat(uniqueString(concat(resourceGroup().id, variables('newStorageAccountSuffix'), 'masterboxsa')), 'master')]",
+    "masterBoxDiagSAName": "[concat(uniqueString(concat(resourceGroup().id, variables('newStorageAccountSuffix'), 'masterboxsadiag')), 'diag')]",
     "masterBoxOSDiskName": "[concat(variables('masterBoxName'), 'osdisk')]",
     "masterBoxVHDContainerName": "[concat(variables('masterBoxName'), 'vhd')]",
     "masterBoxIPConfigName": "[concat(variables('masterBoxName'), 'ipconfig')]",
@@ -199,6 +200,15 @@
       }
     },
     {
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[variables('masterBoxDiagSAName')]",
+      "location": "[variables('location')]",
+      "apiVersion": "[variables('storageApiVersion')]",
+      "properties": {
+        "accountType": "Standard_LRS"
+      }
+    },
+    {
       "type": "Microsoft.Network/publicIPAddresses",
       "name": "[variables('publicIPAddressName')]",
       "location": "[variables('location')]",
@@ -243,6 +253,7 @@
       "apiVersion": "[variables('computeApiVersion')]",
       "dependsOn": [
         "[concat('Microsoft.Storage/storageAccounts/', variables('masterBoxSAName'))]",
+        "[concat('Microsoft.Storage/storageAccounts/', variables('masterBoxDiagSAName'))]",
         "[concat('Microsoft.Network/networkInterfaces/', variables('masterBoxNicName'))]"
       ],
       "properties": {
@@ -275,36 +286,36 @@
         "diagnosticsProfile": {
           "bootDiagnostics": {
             "enabled": "true",
-            "storageUri": "[concat('http://',variables('masterBoxSAName'),'.blob.core.windows.net')]"
+            "storageUri": "[concat('http://',variables('masterBoxDiagSAName'),'.blob.core.windows.net')]"
           }
         }
       },
-        "resources": [
-          {
-            "name": "masterExtension",
-            "type": "extensions",
-            "location": "[variables('location')]",
-            "apiVersion": "[variables('storageApiVersion')]",
-            "dependsOn": [
-              "[concat('Microsoft.Compute/virtualMachines/', variables('masterBoxName'))]"
-            ],
-            "tags": {
-              "displayName": "masterExtension"
-            },
-            "properties": {
-              "publisher": "Microsoft.OSTCExtensions",
-              "type": "CustomScriptForLinux",
-              "typeHandlerVersion": "1.4",
-              "autoUpgradeMinorVersion": true,
-              "settings": {
-                "fileUris": [
-                  "[concat(variables('baseTemplateUri'), variables('masterSetupScript'))]"
-                ],
-                "commandToExecute": "[concat('sh ', variables('masterSetupScript'))]"
-              }
+      "resources": [
+        {
+          "name": "masterExtension",
+          "type": "extensions",
+          "location": "[variables('location')]",
+          "apiVersion": "[variables('storageApiVersion')]",
+          "dependsOn": [
+            "[concat('Microsoft.Compute/virtualMachines/', variables('masterBoxName'))]"
+          ],
+          "tags": {
+            "displayName": "masterExtension"
+          },
+          "properties": {
+            "publisher": "Microsoft.OSTCExtensions",
+            "type": "CustomScriptForLinux",
+            "typeHandlerVersion": "1.5.1",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+              "fileUris": [
+                "[concat(variables('baseTemplateUri'), variables('masterSetupScript'))]"
+              ],
+              "commandToExecute": "[concat('sh ', variables('masterSetupScript'))]"
             }
           }
-        ]
+        }
+      ]
     },
     {
       "name": "[concat('clusterSet', copyindex())]",
@@ -315,7 +326,8 @@
         "count": "[parameters('numberOfVMSS')]"
       },
       "dependsOn": [
-        "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]"
+        "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]",
+        "[concat('Microsoft.Compute/virtualMachines/', variables('masterBoxName'))]"
       ],
       "properties": {
         "mode": "Incremental",
