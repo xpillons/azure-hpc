@@ -89,7 +89,7 @@
     "osDiskName": "[concat(variables('namingInfix'), 'osdisk')]",
     "virtualNetworkName": "[parameters('vnetName')]",
     "subnetName": "[parameters('subnetName')]",
-    "RGvnetName": "parameters('RGvnetName')",
+    "RGvnetName": "[parameters('RGvnetName')]",
     "vnetID": "[resourceId(variables('RGvnetName'), 'Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
     "subnetRef": "[concat(variables('vnetID'),'/subnets/', parameters('subnetName'))]",
     "nicName": "[concat(variables('namingInfix'), 'nic')]",
