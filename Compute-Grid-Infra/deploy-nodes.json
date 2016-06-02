@@ -40,6 +40,12 @@
         "description": "Number of VMSSes to deploy (max of 10)"
       }
     },
+    "RGvnetName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the RG of the virtual network to use."
+      }
+    },
     "adminUsername": {
       "type": "string",
       "metadata": {
@@ -59,6 +65,7 @@
     "longNamingInfix": "[toLower(parameters('vmSSPrefix'))]",
     "newStorageAccountSuffix": "[concat(variables('longNamingInfix'), 'sa')]",
     "computeVMsku": "Standard_DS5_v2",
+    "RGvnetName": "parameters('RGvnetName')",
     "vnetName": "grid-vnet",
     "computeSubnet": "computeSubnet",
     "deploymentApiVersion": "2015-11-01",
@@ -90,6 +97,9 @@
           },
           "newStorageAccountSuffix": {
             "value": "[concat(variables('newStorageAccountSuffix'), padLeft(copyindex(), 2, '0'))]"
+          },
+          "RGvnetName": {
+            "value": "[variables('RGvnetName')]"
           },
           "vnetName": {
             "value": "[variables('vnetName')]"
