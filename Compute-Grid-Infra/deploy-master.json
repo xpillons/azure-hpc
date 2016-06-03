@@ -11,7 +11,8 @@
         "RHEL_6.7",
         "RHEL_7.2",
         "CentOS_HPC_65",
-        "CentOS_HPC_71"
+        "CentOS_HPC_71",
+        "W2012R2"
       ],
       "metadata": {
         "description": "The VM image of the compute nodes"
@@ -127,6 +128,12 @@
         "publisher": "RedHat",
         "offer": "RHEL",
         "sku": "7.2",
+        "version": "latest"
+      },
+      "W2012R2": {
+        "publisher": "MicrosoftWindowsServer",
+        "offer": "WindowsServer",
+        "sku": "2012-R2-Datacenter",
         "version": "latest"
       }
     },
@@ -254,7 +261,7 @@
             "vhd": {
               "uri": "[concat('http://',variables('masterBoxSAName'),'.blob.core.windows.net/',variables('masterBoxVHDContainerName'),'/',variables('masterBoxOSDiskName'),'.vhd')]"
             },
-            "caching": "ReadWrite",
+            "caching": "ReadOnly",
             "createOption": "FromImage"
           }
         },
