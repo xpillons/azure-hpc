@@ -6,7 +6,7 @@
       "value": "LSF"
     },
     "computeNodeImage": {
-      "value": "CentOS_6.7"
+      "value": "W2012R2"
     },
     "numberOfVMSS": {
       "value": 4
@@ -18,10 +18,10 @@
       "value": "lsf-master-sus"
     },
     "adminUsername": {
-      "value": ""
+      "value": "lsfadmin"
     },
     "adminPassword": {
-      "value": ""
+      "value": "!!123abc"
     }
   }
 }
