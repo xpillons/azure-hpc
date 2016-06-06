@@ -303,7 +303,8 @@
               "fileUris": [
                 "[concat(variables('baseTemplateUri'), variables('masterSetupScript'))]"
               ],
-              "commandToExecute": "[concat('sh ', variables('masterSetupScript'), ' -a ', variables('masterBoxDataSAName'), ' -k ', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('masterBoxDataSAName')),'storageApiVersion').key1, ' -u ', variables('appId'), ' -t ', variables('tenantId'), ' -p ',  parameters('tenantPassword'))]",
+              "commandToExecute": "[concat('sh ', variables('masterSetupScript'), ' -a ', variables('masterBoxDataSAName'), ' -k ', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('masterBoxDataSAName')),variables('storageApiVersion')).key1, ' -u ', variables('appId'), ' -t ', variables('tenantId'), ' -p ',  parameters('tenantPassword'))]",
+              "timestamp": 1,
               "protectedSettings": {
               }
             }
