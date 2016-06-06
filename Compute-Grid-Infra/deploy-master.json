@@ -38,7 +38,7 @@
       }
     },
     "tenantPassword": {
-      "type": "string",
+      "type": "securestring",
       "metadata": {
         "description": "Azure tenant password"
       }
@@ -304,7 +304,7 @@
                 "[concat(variables('baseTemplateUri'), variables('masterSetupScript'))]"
               ],
               "commandToExecute": "[concat('sh ', variables('masterSetupScript'), ' -a ', variables('masterBoxDataSAName'), ' -k ', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('masterBoxDataSAName')),variables('storageApiVersion')).key1, ' -u ', variables('appId'), ' -t ', variables('tenantId'), ' -p ',  parameters('tenantPassword'))]",
-              "timestamp": 1,
+              "timestamp": 3,
               "protectedSettings": {
               }
             }

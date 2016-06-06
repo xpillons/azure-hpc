@@ -56,8 +56,8 @@ install_azure_files()
 	azure login -u $APP_ID --service-principal --tenant $TENAND_ID -p $PASSWORD
 	azure storage share create --share lsf -a $SA_NAME -k $SA_KEY
 	
-	mount -t cifs //$SA_NAME.file.core.windows.net/lsf /mnt/azure -o vers=3.0,username=$SA_NAME,password='$SA_KEY',dir_mode=0777,file_mode=0777
-	echo //$SA_NAME.file.core.windows.net/lsf /mnt/azure -o vers=3.0,username=$SA_NAME,password='$SA_KEY',dir_mode=0777,file_mode=0777 >> /etc/fstab
+	mount -t cifs //$SA_NAME.file.core.windows.net/lsf /mnt/azure -o vers=3.0,username=$SA_NAME,password='${SA_KEY}',dir_mode=0777,file_mode=0777
+	echo //$SA_NAME.file.core.windows.net/lsf /mnt/azure -o vers=3.0,username=$SA_NAME,password='${SA_KEY}',dir_mode=0777,file_mode=0777 >> /etc/fstab
 }
 
 install_azure_cli
