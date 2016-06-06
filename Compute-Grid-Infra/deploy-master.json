@@ -36,6 +36,12 @@
       "metadata": {
         "description": "Admin password on all VMs."
       }
+    },
+    "tenantPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Azure tenant password"
+      }
     }
   },
   "variables": {
@@ -56,6 +62,8 @@
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('vnetName'))]",
     "infraSubnetRef": "[concat(variables('vnetID'),'/subnets/',variables('infraSubnet'))]",
     "vnetName": "grid-vnet",
+    "appId": "3fce2fd0-8800-41f1-a56b-22286408421c",
+    "tenantId": "72f988bf-86f1-41af-91ab-2d7cd011db47",
     "computeSubnet": "computeSubnet",
     "infraSubnet": "infraSubnet",
     "gatewaySubnet": "GatewaySubnet",
@@ -295,7 +303,9 @@
               "fileUris": [
                 "[concat(variables('baseTemplateUri'), variables('masterSetupScript'))]"
               ],
-              "commandToExecute": "[concat('sh ', variables('masterSetupScript'))]"
+              "commandToExecute": "[concat('sh ', variables('masterSetupScript'), ' -a ', variables('masterBoxDataSAName'), ' -k ', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('masterBoxDataSAName')),'storageApiVersion').key1, ' -u ', variables('appId'), ' -t ', variables('tenantId'), ' -p ',  parameters('tenantPassword'))]",
+              "protectedSettings": {
+              }
             }
           }
         }
