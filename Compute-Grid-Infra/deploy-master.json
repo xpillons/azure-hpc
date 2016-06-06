@@ -36,6 +36,12 @@
       "metadata": {
         "description": "Admin password on all VMs."
       }
+    },
+    "tenantPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Azure tenant password"
+      }
     }
   },
   "variables": {
@@ -46,16 +52,18 @@
     "newStorageAccountSuffix": "[concat(variables('longNamingInfix'), 'sa')]",
     "masterBoxName": "[concat(variables('longNamingInfix'), 'master')]",
     "masterBoxSAName": "[concat(uniqueString(concat(resourceGroup().id, variables('newStorageAccountSuffix'), 'masterboxsa')), 'master')]",
-    "masterBoxDiagSAName": "[concat(uniqueString(concat(resourceGroup().id, variables('newStorageAccountSuffix'), 'masterboxsadiag')), 'diag')]",
+    "masterBoxDataSAName": "[concat(uniqueString(concat(resourceGroup().id, variables('newStorageAccountSuffix'), 'masterboxsadiag')), 'data')]",
     "masterBoxOSDiskName": "[concat(variables('masterBoxName'), 'osdisk')]",
     "masterBoxVHDContainerName": "[concat(variables('masterBoxName'), 'vhd')]",
     "masterBoxIPConfigName": "[concat(variables('masterBoxName'), 'ipconfig')]",
     "masterBoxNicName": "[concat(variables('masterBoxName'), 'nic')]",
-    "masterBoxVMsku": "Standard_DS5_v2",
+    "masterBoxVMsku": "Standard_DS3_v2",
     "publicIPAddressName": "[concat(variables('masterBoxName'), 'pip')]",
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('vnetName'))]",
     "infraSubnetRef": "[concat(variables('vnetID'),'/subnets/',variables('infraSubnet'))]",
     "vnetName": "grid-vnet",
+    "appId": "3fce2fd0-8800-41f1-a56b-22286408421c",
+    "tenantId": "72f988bf-86f1-41af-91ab-2d7cd011db47",
     "computeSubnet": "computeSubnet",
     "infraSubnet": "infraSubnet",
     "gatewaySubnet": "GatewaySubnet",
@@ -110,13 +118,8 @@
         "publisher": "SUSE",
         "offer": "SLES-HPC-Priority",
         "sku": "12",
-        "version": "latest"
-      },
-      "Ubuntu_14.04": {
-        "publisher": "Canonical",
-        "offer": "UbuntuServer",
-        "sku": "14.04.3-LTS",
-        "version": "latest"
+        "version": "latest",
+        "os": "Linux"
       },
       "RHEL_6.7": {
         "publisher": "RedHat",
@@ -190,7 +193,7 @@
     },
     {
       "type": "Microsoft.Storage/storageAccounts",
-      "name": "[variables('masterBoxDiagSAName')]",
+      "name": "[variables('masterBoxDataSAName')]",
       "location": "[variables('location')]",
       "apiVersion": "[variables('storageApiVersion')]",
       "properties": {
@@ -242,7 +245,7 @@
       "apiVersion": "[variables('computeApiVersion')]",
       "dependsOn": [
         "[concat('Microsoft.Storage/storageAccounts/', variables('masterBoxSAName'))]",
-        "[concat('Microsoft.Storage/storageAccounts/', variables('masterBoxDiagSAName'))]",
+        "[concat('Microsoft.Storage/storageAccounts/', variables('masterBoxDataSAName'))]",
         "[concat('Microsoft.Network/networkInterfaces/', variables('masterBoxNicName'))]"
       ],
       "properties": {
@@ -275,7 +278,7 @@
         "diagnosticsProfile": {
           "bootDiagnostics": {
             "enabled": "true",
-            "storageUri": "[concat('http://',variables('masterBoxDiagSAName'),'.blob.core.windows.net')]"
+            "storageUri": "[concat('http://',variables('masterBoxDataSAName'),'.blob.core.windows.net')]"
           }
         }
       },
@@ -300,7 +303,9 @@
               "fileUris": [
                 "[concat(variables('baseTemplateUri'), variables('masterSetupScript'))]"
               ],
-              "commandToExecute": "[concat('sh ', variables('masterSetupScript'))]"
+              "commandToExecute": "[concat('sh ', variables('masterSetupScript'), ' -a ', variables('masterBoxDataSAName'), ' -k ', listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('masterBoxDataSAName')),'storageApiVersion').key1, ' -u ', variables('appId'), ' -t ', variables('tenantId'), ' -p ',  parameters('tenantPassword'))]",
+              "protectedSettings": {
+              }
             }
           }
         }
