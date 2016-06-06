@@ -11,7 +11,7 @@ log()
 	echo "$1"
 }
 
-while getopts :a:k:u:tp optname; do
+while getopts :a:k:u:t:p optname; do
   log "Option $optname set with value ${OPTARG}"
   
   case $optname in
@@ -40,6 +40,9 @@ install_azure_cli()
 	curl --silent --location https://rpm.nodesource.com/setup_4.x | bash -
 	yum -y install nodejs
 
+	[[ -z "$HOME" || ! -d "$HOME" ]] && { echo 'fixing $HOME'; HOME=/root; } 
+	export HOME
+	
 	npm install -g azure-cli
 }
 
