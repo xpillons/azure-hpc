@@ -38,7 +38,7 @@
       }
     },
     "tenantPassword": {
-      "type": "securestring",
+      "type": "string",
       "metadata": {
         "description": "Azure tenant password"
       }

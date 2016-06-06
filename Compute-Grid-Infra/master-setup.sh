@@ -44,6 +44,7 @@ install_azure_cli()
 	export HOME
 	
 	npm install -g azure-cli
+	azure telemetry --disable
 }
 
 ######################################################################
