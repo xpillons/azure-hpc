@@ -54,8 +54,9 @@ install_azure_files()
 	yum -y install samba-client samba-common cifs-utils
 	mkdir /mnt/azure
 	
+	log "azure login"
+	#azure login -u $APP_ID --service-principal --tenant $TENAND_ID -p $PASSWORD
 	log "create azure share"
-	azure login -u $APP_ID --service-principal --tenant $TENAND_ID -p $PASSWORD
 	azure storage share create --share lsf -a $SA_NAME -k $SA_KEY
 	
 	log "mount share"
