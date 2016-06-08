@@ -98,6 +98,7 @@
     "subnetName": "[parameters('subnetName')]",
     "RGvnetName": "[parameters('RGvnetName')]",
     "vnetID": "[resourceId(variables('RGvnetName'), 'Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
+    "commonSAId": "[resourceId(variables('RGvnetName'),'Microsoft.Storage/storageAccounts', parameters('sharedSAName'))]",
     "subnetRef": "[concat(variables('vnetID'),'/subnets/', parameters('subnetName'))]",
     "nicName": "[concat(variables('namingInfix'), 'nic')]",
     "ipConfigName": "[concat(variables('namingInfix'), 'ipconfig')]",
@@ -238,7 +239,7 @@
                       "fileUris": [
                         "[concat(variables('baseTemplateUri'), variables('cnSetupScript'))]"
                       ],
-                      "commandToExecute": "[concat('sh ', variables('cnSetupScript'), ' -a ', parameters('sharedSAName'), ' -k ', listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('sharedSAName')),variables('storageApiVersion')).key1)]"
+                      "commandToExecute": "[concat('sh ', variables('cnSetupScript'), ' -a ', parameters('sharedSAName'), ' -k ', listKeys(variables('commonSAId'),variables('storageApiVersion')).key1)]"
                     }
                   }
                 }
