@@ -1,9 +1,4 @@
 #bash 
-SA_NAME="account"
-SA_KEY="key"
-APP_ID=""
-TENAND_ID=""
-PASSWORD=""
 
 #############################################################################
 log()
@@ -16,19 +11,10 @@ while getopts :a:k:u:t:p optname; do
   
   case $optname in
     a)  # storage account
-		SA_NAME=${OPTARG}
+		export AZURE_STORAGE_ACCOUNT=${OPTARG}
 		;;
     k)  # storage key
-		SA_KEY=${OPTARG}
-		;;
-    u)  # user id
-		APP_ID=${OPTARG}
-		;;
-    t)  # tenand id
-		TENAND_ID=${OPTARG}
-		;;
-    p)  # password
-		PASSWORD=${OPTARG}
+		export AZURE_STORAGE_ACCESS_KEY=${OPTARG}
 		;;
   esac
 done
@@ -54,14 +40,13 @@ install_azure_files()
 	yum -y install samba-client samba-common cifs-utils
 	mkdir /mnt/azure
 	
-	log "azure login"
-	#azure login -u $APP_ID --service-principal --tenant $TENAND_ID -p $PASSWORD
 	log "create azure share"
-	azure storage share create --share lsf -a $SA_NAME -k $SA_KEY
+	azure storage share create --share lsf #-a $SA_NAME -k $SA_KEY
 	
 	log "mount share"
-	mount -t cifs //$SA_NAME.file.core.windows.net/lsf /mnt/azure -o vers=3.0,username=$SA_NAME,password=''${SA_KEY}'',dir_mode=0777,file_mode=0777
-	echo //$SA_NAME.file.core.windows.net/lsf /mnt/azure cifs vers=3.0,username=$SA_NAME,password=''${SA_KEY}'',dir_mode=0777,file_mode=0777 >> /etc/fstab
+	mount -t cifs //$AZURE_STORAGE_ACCOUNT.file.core.windows.net/lsf /mnt/azure -o vers=3.0,username=$AZURE_STORAGE_ACCOUNT,password=''${AZURE_STORAGE_ACCESS_KEY}'',dir_mode=0777,file_mode=0777
+	echo //$AZURE_STORAGE_ACCOUNT.file.core.windows.net/lsf /mnt/azure cifs vers=3.0,username=$AZURE_STORAGE_ACCOUNT,password=''${AZURE_STORAGE_ACCESS_KEY}'',dir_mode=0777,file_mode=0777 >> /etc/fstab
+	
 }
 
 install_azure_cli
