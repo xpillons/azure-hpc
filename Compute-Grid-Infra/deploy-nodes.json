@@ -11,7 +11,8 @@
         "RHEL_6.7",
         "RHEL_7.2",
         "CentOS_HPC_65",
-        "CentOS_HPC_71"
+        "CentOS_HPC_71",
+        "W2012R2"
       ],
       "metadata": {
         "description": "The VM image of the compute nodes"
@@ -57,6 +58,12 @@
       "metadata": {
         "description": "Admin password on all VMs."
       }
+    },
+    "sharedSAName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the shared Storage Account used to share common data"
+      }
     }
   },
   "variables": {
@@ -64,7 +71,7 @@
     "namingInfix": "[toLower(substring(concat(parameters('vmSSPrefix'), uniqueString(resourceGroup().id)), 0, 9))]",
     "longNamingInfix": "[toLower(parameters('vmSSPrefix'))]",
     "newStorageAccountSuffix": "[concat(variables('longNamingInfix'), 'sa')]",
-    "computeVMsku": "Standard_DS5_v2",
+    "computeVMsku": "Standard_DS3_v2",
     "RGvnetName": "[parameters('RGvnetName')]",
     "vnetName": "grid-vnet",
     "computeSubnet": "computeSubnet",
@@ -118,6 +125,9 @@
           },
           "vmSku": {
             "value": "[variables('computeVMsku')]"
+          },
+          "sharedSAName": {
+            "value": "[parameters('sharedSAName')]"
           }
         }
       }

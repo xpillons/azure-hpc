@@ -72,6 +72,12 @@
       "metadata": {
         "description": "Name of the virtual network subnet to use."
       }
+    },
+    "sharedSAName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the shared Storage Account used to share common data"
+      }
     }
   },
   "variables": {
@@ -232,7 +238,7 @@
                       "fileUris": [
                         "[concat(variables('baseTemplateUri'), variables('cnSetupScript'))]"
                       ],
-                      "commandToExecute": "[concat('sh ', variables('cnSetupScript'))]"
+                      "commandToExecute": "[concat('sh ', variables('cnSetupScript'), ' -a ', parameters('sharedSAName'), ' -k ', listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('sharedSAName')),variables('storageApiVersion')).key1)]"
                     }
                   }
                 }
