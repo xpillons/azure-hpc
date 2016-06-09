@@ -25,16 +25,16 @@
       },
       "maxLength": 8
     },
-    "adminUsername": {
+    "adminUserName": {
       "type": "string",
       "metadata": {
-        "description": "Admin username on all VMs."
+        "description": "User name for the Virtual Machine."
       }
     },
-    "adminPassword": {
-      "type": "securestring",
+    "sshKeyData": {
+      "type": "string",
       "metadata": {
-        "description": "Admin password on all VMs."
+        "description": "SSH rsa public key file as a string."
       }
     }
   },
@@ -53,16 +53,17 @@
     "masterBoxNicName": "[concat(variables('masterBoxName'), 'nic')]",
     "masterBoxVMsku": "Standard_DS3_v2",
     "publicIPAddressName": "[concat(variables('masterBoxName'), 'pip')]",
+    "virtualNetworkName": "grid-vnet",
+    "vnetID": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
     "networkSettings": {
-      "virtualNetworkName": "grid-vnet",
-      "vnetID": "[resourceId('Microsoft.Network/virtualNetworks', variables('networkSettings').virtualNetworkName)]",
+      "virtualNetworkName": "[variables('virtualNetworkName')]",
       "addressPrefix": "10.0.0.0/20",
       "computeSubnetPrefix": "10.0.0.0/21",
       "infraSubnetPrefix": "10.0.8.0/28",
       "gatewaySubnetPrefix": "10.0.9.0/29",
-      "infraSubnetRef": "[concat(variables('networkSettings').vnetID,'/subnets/infraSubnet/')]"
+      "infraSubnetRef": "[concat(variables('vnetID'),'/subnets/infraSubnet/')]"
     },
-
+    "sshKeyPath": "[concat('/home/',parameters('adminUserName'),'/.ssh/authorized_keys')]",
     "computeNodeImages": {
       "CentOS_6.7": {
         "publisher": "OpenLogic",
@@ -232,8 +233,18 @@
         },
         "osProfile": {
           "computerName": "[variables('masterBoxName')]",
-          "adminUsername": "[parameters('adminUsername')]",
-          "adminPassword": "[parameters('adminPassword')]"
+          "adminUsername": "[parameters('adminUserName')]",
+          "linuxConfiguration": {
+            "disablePasswordAuthentication": "true",
+            "ssh": {
+              "publicKeys": [
+                {
+                  "path": "[variables('sshKeyPath')]",
+                  "keyData": "[parameters('sshKeyData')]"
+                }
+              ]
+            }
+          }
         },
         "storageProfile": {
           "imageReference": "[variables('imageReference')]",
