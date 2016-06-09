@@ -1,0 +1,24 @@
+﻿{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vmSSPrefix": {
+      "value": "LSF"
+    },
+    "computeNodeImage": {
+      "value": "RHEL_7.2"
+    },
+    "numberOfVMSS": {
+      "value": 2
+    },
+    "instanceCountPerVMSS": {
+      "value": 2
+    },
+    "RGvnetName": {
+      "value": "lsf-master-sus"
+    },
+    "sharedSAName": {
+      "value": "kgdraworoxvekdata"
+    }
+  }
+}
