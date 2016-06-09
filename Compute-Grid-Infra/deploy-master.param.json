@@ -6,12 +6,12 @@
       "value": "LSF"
     },
     "masterImage": {
-      "value": "CentOS_6.7"
+      "value": "RHEL_7.2"
     },
     "adminUsername": {
-      "value": ""
+      "value": "lsfadmin"
     },
-    "adminPassword": {
+    "sshKeyData": {
       "value": ""
     }
   }

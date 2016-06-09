@@ -6,22 +6,19 @@
       "value": "LSF"
     },
     "computeNodeImage": {
-      "value": "W2012R2"
+      "value": "RHEL_7.2"
     },
     "numberOfVMSS": {
-      "value": 4
+      "value": 2
     },
     "instanceCountPerVMSS": {
-      "value": 1
+      "value": 2
     },
     "RGvnetName": {
       "value": "lsf-master-sus"
     },
-    "adminUsername": {
-      "value": "lsfadmin"
-    },
-    "adminPassword": {
-      "value": "!!123abc"
+    "sharedSAName": {
+      "value": "kgdraworoxvekdata"
     }
   }
 }
