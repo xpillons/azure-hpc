@@ -53,16 +53,16 @@
     "masterBoxNicName": "[concat(variables('masterBoxName'), 'nic')]",
     "masterBoxVMsku": "Standard_DS3_v2",
     "publicIPAddressName": "[concat(variables('masterBoxName'), 'pip')]",
-    "vnetID": "[resourceId('Microsoft.Network/virtualNetworks',variables('vnetName'))]",
-    "infraSubnetRef": "[concat(variables('vnetID'),'/subnets/',variables('infraSubnet'))]",
-    "vnetName": "grid-vnet",
-    "computeSubnet": "computeSubnet",
-    "infraSubnet": "infraSubnet",
-    "gatewaySubnet": "GatewaySubnet",
-    "addressPrefix": "10.0.0.0/20",
-    "computeSubnetPrefix": "10.0.0.0/21",
-    "infraSubnetPrefix": "10.0.8.0/28",
-    "gatewaySubnetPrefix": "10.0.9.0/29",
+    "networkSettings": {
+      "virtualNetworkName": "grid-vnet",
+      "vnetID": "[resourceId('Microsoft.Network/virtualNetworks', variables('networkSettings').virtualNetworkName)]",
+      "addressPrefix": "10.0.0.0/20",
+      "computeSubnetPrefix": "10.0.0.0/21",
+      "infraSubnetPrefix": "10.0.8.0/28",
+      "gatewaySubnetPrefix": "10.0.9.0/29",
+      "infraSubnetRef": "[concat(variables('networkSettings').vnetID,'/subnets/infraSubnet/')]"
+    },
+
     "computeNodeImages": {
       "CentOS_6.7": {
         "publisher": "OpenLogic",
@@ -137,41 +137,27 @@
     "networkApiVersion": "2016-03-30",
     "storageApiVersion": "2015-06-15",
     "extensionApiVersion": "2015-06-15",
+    "deploymentApiVersion": "2015-01-01",
     "baseTemplateUri": "https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/",
+    "sharedTemplateUrl": "[concat(variables('baseTemplateUri'), 'shared-resources.json')]",
     "masterSetupScript": "master-setup.sh"
   },
   "resources": [
     {
-      "type": "Microsoft.Network/virtualNetworks",
-      "name": "[variables('vnetName')]",
-      "location": "[variables('location')]",
-      "apiVersion": "[variables('networkApiVersion')]",
+      "name": "shared-resources",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "[variables('deploymentApiVersion')]",
       "properties": {
-        "addressSpace": {
-          "addressPrefixes": [
-            "[variables('addressPrefix')]"
-          ]
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('sharedTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
         },
-        "subnets": [
-          {
-            "name": "[variables('computeSubnet')]",
-            "properties": {
-              "addressPrefix": "[variables('computeSubnetPrefix')]"
-            }
-          },
-          {
-            "name": "[variables('infraSubnet')]",
-            "properties": {
-              "addressPrefix": "[variables('infraSubnetPrefix')]"
-            }
-          },
-          {
-            "name": "[variables('gatewaySubnet')]",
-            "properties": {
-              "addressPrefix": "[variables('gatewaySubnetPrefix')]"
-            }
+        "parameters": {
+          "networkSettings": {
+            "value": "[variables('networkSettings')]"
           }
-        ]
+        }
       }
     },
     {
@@ -211,7 +197,7 @@
       "apiVersion": "[variables('networkApiVersion')]",
       "dependsOn": [
         "[concat('Microsoft.Network/publicIPAddresses/', variables('publicIPAddressName'))]",
-        "[concat('Microsoft.Network/virtualNetworks/', variables('vnetName'))]"
+        "[concat('Microsoft.Resources/deployments/', 'shared-resources')]"
       ],
       "properties": {
         "ipConfigurations": [
@@ -223,7 +209,7 @@
                 "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('publicIPAddressName'))]"
               },
               "subnet": {
-                "id": "[variables('infraSubnetRef')]"
+                "id": "[variables('networkSettings').infraSubnetRef]"
               }
             }
           }
