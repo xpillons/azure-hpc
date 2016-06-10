@@ -28,7 +28,7 @@
       "scriptsToDownload": [
         "[concat(variables('scriptUrl'), 'master-setup.sh')]"
       ],
-      "installCommand": "[concat('bash ', variables('installCommand'))]"
+      "commandToExecute": "[concat('bash ', variables('installCommand'))]"
     },
     "scriptUrl": "https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/",
     "computeApiVersion": "2016-03-30",
