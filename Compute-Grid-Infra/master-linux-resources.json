@@ -23,8 +23,7 @@
   },
   "variables": {
     "location": "[resourceGroup().location]",
-    "dataSAKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('masterSettings').DataSAName),variables('storageApiVersion')).key1]",
-    "installCommand": "[concat('master-setup.sh -a ', parameters('masterSettings').DataSAName, ' -k ', variables('dataSAKey'))]",
+    "installCommand": "[concat('master-setup.sh -a ', parameters('masterSettings').DataSAName, ' -k ', listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('masterSettings').DataSAName), variables('storageApiVersion')).key1)]",
     "vmScripts": {
       "scriptsToDownload": [
         "[concat(variables('scriptUrl'), 'master-setup.sh')]"
