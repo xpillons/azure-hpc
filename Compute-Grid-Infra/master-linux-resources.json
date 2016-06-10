@@ -47,7 +47,7 @@
         },
         "osProfile": {
           "computerName": "[parameters('masterSettings').Name]",
-          "adminUsername": "[parameters('masterSettings').adminUserName]",
+          "adminUsername": "[parameters('masterOSSettings').adminUserName]",
           "linuxConfiguration": {
             "disablePasswordAuthentication": "true",
             "ssh": {
