@@ -1,0 +1,119 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "networkSettings": {
+      "type": "object",
+      "metadata": {
+        "Description": "Network settings object"
+      }
+    },
+    "masterSettings": {
+      "type": "object",
+      "metadata": {
+        "Description": "Network settings object"
+      }
+    },
+    "masterOSSettings": {
+      "type": "object",
+      "metadata": {
+        "Description": "Network settings object"
+      }
+    }
+  },
+  "variables": {
+    "location": "[resourceGroup().location]",
+    "dataSAKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('masterSettings').DataSAName),variables('storageApiVersion')).key1]",
+    "installCommand": "[concat('master-setup.sh -a ', parameters('masterSettings').DataSAName, ' -k ', variables('dataSAKey'))]",
+    "vmScripts": {
+      "scriptsToDownload": [
+        "[concat(variables('scriptUrl'), 'master-setup.sh')]"
+      ],
+      "installCommand": "[concat('bash ', variables('installCommand'))]"
+    },
+    "scriptUrl": "https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/",
+    "computeApiVersion": "2016-03-30",
+    "storageApiVersion": "2015-06-15"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Compute/virtualMachines",
+      "name": "[parameters('masterSettings').Name]",
+      "location": "[variables('location')]",
+      "apiVersion": "[variables('computeApiVersion')]",
+      "dependsOn": [
+      ],
+      "properties": {
+        "hardwareProfile": {
+          "vmSize": "[parameters('masterSettings').VMsku]"
+        },
+        "osProfile": {
+          "computerName": "[parameters('masterSettings').Name]",
+          "adminUsername": "[parameters('masterSettings').adminUserName]",
+          "linuxConfiguration": {
+            "disablePasswordAuthentication": "true",
+            "ssh": {
+              "publicKeys": [
+                {
+                  "path": "[parameters('masterOSSettings').sshKeyPath]",
+                  "keyData": "[parameters('masterSettings').sshKeyData]"
+                }
+              ]
+            }
+          }
+        },
+        "storageProfile": {
+          "imageReference": "[parameters('masterOSSettings').imageReference]",
+          "osDisk": {
+            "name": "[parameters('masterSettings').OSDiskName]",
+            "vhd": {
+              "uri": "[concat('http://',parameters('masterSettings').SAName,'.blob.core.windows.net/',parameters('masterSettings').VHDContainerName,'/',parameters('masterSettings').OSDiskName,'.vhd')]"
+            },
+            "caching": "ReadOnly",
+            "createOption": "FromImage"
+          }
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces',parameters('masterSettings').NicName)]"
+            }
+          ]
+        },
+        "diagnosticsProfile": {
+          "bootDiagnostics": {
+            "enabled": "true",
+            "storageUri": "[concat('http://',parameters('masterSettings').SAName,'.blob.core.windows.net')]"
+          }
+        }
+      },
+      "resources": [
+        {
+          "name": "masterExtension",
+          "type": "extensions",
+          "location": "[variables('location')]",
+          "apiVersion": "[variables('storageApiVersion')]",
+          "dependsOn": [
+            "[concat('Microsoft.Compute/virtualMachines/', parameters('masterSettings').Name)]"
+          ],
+          "tags": {
+            "displayName": "masterExtension"
+          },
+          "properties": {
+            "publisher": "Microsoft.OSTCExtensions",
+            "type": "CustomScriptForLinux",
+            "typeHandlerVersion": "1.5",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+              "fileUris": "[variables('vmScripts').scriptsToDownload]",
+              "commandToExecute": "[variables('vmScripts').commandToExecute]",
+              "timestamp": 4,
+              "protectedSettings": {
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

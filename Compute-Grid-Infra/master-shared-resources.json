@@ -1,0 +1,83 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "networkSettings": {
+      "type": "object",
+      "metadata": {
+        "Description": "Network settings object"
+      }
+    },
+    "masterSettings": {
+      "type": "object",
+      "metadata": {
+        "Description": "Network settings object"
+      }
+    }
+  },
+  "variables": {
+    "location": "[resourceGroup().location]",
+    "storageAccountType": "Premium_LRS",
+    "networkApiVersion": "2016-03-30",
+    "storageApiVersion": "2015-06-15"
+  },
+  "resources": [
+    {
+      {
+        "type": "Microsoft.Storage/storageAccounts",
+        "name": "[parameters('masterSettings').Name]",
+        "location": "[variables('location')]",
+        "apiVersion": "[variables('storageApiVersion')]",
+        "properties": {
+          "accountType": "[variables('storageAccountType')]"
+        }
+      },
+      {
+        "type": "Microsoft.Storage/storageAccounts",
+        "name": "[parameters('masterSettings').DataSAName]",
+        "location": "[variables('location')]",
+        "apiVersion": "[variables('storageApiVersion')]",
+        "properties": {
+          "accountType": "Standard_LRS"
+        }
+      },
+      {
+        "type": "Microsoft.Network/publicIPAddresses",
+        "name": "[parameters('masterSettings').publicIPAddressName]",
+        "location": "[variables('location')]",
+        "apiVersion": "[variables('networkApiVersion')]",
+        "properties": {
+          "publicIPAllocationMethod": "Dynamic",
+          "dnsSettings": {
+            "domainNameLabel": "[parameters('masterSettings').publicIPDomainName]"
+          }
+        }
+      },
+      {
+        "type": "Microsoft.Network/networkInterfaces",
+        "name": "[parameters('masterSettings').NicName]",
+        "location": "[variables('location')]",
+        "apiVersion": "[variables('networkApiVersion')]",
+        "dependsOn": [
+          "[concat('Microsoft.Network/publicIPAddresses/', parameters('masterSettings').publicIPAddressName)]"
+        ],
+        "properties": {
+          "ipConfigurations": [
+            {
+              "name": "[parameters('masterSettings').IPConfigName]",
+              "properties": {
+                "privateIPAllocationMethod": "Dynamic",
+                "publicIPAddress": {
+                  "id": "[resourceId('Microsoft.Network/publicIPAddresses',parameters('masterSettings').publicIPAddressName)]"
+                },
+                "subnet": {
+                  "id": "[parameters('networkSettings').infraSubnetRef]"
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
