@@ -23,11 +23,12 @@
   },
   "variables": {
     "location": "[resourceGroup().location]",
+    "installCommand": "[concat('master-setup.sh -a ', parameters('masterSettings').DataSAName, ' -k ', listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('masterSettings').DataSAName), variables('storageApiVersion')).key1)]",
     "vmScripts": {
       "scriptsToDownload": [
         "[concat(variables('scriptUrl'), 'master-setup.sh')]"
       ],
-      "commandToExecute": ""
+      "commandToExecute": "[concat('bash ', variables('installCommand'))]"
     },
     "scriptUrl": "https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/",
     "computeApiVersion": "2016-03-30",
@@ -104,7 +105,7 @@
             "autoUpgradeMinorVersion": true,
             "settings": {
               "fileUris": "[variables('vmScripts').scriptsToDownload]",
-              "commandToExecute": "[concat('bash ', concat('master-setup.sh -a ', parameters('masterSettings').DataSAName, ' -k ', listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('masterSettings').DataSAName), variables('storageApiVersion')).key1))]",
+              "commandToExecute": "[variables('vmScripts').commandToExecute]",
               "timestamp": 4,
               "protectedSettings": {
               }

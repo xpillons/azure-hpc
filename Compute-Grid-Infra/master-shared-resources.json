@@ -24,7 +24,7 @@
   "resources": [    
     {
       "type": "Microsoft.Storage/storageAccounts",
-      "name": "[parameters('masterSettings').Name]",
+      "name": "[parameters('masterSettings').SAName]",
       "location": "[variables('location')]",
       "apiVersion": "[variables('storageApiVersion')]",
       "properties": {
