@@ -54,7 +54,7 @@
               "publicKeys": [
                 {
                   "path": "[parameters('masterOSSettings').sshKeyPath]",
-                  "keyData": "[parameters('masterSettings').sshKeyData]"
+                  "keyData": "[parameters('masterOSSettings').sshKeyData]"
                 }
               ]
             }
