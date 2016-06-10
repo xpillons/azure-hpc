@@ -67,7 +67,7 @@
       "publicIPDomainName": "[variables('namingInfix')]"
     },
     "masterOSSettings": {
-      "osType": "Linux",
+      "osType": "linux",
       "adminUserName": "[parameters('adminUserName')]",
       "sshKeyData": "[parameters('sshKeyData')]",
       "sshKeyPath": "[concat('/home/',parameters('adminUserName'),'/.ssh/authorized_keys')]",
@@ -200,7 +200,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "[variables('deploymentApiVersion')]",
       "dependsOn": [
-        "shared-master-resources"
+        "master-shared-resources"
       ],
       "properties": {
         "mode": "Incremental",
