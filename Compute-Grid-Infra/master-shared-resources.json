@@ -21,62 +21,60 @@
     "networkApiVersion": "2016-03-30",
     "storageApiVersion": "2015-06-15"
   },
-  "resources": [
+  "resources": [    
     {
-      {
-        "type": "Microsoft.Storage/storageAccounts",
-        "name": "[parameters('masterSettings').Name]",
-        "location": "[variables('location')]",
-        "apiVersion": "[variables('storageApiVersion')]",
-        "properties": {
-          "accountType": "[variables('storageAccountType')]"
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[parameters('masterSettings').Name]",
+      "location": "[variables('location')]",
+      "apiVersion": "[variables('storageApiVersion')]",
+      "properties": {
+        "accountType": "[variables('storageAccountType')]"
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[parameters('masterSettings').DataSAName]",
+      "location": "[variables('location')]",
+      "apiVersion": "[variables('storageApiVersion')]",
+      "properties": {
+        "accountType": "Standard_LRS"
+      }
+    },
+    {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "name": "[parameters('masterSettings').publicIPAddressName]",
+      "location": "[variables('location')]",
+      "apiVersion": "[variables('networkApiVersion')]",
+      "properties": {
+        "publicIPAllocationMethod": "Dynamic",
+        "dnsSettings": {
+          "domainNameLabel": "[parameters('masterSettings').publicIPDomainName]"
         }
-      },
-      {
-        "type": "Microsoft.Storage/storageAccounts",
-        "name": "[parameters('masterSettings').DataSAName]",
-        "location": "[variables('location')]",
-        "apiVersion": "[variables('storageApiVersion')]",
-        "properties": {
-          "accountType": "Standard_LRS"
-        }
-      },
-      {
-        "type": "Microsoft.Network/publicIPAddresses",
-        "name": "[parameters('masterSettings').publicIPAddressName]",
-        "location": "[variables('location')]",
-        "apiVersion": "[variables('networkApiVersion')]",
-        "properties": {
-          "publicIPAllocationMethod": "Dynamic",
-          "dnsSettings": {
-            "domainNameLabel": "[parameters('masterSettings').publicIPDomainName]"
-          }
-        }
-      },
-      {
-        "type": "Microsoft.Network/networkInterfaces",
-        "name": "[parameters('masterSettings').NicName]",
-        "location": "[variables('location')]",
-        "apiVersion": "[variables('networkApiVersion')]",
-        "dependsOn": [
-          "[concat('Microsoft.Network/publicIPAddresses/', parameters('masterSettings').publicIPAddressName)]"
-        ],
-        "properties": {
-          "ipConfigurations": [
-            {
-              "name": "[parameters('masterSettings').IPConfigName]",
-              "properties": {
-                "privateIPAllocationMethod": "Dynamic",
-                "publicIPAddress": {
-                  "id": "[resourceId('Microsoft.Network/publicIPAddresses',parameters('masterSettings').publicIPAddressName)]"
-                },
-                "subnet": {
-                  "id": "[parameters('networkSettings').infraSubnetRef]"
-                }
+      }
+    },
+    {
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[parameters('masterSettings').NicName]",
+      "location": "[variables('location')]",
+      "apiVersion": "[variables('networkApiVersion')]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/publicIPAddresses/', parameters('masterSettings').publicIPAddressName)]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "[parameters('masterSettings').IPConfigName]",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses',parameters('masterSettings').publicIPAddressName)]"
+              },
+              "subnet": {
+                "id": "[parameters('networkSettings').infraSubnetRef]"
               }
             }
-          ]
-        }
+          }
+        ]
       }
     }
   ]
