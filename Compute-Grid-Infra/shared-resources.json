@@ -2,6 +2,12 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "commonSettings": {
+      "type": "object",
+      "metadata": {
+        "Description": "Common settings object"
+      }
+    },
     "networkSettings": {
       "type": "object",
       "metadata": {
@@ -10,9 +16,19 @@
     }
   },
   "variables": {
-    "networkApiVersion": "2016-03-30"
+    "networkApiVersion": "2016-03-30",
+    "storageApiVersion": "2015-06-15"
   },
   "resources": [
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "name": "[parameters('commonSettings').DataSAName]",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "[variables('storageApiVersion')]",
+      "properties": {
+        "accountType": "Standard_LRS"
+      }
+    },
     {
       "type": "Microsoft.Network/virtualNetworks",
       "name": "[parameters('networkSettings').virtualNetworkName]",

@@ -2,6 +2,12 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "commonSettings": {
+      "type": "object",
+      "metadata": {
+        "Description": "common settings object"
+      }
+    },
     "networkSettings": {
       "type": "object",
       "metadata": {
@@ -11,13 +17,13 @@
     "masterSettings": {
       "type": "object",
       "metadata": {
-        "Description": "Network settings object"
+        "Description": "master settings object"
       }
     },
     "masterOSSettings": {
       "type": "object",
       "metadata": {
-        "Description": "Network settings object"
+        "Description": "master OS settings object"
       }
     }
   },
@@ -81,7 +87,7 @@
         "diagnosticsProfile": {
           "bootDiagnostics": {
             "enabled": "true",
-            "storageUri": "[concat('http://',parameters('masterSettings').DataSAName,'.blob.core.windows.net')]"
+            "storageUri": "[concat('http://',parameters('masterSettings').DiagSAName,'.blob.core.windows.net')]"
           }
         }
       },
@@ -104,7 +110,7 @@
             "autoUpgradeMinorVersion": true,
             "settings": {
               "fileUris": "[variables('vmScripts').scriptsToDownload]",
-              "commandToExecute": "[concat('bash ', concat('master-setup.sh -a ', parameters('masterSettings').DataSAName, ' -k ', listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('masterSettings').DataSAName), variables('storageApiVersion')).key1))]",
+              "commandToExecute": "[concat('bash ', concat('master-setup.sh -a ', parameters('commonSettings').DataSAName, ' -k ', listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('commonSettings').DataSAName), variables('storageApiVersion')).key1))]",
               "timestamp": 4,
               "protectedSettings": {
               }

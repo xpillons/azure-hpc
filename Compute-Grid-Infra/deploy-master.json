@@ -31,6 +31,12 @@
         "description": "User name for the Virtual Machine."
       }
     },
+    "adminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "password for the Virtual Machine."
+      }
+    },
     "sshKeyData": {
       "type": "string",
       "metadata": {
@@ -45,6 +51,9 @@
     "newStorageAccountSuffix": "[concat(variables('longNamingInfix'), 'sa')]",
     "virtualNetworkName": "grid-vnet",
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
+    "commonSettings": {
+      "DataSAName": "[concat(uniqueString(concat(resourceGroup().id, variables('newStorageAccountSuffix'), 'data')), 'data')]"
+    },
     "networkSettings": {
       "virtualNetworkName": "[variables('virtualNetworkName')]",
       "addressPrefix": "10.0.0.0/20",
@@ -57,7 +66,7 @@
     "masterSettings": {
       "Name": "[variables('masterBoxName')]",
       "SAName": "[concat(uniqueString(concat(resourceGroup().id, variables('newStorageAccountSuffix'), 'masterboxsa')), 'master')]",
-      "DataSAName": "[concat(uniqueString(concat(resourceGroup().id, variables('newStorageAccountSuffix'), 'masterboxsadiag')), 'data')]",
+      "DiagSAName": "[concat(uniqueString(concat(resourceGroup().id, variables('newStorageAccountSuffix'), 'masterboxsadiag')), 'diag')]",
       "OSDiskName": "[concat(variables('masterBoxName'), 'osdisk')]",
       "VHDContainerName": "[concat(variables('masterBoxName'), 'vhd')]",
       "IPConfigName": "[concat(variables('masterBoxName'), 'ipconfig')]",
@@ -69,6 +78,7 @@
     "masterOSSettings": {
       "osType": "linux",
       "adminUserName": "[parameters('adminUserName')]",
+      "adminPassword": "[parameters('adminPassword')]",
       "sshKeyData": "[parameters('sshKeyData')]",
       "sshKeyPath": "[concat('/home/',parameters('adminUserName'),'/.ssh/authorized_keys')]",
       "imageReference": "[variables('computeNodeImages')[parameters('masterImage')]]"
@@ -165,6 +175,9 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
+          "commonSettings": {
+            "value": "[variables('commonSettings')]"
+          },
           "networkSettings": {
             "value": "[variables('networkSettings')]"
           }
@@ -185,6 +198,9 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
+          "commonSettings": {
+            "value": "[variables('commonSettings')]"
+          },
           "networkSettings": {
             "value": "[variables('networkSettings')]"
           },
@@ -209,6 +225,9 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
+          "commonSettings": {
+            "value": "[variables('commonSettings')]"
+          },
           "networkSettings": {
             "value": "[variables('networkSettings')]"
           },
