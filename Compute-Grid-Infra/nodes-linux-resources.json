@@ -32,24 +32,6 @@
     "newStorageAccountSuffix": {
       "type": "string"
     },
-    "RGvnetName": {
-      "type": "string",
-      "metadata": {
-        "description": "Name of the RG of the virtual network to use."
-      }
-    },
-    "vnetName": {
-      "type": "string",
-      "metadata": {
-        "description": "Name of the virtual network to use."
-      }
-    },
-    "subnetName": {
-      "type": "string",
-      "metadata": {
-        "description": "Name of the virtual network subnet to use."
-      }
-    },
     "sharedSAName": {
       "type": "string",
       "metadata": {
@@ -71,9 +53,9 @@
     "saCount": "[length(variables('uniqueStringArray'))]",
     "vhdContainerName": "[concat(variables('namingInfix'), 'vhd')]",
     "osDiskName": "[concat(variables('namingInfix'), 'osdisk')]",
-    "vnetID": "[resourceId(parameters('RGvnetName'), 'Microsoft.Network/virtualNetworks', parameters('vnetName'))]",
-    "commonSAId": "[resourceId(parameters('RGvnetName'),'Microsoft.Storage/storageAccounts', parameters('sharedSAName'))]",
-    "subnetRef": "[concat(variables('vnetID'),'/subnets/', parameters('subnetName'))]",
+    "vnetID": "[resourceId(parameters('nodeSettings').vnetRG, 'Microsoft.Network/virtualNetworks', parameters('nodeSettings').vnetName)]",
+    "commonSAId": "[resourceId(parameters('nodeSettings').vnetRG,'Microsoft.Storage/storageAccounts', parameters('sharedSAName'))]",
+    "subnetRef": "[concat(variables('vnetID'),'/subnets/', parameters('nodeSettings').subnetName)]",
     "nicName": "[concat(variables('namingInfix'), 'nic')]",
     "ipConfigName": "[concat(variables('namingInfix'), 'ipconfig')]",
     "computeApiVersion": "2016-03-30",
