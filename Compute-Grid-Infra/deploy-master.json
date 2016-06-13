@@ -80,7 +80,6 @@
       "adminUserName": "[parameters('adminUserName')]",
       "adminPassword": "[parameters('adminPassword')]",
       "sshKeyData": "[parameters('sshKeyData')]",
-      "sshKeyPath": "[concat('/home/',parameters('adminUserName'),'/.ssh/authorized_keys')]",
       "imageReference": "[variables('computeNodeImages')[parameters('masterImage')]]"
     },
 

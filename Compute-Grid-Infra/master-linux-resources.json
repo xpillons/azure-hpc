@@ -36,6 +36,7 @@
       "commandToExecute": ""
     },
     "scriptUrl": "https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/",
+    "sshKeyPath": "[concat('/home/',parameters('masterOSSettings').adminUserName,'/.ssh/authorized_keys')]",
     "computeApiVersion": "2016-03-30",
     "storageApiVersion": "2015-06-15"
   },
@@ -59,7 +60,7 @@
             "ssh": {
               "publicKeys": [
                 {
-                  "path": "[parameters('masterOSSettings').sshKeyPath]",
+                  "path": "[variables('sshKeyPath')]",
                   "keyData": "[parameters('masterOSSettings').sshKeyData]"
                 }
               ]

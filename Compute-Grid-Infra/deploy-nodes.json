@@ -59,6 +59,12 @@
         "description": "Admin password on all VMs."
       }
     },
+    "sshKeyData": {
+      "type": "string",
+      "metadata": {
+        "description": "SSH rsa public key file as a string."
+      }
+    },
     "sharedSAName": {
       "type": "string",
       "metadata": {
@@ -71,12 +77,94 @@
     "namingInfix": "[toLower(substring(concat(parameters('vmSSPrefix'), uniqueString(resourceGroup().id)), 0, 9))]",
     "longNamingInfix": "[toLower(parameters('vmSSPrefix'))]",
     "newStorageAccountSuffix": "[concat(variables('longNamingInfix'), 'sa')]",
-    "computeVMsku": "Standard_DS3_v2",
-    "RGvnetName": "[parameters('RGvnetName')]",
-    "vnetName": "grid-vnet",
-    "computeSubnet": "computeSubnet",
     "deploymentApiVersion": "2015-11-01",
-    "baseTemplateUri": "https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/"
+    "baseTemplateUri": "https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/",
+
+    "nodeSettings": {
+      "VMsku": "Standard_DS3_v2",
+      "vnetRG": "[parameters('RGvnetName')]",
+      "vnetName": "grid-vnet",
+      "subnetName": "computeSubnet"
+    },
+    "computeNodeImages": {
+      "CentOS_6.7": {
+        "publisher": "OpenLogic",
+        "offer": "CentOS",
+        "sku": "6.7",
+        "version": "latest"
+      },
+      "CentOS_7.0": {
+        "publisher": "OpenLogic",
+        "offer": "CentOS",
+        "sku": "7.0",
+        "version": "latest"
+      },
+      "CentOS_HPC_65": {
+        "publisher": "OpenLogic",
+        "offer": "CentOS-HPC",
+        "sku": "6.5",
+        "version": "latest"
+      },
+      "CentOS_HPC_71": {
+        "publisher": "OpenLogic",
+        "offer": "CentOS-HPC",
+        "sku": "7.1",
+        "version": "latest"
+      },
+      "SLES_12": {
+        "publisher": "SUSE",
+        "offer": "SLES",
+        "sku": "12",
+        "version": "latest"
+      },
+      "SLES_Premium_12": {
+        "publisher": "SUSE",
+        "offer": "SLES-Priority",
+        "sku": "12",
+        "version": "latest"
+      },
+      "SLES_HPC_12": {
+        "publisher": "SUSE",
+        "offer": "SLES-HPC",
+        "sku": "12",
+        "version": "latest"
+      },
+      "SLES_HPC_Premium_12": {
+        "publisher": "SUSE",
+        "offer": "SLES-HPC-Priority",
+        "sku": "12",
+        "version": "latest",
+        "os": "Linux"
+      },
+      "RHEL_6.7": {
+        "publisher": "RedHat",
+        "offer": "RHEL",
+        "sku": "6.7",
+        "version": "latest"
+      },
+      "RHEL_7.2": {
+        "publisher": "RedHat",
+        "offer": "RHEL",
+        "sku": "7.2",
+        "version": "latest"
+      },
+      "W2012R2": {
+        "publisher": "MicrosoftWindowsServer",
+        "offer": "WindowsServer",
+        "sku": "2012-R2-Datacenter",
+        "version": "latest"
+      }
+    },
+
+    "nodeOSSettings": {
+      "osType": "linux",
+      "adminUserName": "[parameters('adminUserName')]",
+      "adminPassword": "[parameters('adminPassword')]",
+      "sshKeyData": "[parameters('sshKeyData')]",
+      "imageReference": "[variables('computeNodeImages')[parameters('computeNodeImage')]]"
+    },
+    "node-OSTemplateUrl": "[concat(variables('baseTemplateUri'), 'nodes-', variables('nodeOSSettings').osType,'-resources.json')]"
+
   },
   "resources": [
     {
@@ -92,10 +180,16 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[concat(variables('baseTemplateUri'),'base.json')]",
+          "uri": "[variables('node-OSTemplateUrl')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
+          "nodeSettings": {
+            "value": "[variables('nodeSettings')]"
+          },
+          "nodeOSSettings": {
+            "value": "[variables('nodeOSSettings')]"
+          },
           "vmSSName": {
             "value": "[concat(parameters('vmSSPrefix'), padLeft(copyindex(), 2, '0'))]"
           },
@@ -104,27 +198,6 @@
           },
           "newStorageAccountSuffix": {
             "value": "[concat(variables('newStorageAccountSuffix'), padLeft(copyindex(), 2, '0'))]"
-          },
-          "RGvnetName": {
-            "value": "[variables('RGvnetName')]"
-          },
-          "vnetName": {
-            "value": "[variables('vnetName')]"
-          },
-          "subnetName": {
-            "value": "[variables('computeSubnet')]"
-          },
-          "adminUsername": {
-            "value": "[parameters('adminUsername')]"
-          },
-          "adminPassword": {
-            "value": "[parameters('adminPassword')]"
-          },
-          "computeNodeImage": {
-            "value": "[parameters('computeNodeImage')]"
-          },
-          "vmSku": {
-            "value": "[variables('computeVMsku')]"
           },
           "sharedSAName": {
             "value": "[parameters('sharedSAName')]"
