@@ -24,10 +24,10 @@
     "instanceCount": {
       "type": "int",
       "metadata": {
-        "description": "Number of VM instances (100 or less)."
+        "description": "Number of VM instances (20 or less)."
       },
-      "defaultValue": 4,
-      "maxValue": 100
+      "defaultValue": 1,
+      "maxValue": 20
     },
     "newStorageAccountSuffix": {
       "type": "string"
