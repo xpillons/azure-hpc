@@ -97,13 +97,13 @@
           "properties": {
             "publisher": "Microsoft.Compute",
             "type": "CustomScriptExtension",
-            "typeHandlerVersion": "1.4",
+            "typeHandlerVersion": "1.8",
             "autoUpgradeMinorVersion": true,
             "settings": {
               "fileUris": [
                 "[variables('vmScripts').scriptsToDownload]"
               ],
-              "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File ', 'master-setup.ps1 -StorageAccount ', parameters('commonSettings').DataSAName, ' -StorageKey ', listKeys(variables('sharedAccountId'), variables('storageApiVersion')).key1)]"
+              "commandToExecute": ""
             }
           }
         }
