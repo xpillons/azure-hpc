@@ -21,15 +21,6 @@
   },
   "resources": [
     {
-      "type": "Microsoft.Storage/storageAccounts",
-      "name": "[parameters('commonSettings').DataSAName]",
-      "location": "[resourceGroup().location]",
-      "apiVersion": "[variables('storageApiVersion')]",
-      "properties": {
-        "accountType": "Standard_LRS"
-      }
-    },
-    {
       "type": "Microsoft.Network/virtualNetworks",
       "name": "[parameters('networkSettings').virtualNetworkName]",
       "location": "[resourceGroup().location]",
