@@ -100,10 +100,9 @@
             "typeHandlerVersion": "1.7",
             "autoUpgradeMinorVersion": true,
             "settings": {
-              "fileUris": "[variables('vmScripts').scriptsToDownload]",
-              "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File ', 'master-setup.ps1 -StorageAccount ', parameters('commonSettings').DataSAName, ' -StorageKey ', listKeys(variables('sharedAccountId'), variables('storageApiVersion')).key1)]",
-              "timestamp": 12,
-              "protectedSettings": {
+              "fileUris": "[variables('vmScripts').scriptsToDownload]",              
+              "CommandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File ', 'master-setup.ps1 -StorageAccount ', parameters('commonSettings').DataSAName, ' -StorageKey ', listKeys(variables('sharedAccountId'), variables('storageApiVersion')).key1)]",
+              "protectedSettings": {                
               }
             }
           }
