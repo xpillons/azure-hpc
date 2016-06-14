@@ -100,8 +100,7 @@
             "typeHandlerVersion": "1.8",
             "autoUpgradeMinorVersion": true,
             "settings": {
-              "fileUris": [
-                "[variables('vmScripts').scriptsToDownload]"
+              "fileUris": [                
               ],
               "commandToExecute": ""
             }
