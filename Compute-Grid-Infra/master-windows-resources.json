@@ -91,13 +91,18 @@
           "dependsOn": [
             "[concat('Microsoft.Compute/virtualMachines/', parameters('masterSettings').Name)]"
           ],
+          "tags": {
+            "displayName": "WindowsMasterExtension"
+          },
           "properties": {
             "publisher": "Microsoft.Compute",
             "type": "CustomScriptExtension",
             "typeHandlerVersion": "1.4",
             "autoUpgradeMinorVersion": true,
             "settings": {
-              "fileUris": [ "[variables('vmScripts').scriptsToDownload]" ],
+              "fileUris": [
+                "[variables('vmScripts').scriptsToDownload]"
+              ],
               "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File ', 'master-setup.ps1 -StorageAccount ', parameters('commonSettings').DataSAName, ' -StorageKey ', listKeys(variables('sharedAccountId'), variables('storageApiVersion')).key1)]"
             }
           }
