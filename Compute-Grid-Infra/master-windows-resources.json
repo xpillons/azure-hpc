@@ -91,19 +91,14 @@
           "dependsOn": [
             "[concat('Microsoft.Compute/virtualMachines/', parameters('masterSettings').Name)]"
           ],
-          "tags": {
-            "displayName": "masterExtension"
-          },
           "properties": {
             "publisher": "Microsoft.Compute",
             "type": "CustomScriptExtension",
-            "typeHandlerVersion": "1.7",
+            "typeHandlerVersion": "1.8",
             "autoUpgradeMinorVersion": true,
             "settings": {
-              "fileUris": "[variables('vmScripts').scriptsToDownload]",              
-              "CommandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File ', 'master-setup.ps1 -StorageAccount ', parameters('commonSettings').DataSAName, ' -StorageKey ', listKeys(variables('sharedAccountId'), variables('storageApiVersion')).key1)]",
-              "protectedSettings": {                
-              }
+              "fileUris": [ "[variables('vmScripts').scriptsToDownload]" ],
+              "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File ', 'master-setup.ps1 -StorageAccount ', parameters('commonSettings').DataSAName, ' -StorageKey ', listKeys(variables('sharedAccountId'), variables('storageApiVersion')).key1)]"
             }
           }
         }
