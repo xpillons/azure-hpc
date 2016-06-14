@@ -141,7 +141,7 @@
     "baseTemplateUri": "https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/",
     "sharedTemplateUrl": "[concat(variables('baseTemplateUri'), 'shared-resources.json')]",
     "master-sharedTemplateUrl": "[concat(variables('baseTemplateUri'), 'master-shared-resources.json')]",
-    "master-OSTemplateUrl": "[concat(variables('baseTemplateUri'), 'master-', variables('masterOSSettings').osType,'-resources.json')]"
+    "master-OSTemplateUrl": "[concat(variables('baseTemplateUri'), 'master-', variables('masterOSSettings').osType.os, '-resources.json')]"
   },
   "resources": [
     {
