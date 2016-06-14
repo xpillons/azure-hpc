@@ -84,7 +84,7 @@
       },
       "resources": [
         {
-          "name": "masterExtension",
+          "name": "WindowsMasterExtension",
           "type": "extensions",
           "location": "[variables('location')]",
           "apiVersion": "[variables('storageApiVersion')]",
@@ -94,7 +94,7 @@
           "properties": {
             "publisher": "Microsoft.Compute",
             "type": "CustomScriptExtension",
-            "typeHandlerVersion": "1.8",
+            "typeHandlerVersion": "1.4",
             "autoUpgradeMinorVersion": true,
             "settings": {
               "fileUris": [ "[variables('vmScripts').scriptsToDownload]" ],
