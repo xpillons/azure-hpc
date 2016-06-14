@@ -8,10 +8,7 @@
       "allowedValues": [
         "CentOS_6.7",
         "CentOS_7.0",
-        "RHEL_6.7",
         "RHEL_7.2",
-        "CentOS_HPC_65",
-        "CentOS_HPC_71",
         "W2012R2"
       ],
       "metadata": {
@@ -42,6 +39,18 @@
       "metadata": {
         "description": "SSH rsa public key file as a string."
       }
+    },
+    "sharedDataAccount": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the shared storage account"
+      }
+    },
+    "RGStorageName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of Resource Group of the shared storage account"
+      }
     }
   },
   "variables": {
@@ -52,7 +61,8 @@
     "virtualNetworkName": "grid-vnet",
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
     "commonSettings": {
-      "DataSAName": "[concat(uniqueString(concat(resourceGroup().id, variables('newStorageAccountSuffix'), 'data')), 'data')]"
+      "DataSAName": "[parameters('sharedDataAccount')]",
+      "RGStorageName": "[parameters('RGStorageName')]"
     },
     "networkSettings": {
       "virtualNetworkName": "[variables('virtualNetworkName')]",
@@ -76,13 +86,27 @@
       "publicIPDomainName": "[variables('namingInfix')]"
     },
     "masterOSSettings": {
-      "osType": "linux",
+      "osType": "[variables('osTypes')[parameters('masterImage')]]",
       "adminUserName": "[parameters('adminUserName')]",
       "adminPassword": "[parameters('adminPassword')]",
       "sshKeyData": "[parameters('sshKeyData')]",
       "imageReference": "[variables('computeNodeImages')[parameters('masterImage')]]"
     },
 
+    "osTypes": {
+      "CentOS_6.7": {
+        "os": "linux"
+      },
+      "CentOS_7.0": {
+        "os": "linux"
+      },
+      "RHEL_7.2": {
+        "os": "linux"
+      },
+      "W2012R2": {
+        "os": "windows"
+      }
+    },
     "computeNodeImages": {
       "CentOS_6.7": {
         "publisher": "OpenLogic",
@@ -94,49 +118,6 @@
         "publisher": "OpenLogic",
         "offer": "CentOS",
         "sku": "7.0",
-        "version": "latest"
-      },
-      "CentOS_HPC_65": {
-        "publisher": "OpenLogic",
-        "offer": "CentOS-HPC",
-        "sku": "6.5",
-        "version": "latest"
-      },
-      "CentOS_HPC_71": {
-        "publisher": "OpenLogic",
-        "offer": "CentOS-HPC",
-        "sku": "7.1",
-        "version": "latest"
-      },
-      "SLES_12": {
-        "publisher": "SUSE",
-        "offer": "SLES",
-        "sku": "12",
-        "version": "latest"
-      },
-      "SLES_Premium_12": {
-        "publisher": "SUSE",
-        "offer": "SLES-Priority",
-        "sku": "12",
-        "version": "latest"
-      },
-      "SLES_HPC_12": {
-        "publisher": "SUSE",
-        "offer": "SLES-HPC",
-        "sku": "12",
-        "version": "latest"
-      },
-      "SLES_HPC_Premium_12": {
-        "publisher": "SUSE",
-        "offer": "SLES-HPC-Priority",
-        "sku": "12",
-        "version": "latest",
-        "os": "Linux"
-      },
-      "RHEL_6.7": {
-        "publisher": "RedHat",
-        "offer": "RHEL",
-        "sku": "6.7",
         "version": "latest"
       },
       "RHEL_7.2": {
@@ -241,4 +222,3 @@
     }
   ]
 }
-

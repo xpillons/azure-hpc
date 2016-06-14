@@ -31,13 +31,12 @@
     "location": "[resourceGroup().location]",
     "vmScripts": {
       "scriptsToDownload": [
-        "[concat(variables('scriptUrl'), 'master-setup.sh')]"
+        "[concat(variables('scriptUrl'), 'master-setup.ps1')]"
       ],
       "commandToExecute": ""
     },
     "scriptUrl": "https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/",
     "sharedAccountId": "resourceId(parameters('commonSettings').RGStorageName, 'Microsoft.Storage/storageAccounts', parameters('commonSettings').DataSAName)",
-    "sshKeyPath": "[concat('/home/',parameters('masterOSSettings').adminUserName,'/.ssh/authorized_keys')]",
     "computeApiVersion": "2016-03-30",
     "storageApiVersion": "2015-06-15"
   },
@@ -56,17 +55,7 @@
         "osProfile": {
           "computerName": "[parameters('masterSettings').Name]",
           "adminUsername": "[parameters('masterOSSettings').adminUserName]",
-          "linuxConfiguration": {
-            "disablePasswordAuthentication": "true",
-            "ssh": {
-              "publicKeys": [
-                {
-                  "path": "[variables('sshKeyPath')]",
-                  "keyData": "[parameters('masterOSSettings').sshKeyData]"
-                }
-              ]
-            }
-          }
+          "adminPassword": "[parameters('masterOSSettings').adminPassword]"
         },
         "storageProfile": {
           "imageReference": "[parameters('masterOSSettings').imageReference]",
@@ -106,15 +95,15 @@
             "displayName": "masterExtension"
           },
           "properties": {
-            "publisher": "Microsoft.OSTCExtensions",
-            "type": "CustomScriptForLinux",
-            "typeHandlerVersion": "1.5",
+            "publisher": "Microsoft.Compute",
+            "type": "CustomScriptExtension",
+            "typeHandlerVersion": "1.8",
             "autoUpgradeMinorVersion": true,
             "settings": {
               "fileUris": "[variables('vmScripts').scriptsToDownload]",
               "timestamp": 4,
               "protectedSettings": {
-                "commandToExecute": "[concat('bash ', concat('master-setup.sh -a ', parameters('commonSettings').DataSAName, ' -k ', listKeys(variables('sharedAccountId'), variables('storageApiVersion')).key1))]"
+                "commandToExecute": "[concat('-ExecutionPolicy Unrestricted -File ', 'master-setup.ps1 -StorageAccount ', parameters('commonSettings').DataSAName, ' -StorageKey ', listKeys(variables('sharedAccountId'), variables('storageApiVersion')).key1)]"
               }
             }
           }
