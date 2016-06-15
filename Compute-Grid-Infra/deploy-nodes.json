@@ -92,6 +92,20 @@
       "vnetName": "grid-vnet",
       "subnetName": "computeSubnet"
     },
+    "osTypes": {
+      "CentOS_6.7": {
+        "os": "linux"
+      },
+      "CentOS_7.0": {
+        "os": "linux"
+      },
+      "RHEL_7.2": {
+        "os": "linux"
+      },
+      "W2012R2": {
+        "os": "windows"
+      }
+    },
     "computeNodeImages": {
       "CentOS_6.7": {
         "publisher": "OpenLogic",
@@ -119,7 +133,7 @@
       }
     },
     "nodeOSSettings": {
-      "osType": "linux",
+      "osType": "[variables('osTypes')[parameters('computeNodeImage')]]",
       "adminUserName": "[parameters('adminUserName')]",
       "adminPassword": "[parameters('adminPassword')]",
       "sshKeyData": "[parameters('sshKeyData')]",
