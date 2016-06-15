@@ -100,13 +100,9 @@
             "typeHandlerVersion": "1.8",
             "autoUpgradeMinorVersion": true,
             "settings": {
-              "fileUris": [
-
-              ],
-              "CommandToExecute": "hostname"
-            },
-            "protectedSettings": {
-              "CommandToExecute": "hostname"
+              "fileUris": "[variables('vmScripts').scriptsToDownload]",
+              "commandToExecute": "[concat('bash ', concat('master-setup.sh -a ', parameters('commonSettings').DataSAName, ' -k ', listKeys(variables('sharedAccountId'), variables('storageApiVersion')).key1))]",
+              "timestamp": 4
             }
           }
         }

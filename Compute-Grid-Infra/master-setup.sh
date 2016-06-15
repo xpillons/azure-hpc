@@ -40,8 +40,8 @@ install_azure_files()
 	yum -y install samba-client samba-common cifs-utils
 	mkdir /mnt/azure
 	
-	log "create azure share"
-	azure storage share create --share lsf #-a $SA_NAME -k $SA_KEY
+	#log "create azure share"
+	#azure storage share create --share lsf #-a $SA_NAME -k $SA_KEY
 	
 	log "mount share"
 	mount -t cifs //$AZURE_STORAGE_ACCOUNT.file.core.windows.net/lsf /mnt/azure -o vers=3.0,username=$AZURE_STORAGE_ACCOUNT,password=''${AZURE_STORAGE_ACCESS_KEY}'',dir_mode=0777,file_mode=0777
