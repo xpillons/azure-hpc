@@ -2,6 +2,12 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "commonSettings": {
+      "type": "object",
+      "metadata": {
+        "Description": "common settings object"
+      }
+    },
     "nodeSettings": {
       "type": "object",
       "metadata": {
@@ -31,12 +37,6 @@
     },
     "newStorageAccountSuffix": {
       "type": "string"
-    },
-    "sharedSAName": {
-      "type": "string",
-      "metadata": {
-        "description": "Name of the shared Storage Account used to share common data"
-      }
     }
   },
   "variables": {
@@ -54,15 +54,21 @@
     "vhdContainerName": "[concat(variables('namingInfix'), 'vhd')]",
     "osDiskName": "[concat(variables('namingInfix'), 'osdisk')]",
     "vnetID": "[resourceId(parameters('nodeSettings').vnetRG, 'Microsoft.Network/virtualNetworks', parameters('nodeSettings').vnetName)]",
-    "commonSAId": "[resourceId(parameters('nodeSettings').vnetRG,'Microsoft.Storage/storageAccounts', parameters('sharedSAName'))]",
     "subnetRef": "[concat(variables('vnetID'),'/subnets/', parameters('nodeSettings').subnetName)]",
     "nicName": "[concat(variables('namingInfix'), 'nic')]",
     "ipConfigName": "[concat(variables('namingInfix'), 'ipconfig')]",
     "computeApiVersion": "2016-03-30",
     "networkApiVersion": "2016-03-30",
     "storageApiVersion": "2015-06-15",
-    "baseTemplateUri": "https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/",
     "cnSetupScript": "cn-setup.sh",
+    "scriptUrl": "https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/",
+    "sharedAccountId": "[resourceId(parameters('commonSettings').RGStorageName, 'Microsoft.Storage/storageAccounts', parameters('commonSettings').DataSAName)]",
+    "vmScripts": {
+      "scriptsToDownload": [
+        "[concat(variables('scriptUrl'), 'cn-setup.sh')]"
+      ],
+      "commandToExecute": ""
+    },
     "sshKeyPath": "[concat('/home/',parameters('nodeOSSettings').adminUserName,'/.ssh/authorized_keys')]"
   },
   "resources": [
@@ -158,10 +164,8 @@
                   "typeHandlerVersion": "1.5",
                   "autoUpgradeMinorVersion": true,
                   "settings": {
-                    "fileUris": [
-                      "[concat(variables('baseTemplateUri'), variables('cnSetupScript'))]"
-                    ],
-                    "commandToExecute": "[concat('sh ', variables('cnSetupScript'), ' -a ', parameters('sharedSAName'), ' -k ', listKeys(variables('commonSAId'),variables('storageApiVersion')).key1)]"
+                    "fileUris": "[variables('vmScripts').scriptsToDownload]",
+                    "commandToExecute": "[concat('sh ', variables('cnSetupScript'), ' -a ', parameters('commonSettings').DataSAName, ' -k ', listKeys(variables('sharedAccountId'), variables('storageApiVersion')).key1)]"
                   }
                 }
               }

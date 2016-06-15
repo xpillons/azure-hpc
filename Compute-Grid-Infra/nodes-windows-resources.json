@@ -65,7 +65,7 @@
     "sharedAccountId": "[resourceId(parameters('commonSettings').RGStorageName, 'Microsoft.Storage/storageAccounts', parameters('commonSettings').DataSAName)]",
     "vmScripts": {
       "scriptsToDownload": [
-        "[concat(variables('scriptUrl'), 'master-setup.ps1')]"
+        "[concat(variables('scriptUrl'), 'cn-setup.ps1')]"
       ],
       "commandToExecute": ""
     }
@@ -154,7 +154,7 @@
                   "autoUpgradeMinorVersion": true,
                   "settings": {
                     "fileUris": "[variables('vmScripts').scriptsToDownload]",
-                    "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File master-setup.ps1 -StorageAccount ', parameters('commonSettings').DataSAName, ' -StorageKey ', listKeys(variables('sharedAccountId'), variables('storageApiVersion')).key1)]",
+                    "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File cn-setup.ps1 -StorageAccount ', parameters('commonSettings').DataSAName, ' -StorageKey ', listKeys(variables('sharedAccountId'), variables('storageApiVersion')).key1)]",
                     "timestamp": 12
                   }
                 }
