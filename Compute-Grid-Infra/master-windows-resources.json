@@ -82,29 +82,31 @@
           }
         }
       }
-    },
-    {
-      "name": "WindowsMasterExtension",
-      "type": "Microsoft.Compute/virtualMachines/extensions",
-      "location": "[variables('location')]",
-      "apiVersion": "[variables('storageApiVersion')]",
-      "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachines/', parameters('masterSettings').Name)]"
-      ],
-      "tags": {
-        "displayName": "WindowsMasterExtension"
-      },
-      "properties": {
-        "publisher": "Microsoft.Compute",
-        "type": "CustomScriptExtension",
-        "typeHandlerVersion": "1.8",
-        "autoUpgradeMinorVersion": true,
-        "settings": {
-          "CommandToExecute": "hostname"
-        },
-        "protectedSettings": {
+      "resources": [
+        {
+          "name": "WindowsMasterExtension",
+          "type": "extensions",
+          "location": "[variables('location')]",
+          "apiVersion": "[variables('storageApiVersion')]",
+          "dependsOn": [
+            "[concat('Microsoft.Compute/virtualMachines/', parameters('masterSettings').Name)]"
+          ],
+          "tags": {
+            "displayName": "WindowsMasterExtension"
+          },
+          "properties": {
+            "publisher": "Microsoft.Compute",
+            "type": "CustomScriptExtension",
+            "typeHandlerVersion": "1.8",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+              "CommandToExecute": "hostname"
+            },
+            "protectedSettings": {
+            }
+          }
         }
-      }
+      ]
     }
   ]
 }
