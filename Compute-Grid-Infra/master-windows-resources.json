@@ -81,32 +81,31 @@
             "storageUri": "[concat('http://',parameters('masterSettings').DiagSAName,'.blob.core.windows.net')]"
           }
         }
+      }
+    },
+    {
+      "name": "WindowsMasterExtension",
+      "type": "extensions",
+      "location": "[variables('location')]",
+      "apiVersion": "[variables('storageApiVersion')]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', parameters('masterSettings').Name)]"
+      ],
+      "tags": {
+        "displayName": "WindowsMasterExtension"
       },
-        "resources": [
-          {
-            "name": "WindowsMasterExtension",
-            "type": "extensions",
-            "location": "[variables('location')]",
-            "apiVersion": "[variables('storageApiVersion')]",
-            "dependsOn": [
-              "[concat('Microsoft.Compute/virtualMachines/', parameters('masterSettings').Name)]"
-            ],
-            "tags": {
-              "displayName": "WindowsMasterExtension"
-            },
-            "properties": {
-              "publisher": "Microsoft.Compute",
-              "type": "CustomScriptExtension",
-              "typeHandlerVersion": "1.8",
-              "autoUpgradeMinorVersion": true,
-              "settings": {
-                "CommandToExecute": "hostname"
-              },
-              "protectedSettings": {
-              }
-            }
-          }
-        ]
+      "properties": {
+        "publisher": "Microsoft.Compute",
+        "type": "CustomScriptExtension",
+        "typeHandlerVersion": "1.8",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "CommandToExecute": "hostname"
+        },
+        "protectedSettings": {
+        }
+      }
+    }
     }
   ]
 }
