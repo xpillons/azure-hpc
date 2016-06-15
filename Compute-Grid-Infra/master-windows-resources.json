@@ -85,7 +85,7 @@
     },
     {
       "name": "WindowsMasterExtension",
-      "type": "extensions",
+      "type": "Microsoft.Compute/virtualMachines/extensions",
       "location": "[variables('location')]",
       "apiVersion": "[variables('storageApiVersion')]",
       "dependsOn": [
