@@ -8,10 +8,7 @@
       "allowedValues": [
         "CentOS_6.7",
         "CentOS_7.0",
-        "RHEL_6.7",
         "RHEL_7.2",
-        "CentOS_HPC_65",
-        "CentOS_HPC_71",
         "W2012R2"
       ],
       "metadata": {
@@ -65,10 +62,16 @@
         "description": "SSH rsa public key file as a string."
       }
     },
-    "sharedSAName": {
+    "sharedDataAccount": {
       "type": "string",
       "metadata": {
-        "description": "Name of the shared Storage Account used to share common data"
+        "description": "Name of the shared storage account"
+      }
+    },
+    "RGStorageName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of Resource Group of the shared storage account"
       }
     }
   },
@@ -79,6 +82,11 @@
     "newStorageAccountSuffix": "[concat(variables('longNamingInfix'), 'sa')]",
     "deploymentApiVersion": "2015-11-01",
     "baseTemplateUri": "https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/",
+
+    "commonSettings": {
+      "DataSAName": "[parameters('sharedDataAccount')]",
+      "RGStorageName": "[parameters('RGStorageName')]"
+    },
 
     "nodeSettings": {
       "VMsku": "Standard_DS3_v2",
@@ -97,49 +105,6 @@
         "publisher": "OpenLogic",
         "offer": "CentOS",
         "sku": "7.0",
-        "version": "latest"
-      },
-      "CentOS_HPC_65": {
-        "publisher": "OpenLogic",
-        "offer": "CentOS-HPC",
-        "sku": "6.5",
-        "version": "latest"
-      },
-      "CentOS_HPC_71": {
-        "publisher": "OpenLogic",
-        "offer": "CentOS-HPC",
-        "sku": "7.1",
-        "version": "latest"
-      },
-      "SLES_12": {
-        "publisher": "SUSE",
-        "offer": "SLES",
-        "sku": "12",
-        "version": "latest"
-      },
-      "SLES_Premium_12": {
-        "publisher": "SUSE",
-        "offer": "SLES-Priority",
-        "sku": "12",
-        "version": "latest"
-      },
-      "SLES_HPC_12": {
-        "publisher": "SUSE",
-        "offer": "SLES-HPC",
-        "sku": "12",
-        "version": "latest"
-      },
-      "SLES_HPC_Premium_12": {
-        "publisher": "SUSE",
-        "offer": "SLES-HPC-Priority",
-        "sku": "12",
-        "version": "latest",
-        "os": "Linux"
-      },
-      "RHEL_6.7": {
-        "publisher": "RedHat",
-        "offer": "RHEL",
-        "sku": "6.7",
         "version": "latest"
       },
       "RHEL_7.2": {
@@ -184,6 +149,9 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
+          "commonSettings": {
+            "value": "[variables('commonSettings')]"
+          },
           "nodeSettings": {
             "value": "[variables('nodeSettings')]"
           },
@@ -198,9 +166,6 @@
           },
           "newStorageAccountSuffix": {
             "value": "[concat(variables('newStorageAccountSuffix'), padLeft(copyindex(), 2, '0'))]"
-          },
-          "sharedSAName": {
-            "value": "[parameters('sharedSAName')]"
           }
         }
       }
