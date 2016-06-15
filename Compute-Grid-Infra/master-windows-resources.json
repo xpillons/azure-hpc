@@ -103,6 +103,7 @@
               "CommandToExecute": "hostname"
             },
             "protectedSettings": {
+              "CommandToExecute": "hostname"
             }
           }
         }
