@@ -81,7 +81,7 @@
             "storageUri": "[concat('http://',parameters('masterSettings').DiagSAName,'.blob.core.windows.net')]"
           }
         }
-      }
+      },
       "resources": [
         {
           "name": "WindowsMasterExtension",
