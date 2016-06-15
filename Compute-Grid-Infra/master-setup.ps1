@@ -2,11 +2,11 @@ param (
     [Parameter(Mandatory=$true)]
     [string]$StorageAccount,
     [Parameter(Mandatory=$true)]
-    [string]$StorageKey,
-    [Parameter(Mandatory=$true)]
-    [string]$UserName
+    [string]$StorageKey
 )
 
-&runas /user:$UserName cmdkey /add:$StorageAccount.file.core.windows.net /user:$StorageAccount /pass:$StorageKey
+&net use Z: \\$StorageAccount.file.core.windows.net\lsf /u:$StorageAccount $StorageKey /persistent:yes
 
-&runas /user:$UserName  net use Z: \\$StorageAccount.file.core.windows.net\lsf
+&net use
+
+
