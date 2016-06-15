@@ -1,3 +1,7 @@
 Compute-Grid-Infra/deploy-master.param.json
 Compute-Grid-Infra/deploy-nodes.param.json
 HpcPack-AddLinuxNodes-vmss/azuredeploy.param.json
+Compute-Grid-Infra/deploy-win-nodes.param.json
+Compute-Grid-Infra/deploy-win-master.param.json
+Compute-Grid-Infra/deploy-master.param.json
+Compute-Grid-Infra/deploy-nodes.param.json
