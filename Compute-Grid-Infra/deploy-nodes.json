@@ -28,7 +28,7 @@
         "description": "Number of VM instances per Scaleset (20 or less)."
       },
       "defaultValue": 2,
-      "maxValue": 20
+      "maxValue": 100
     },
     "numberOfVMSS": {
       "type": "int",
@@ -135,7 +135,6 @@
     "nodeOSSettings": {
       "osType": "[variables('osTypes')[parameters('computeNodeImage')]]",
       "adminUserName": "[parameters('adminUserName')]",
-      "adminPassword": "[parameters('adminPassword')]",
       "sshKeyData": "[parameters('sshKeyData')]",
       "imageReference": "[variables('computeNodeImages')[parameters('computeNodeImage')]]"
     },

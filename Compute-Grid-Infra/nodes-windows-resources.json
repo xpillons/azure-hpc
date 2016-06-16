@@ -30,13 +30,19 @@
     "instanceCount": {
       "type": "int",
       "metadata": {
-        "description": "Number of VM instances (20 or less)."
+        "description": "Number of VM instances (100 or less)."
       },
       "defaultValue": 1,
-      "maxValue": 20
+      "maxValue": 100
     },
     "newStorageAccountSuffix": {
       "type": "string"
+    },
+    "adminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "password for the Virtual Machine."
+      }
     }
   },
   "variables": {
@@ -126,7 +132,7 @@
           "osProfile": {
             "computerNamePrefix": "[variables('namingInfix')]",
             "adminUsername": "[parameters('nodeOSSettings').adminUserName]",
-            "adminPassword": "[parameters('nodeOSSettings').adminPassword]"
+            "adminPassword": "[parameters('adminPassword')]"
           },
           "storageProfile": {
             "imageReference": "[parameters('nodeOSSettings').imageReference]",
