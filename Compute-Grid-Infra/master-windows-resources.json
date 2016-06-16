@@ -25,6 +25,12 @@
       "metadata": {
         "Description": "master OS settings object"
       }
+    },
+    "adminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "password for the Virtual Machine."
+      }
     }
   },
   "variables": {
@@ -55,7 +61,7 @@
         "osProfile": {
           "computerName": "[parameters('masterSettings').Name]",
           "adminUsername": "[parameters('masterOSSettings').adminUserName]",
-          "adminPassword": "[parameters('masterOSSettings').adminPassword]"
+          "adminPassword": "[parameters('adminPassword')]"
         },
         "storageProfile": {
           "imageReference": "[parameters('masterOSSettings').imageReference]",

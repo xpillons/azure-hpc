@@ -88,7 +88,6 @@
     "masterOSSettings": {
       "osType": "[variables('osTypes')[parameters('masterImage')]]",
       "adminUserName": "[parameters('adminUserName')]",
-      "adminPassword": "[parameters('adminPassword')]",
       "sshKeyData": "[parameters('sshKeyData')]",
       "imageReference": "[variables('computeNodeImages')[parameters('masterImage')]]"
     },
@@ -216,6 +215,9 @@
           },
           "masterOSSettings": {
             "value": "[variables('masterOSSettings')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
           }
         }
       }
