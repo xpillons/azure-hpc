@@ -46,5 +46,12 @@ install_azure_files()
 	
 }
 
+install_applications()
+{
+	log "install applications"
+	/mnt/azure/Azure/deployment.pex /mnt/azure/Azure/plays/setup_clients.yml
+}
+
 install_azure_cli
 install_azure_files
+install_applications
