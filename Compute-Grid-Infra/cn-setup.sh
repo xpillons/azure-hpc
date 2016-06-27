@@ -6,7 +6,7 @@ log()
 	echo "$1"
 }
 
-while getopts :a:k:m optname; do
+while getopts :a:k:m: optname; do
   log "Option $optname set with value ${OPTARG}"
   
   case $optname in
