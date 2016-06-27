@@ -58,7 +58,7 @@ install_applications()
 mount_nfs()
 {
 	log "install NFS"
-	yum -y update
+#	yum -y update
 	yum -y install nfs-utils
 	
 	mkdir -p /mnt/nfs/var/nfsshare
