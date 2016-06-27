@@ -59,23 +59,13 @@ mount_nfs()
 {
 	log "install NFS"
 #	yum -y update
-	yum -y install nfs-utils
+	yum -y install nfs-utils nfs-utils-lib
 	
 	mkdir -p /mnt/nfs
 
-	log "start NFS services"
-	systemctl enable rpcbind
-	systemctl enable nfs-server
-	systemctl enable nfs-lock
-	systemctl enable nfs-idmap
-	systemctl start rpcbind
-	systemctl start nfs-server
-	systemctl start nfs-lock
-	systemctl start nfs-idmap
-
-	log "mounting NFS"
-	mount -t nfs ${MASTER_NAME}:/var/nfsshare /mnt/nfs/
-	 
+	log "mounting NFS on " ${MASTER_NAME}
+	showmount -e ${MASTER_NAME}
+	mount -t nfs ${MASTER_NAME}:/var/nfsshare /mnt/nfs/	 
 }
 
 #install_azure_cli
