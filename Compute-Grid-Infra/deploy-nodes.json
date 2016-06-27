@@ -73,6 +73,12 @@
       "metadata": {
         "description": "Name of Resource Group of the shared storage account"
       }
+    },
+    "masterName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of master VM name"
+      }
     }
   },
   "variables": {
@@ -87,10 +93,11 @@
       "RGStorageName": "[parameters('RGStorageName')]"
     },
     "nodeSettings": {
-      "VMsku": "Standard_DS3_v2",
+      "VMsku": "Standard_DS5_v2",
       "vnetRG": "[parameters('RGvnetName')]",
       "vnetName": "grid-vnet",
-      "subnetName": "computeSubnet"
+      "subnetName": "computeSubnet",
+      "masterName": "[parameters('masterName')]"
     },
     "osTypes": {
       "CentOS_6.7": {

@@ -171,7 +171,7 @@
                   "autoUpgradeMinorVersion": true,
                   "settings": {
                     "fileUris": "[variables('vmScripts').scriptsToDownload]",
-                    "commandToExecute": "[concat('sh ', variables('cnSetupScript'), ' -a ', parameters('commonSettings').DataSAName, ' -k ', listKeys(variables('sharedAccountId'), variables('storageApiVersion')).key1)]"
+                    "commandToExecute": "[concat('sh ', variables('cnSetupScript'), ' -m', parameters('nodeSettings').masterName, ' -a ', parameters('commonSettings').DataSAName, ' -k ', listKeys(variables('sharedAccountId'), variables('storageApiVersion')).key1)]"
                   }
                 }
               }
