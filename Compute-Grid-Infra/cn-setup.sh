@@ -61,7 +61,7 @@ mount_nfs()
 #	yum -y update
 	yum -y install nfs-utils
 	
-	mkdir -p /mnt/nfs/var/nfsshare
+	mkdir -p /mnt/nfs
 
 	log "start NFS services"
 	systemctl enable rpcbind
@@ -80,5 +80,5 @@ mount_nfs()
 
 #install_azure_cli
 #install_azure_files
-mount_nfs
-install_applications
+#mount_nfs
+#install_applications
