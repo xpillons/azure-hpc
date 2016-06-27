@@ -16,7 +16,7 @@ while getopts :a:k:m optname; do
     k)  # storage key
 		export AZURE_STORAGE_ACCESS_KEY=${OPTARG}
 		;;
-    m)  # storage key
+    m)  # master name
 		export MASTER_NAME=${OPTARG}
 		;;
   esac
@@ -70,5 +70,5 @@ mount_nfs()
 
 #install_azure_cli
 #install_azure_files
-#mount_nfs
+mount_nfs
 #install_applications
