@@ -71,4 +71,4 @@ mount_nfs()
 #install_azure_cli
 #install_azure_files
 mount_nfs
-#install_applications
+install_applications
