@@ -7,7 +7,7 @@
       "defaultValue": "CentOS_6.7",
       "allowedValues": [
         "CentOS_6.7",
-        "CentOS_7.0",
+        "CentOS_7.2",
         "RHEL_7.2",
         "W2012R2"
       ],
@@ -97,13 +97,13 @@
       "vnetRG": "[parameters('RGvnetName')]",
       "vnetName": "grid-vnet",
       "subnetName": "computeSubnet",
-      "masterName": "[parameters('masterName')]"
+      "MasterName": "[parameters('masterName')]"
     },
     "osTypes": {
       "CentOS_6.7": {
         "os": "linux"
       },
-      "CentOS_7.0": {
+      "CentOS_7.2": {
         "os": "linux"
       },
       "RHEL_7.2": {
@@ -120,10 +120,10 @@
         "sku": "6.7",
         "version": "latest"
       },
-      "CentOS_7.0": {
+      "CentOS_7.2": {
         "publisher": "OpenLogic",
         "offer": "CentOS",
-        "sku": "7.0",
+        "sku": "7.2",
         "version": "latest"
       },
       "RHEL_7.2": {
