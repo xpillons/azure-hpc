@@ -73,7 +73,7 @@
       "scriptsToDownload": [
         "[concat(variables('scriptUrl'), 'cn-setup.ps1')]"
       ],
-      "commandToExecute": ""
+      "commandToExecute": "[concat('\\\\', parameters('nodeSettings').MasterName,'\\Data\\Symphony\\provisionScript.bat')]"
     }
   },
   "resources": [
@@ -160,7 +160,7 @@
                   "autoUpgradeMinorVersion": true,
                   "settings": {
                     "fileUris": "[variables('vmScripts').scriptsToDownload]",
-                    "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File cn-setup.ps1 -StorageAccount ', parameters('commonSettings').DataSAName, ' -StorageKey ', listKeys(variables('sharedAccountId'), variables('storageApiVersion')).key1)]",
+                    "commandToExecute": "[variables('vmScripts').commandToExecute]",
                     "timestamp": 12
                   }
                 }
