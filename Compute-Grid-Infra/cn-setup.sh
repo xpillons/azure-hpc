@@ -1,4 +1,5 @@
 #bash 
+export MOUNT_POINT=/mnt/azure
 
 #############################################################################
 log()
@@ -52,7 +53,7 @@ install_azure_files()
 install_applications()
 {
 	log "install applications"
-	/mnt/azure/Azure/deployment.pex /mnt/azure/Azure/plays/setup_clients.yml
+	${MOUNT_POINT}/Azure/deployment.pex ${MOUNT_POINT}/Azure/plays/setup_clients.yml
 }
 
 mount_nfs()
@@ -61,11 +62,11 @@ mount_nfs()
 #	yum -y update
 	yum -y install nfs-utils nfs-utils-lib
 	
-	mkdir -p /mnt/nfs
+	mkdir -p ${MOUNT_POINT}
 
 	log "mounting NFS on " ${MASTER_NAME}
 	showmount -e ${MASTER_NAME}
-	mount -t nfs ${MASTER_NAME}:/nfsdata/apps /mnt/azure/	 
+	mount -t nfs ${MASTER_NAME}:/nfsdata/apps ${MOUNT_POINT}/	 
 }
 
 #install_azure_cli
