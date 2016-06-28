@@ -52,7 +52,7 @@ install_azure_files()
 install_applications()
 {
 	log "install applications"
-	/mnt/nfs/Azure/deployment.pex /mnt/nfs/Azure/plays/setup_clients.yml
+	/mnt/azure/Azure/deployment.pex /mnt/azure/Azure/plays/setup_clients.yml
 }
 
 mount_nfs()
@@ -65,7 +65,7 @@ mount_nfs()
 
 	log "mounting NFS on " ${MASTER_NAME}
 	showmount -e ${MASTER_NAME}
-	mount -t nfs ${MASTER_NAME}:/var/nfsshare /mnt/nfs/	 
+	mount -t nfs ${MASTER_NAME}:/nfsdata/apps /mnt/azure/	 
 }
 
 #install_azure_cli
