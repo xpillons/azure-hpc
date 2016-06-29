@@ -72,9 +72,9 @@
     "backslash": "\\",
     "vmScripts": {
       "scriptsToDownload": [
-        "[concat(variables('scriptUrl'), 'cn-setup.ps1')]"
+        "[concat(variables('scriptUrl'), 'cn-setup.bat')]"
       ],
-      "commandToExecute": "[concat(variables('backslash'), variables('backslash'), parameters('nodeSettings').MasterName, '\\Data\\Symphony\\provisionScript.bat')]"
+      "commandToExecute": "[concat('cn-setup.bat ', parameters('nodeSettings').MasterName)]"
     }
   },
   "resources": [
