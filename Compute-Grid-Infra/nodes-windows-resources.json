@@ -69,11 +69,12 @@
     "cnSetupScript": "cn-setup.ps1",
     "scriptUrl": "https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/",
     "sharedAccountId": "[resourceId(parameters('commonSettings').RGStorageName, 'Microsoft.Storage/storageAccounts', parameters('commonSettings').DataSAName)]",
+    "backslash": "\\",
     "vmScripts": {
       "scriptsToDownload": [
         "[concat(variables('scriptUrl'), 'cn-setup.ps1')]"
       ],
-      "commandToExecute": "[concat('\\\\', parameters('nodeSettings').MasterName,'\\Data\\Symphony\\provisionScript.bat')]"
+      "commandToExecute": "[concat(variables('backslash'), variables('backslash'), parameters('nodeSettings').MasterName, '\\Data\\Symphony\\provisionScript.bat')]"
     }
   },
   "resources": [
