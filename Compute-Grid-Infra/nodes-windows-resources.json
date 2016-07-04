@@ -72,9 +72,9 @@
     "backslash": "\\",
     "vmScripts": {
       "scriptsToDownload": [
-        "[concat(variables('scriptUrl'), 'cn-setup.bat')]"
+        "[concat(variables('scriptUrl'), 'cn-setup.ps1')]"
       ],
-      "commandToExecute": "[concat('cn-setup.bat ', parameters('nodeSettings').MasterName, ' ', parameters('nodeOSSettings').adminUserName, ' ', parameters('adminPassword'))]"
+      "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File cn-setup.ps1 ', parameters('nodeSettings').MasterName, ' ', parameters('nodeOSSettings').adminUserName, ' ', parameters('adminPassword'))]"
     }
   },
   "resources": [
@@ -113,14 +113,14 @@
           "networkProfile": {
             "networkInterfaceConfigurations": [
               {
-                "name": "[variables('nicName')]",
+                "name": "[variables('nicName')]",                
                 "properties": {
                   "primary": "true",
                   "ipConfigurations": [
                     {
                       "name": "[variables('ipConfigName')]",
                       "properties": {
-                        "subnet": {
+                        "subnet": {                          
                           "id": "[variables('subnetRef')]"
                         }
                       }

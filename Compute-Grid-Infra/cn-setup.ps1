@@ -1,12 +1,16 @@
 param (
     [Parameter(Mandatory=$true)]
-    [string]$StorageAccount,
+    [string]$MasterName,
     [Parameter(Mandatory=$true)]
-    [string]$StorageKey
+    [string]$UserName,
+    [Parameter(Mandatory=$true)]
+    [string]$Password
 )
 
-&net use Z: \\$StorageAccount.file.core.windows.net\lsf /u:$StorageAccount $StorageKey /persistent:yes
+$User = ".\$UserName"
+$PWord = ConvertTo-SecureString -String $Password -AsPlainText -Force
+$Credential = New-Object -TypeName "System.Management.Automation.PSCredential" -ArgumentList $User, $PWord
 
-&net use
+&net use Z: \\$MasterName\Data /user:$UserName $Password /persistent:yes
 
-
+Start-Process "C:\Windows\System32\cmd.exe" -WorkingDirectory "c:\data\symphony" -Credential ($Credential) -ArgumentList "cmd /c provisionScript.bat"
