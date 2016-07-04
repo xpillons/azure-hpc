@@ -15,12 +15,6 @@ function RunSetup($shareName, $user, $pwd)
 	&Z:\symphony\provisionScript.bat | Out-Host 
 }
 
-$User = ".\$UserName"
-Write-Host $User
-$PWord = ConvertTo-SecureString -String $Password -AsPlainText -Force
-$Credential = New-Object -TypeName "System.Management.Automation.PSCredential" -ArgumentList $User, $PWord
-
-$psSession = New-PSSession -Credential $Credential;  
 
 # Enable Remote Powershell Execution From The Master Node
 Enable-PSRemoting -Force
@@ -28,5 +22,11 @@ Enable-PSRemoting -Force
 Restart-Service WinRM -Force
 
 
+$User = ".\$UserName"
+Write-Host $User
+$PWord = ConvertTo-SecureString -String $Password -AsPlainText -Force
+$Credential = New-Object -TypeName "System.Management.Automation.PSCredential" -ArgumentList $User, $PWord
+
+$psSession = New-PSSession -Credential $Credential;  
 Invoke-Command -Session $psSession -Script ${function:RunSetup} -ArgumentList $MasterName,$UserName,$Password
 
