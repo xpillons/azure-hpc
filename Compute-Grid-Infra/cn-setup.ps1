@@ -22,5 +22,11 @@ $Credential = New-Object -TypeName "System.Management.Automation.PSCredential" -
 
 $psSession = New-PSSession -Credential $Credential;  
 
+# Enable Remote Powershell Execution From The Master Node
+Enable-PSRemoting -Force
+&winrm s winrm/config/client '@{TrustedHosts=\"symmaster\"}'
+Restart-Service WinRM -Force
+
+
 Invoke-Command -Session $psSession -Script ${function:RunSetup} -ArgumentList $MasterName,$UserName,$Password
 
