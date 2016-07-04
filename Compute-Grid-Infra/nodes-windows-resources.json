@@ -74,7 +74,7 @@
       "scriptsToDownload": [
         "[concat(variables('scriptUrl'), 'cn-setup.bat')]"
       ],
-      "commandToExecute": "[concat('cn-setup.bat ', parameters('nodeSettings').MasterName), ' ', parameters('nodeOSSettings').adminUserName), ' ', parameters('adminPassword')]"
+      "commandToExecute": "[concat('cn-setup.bat ', parameters('nodeSettings').MasterName, ' ', parameters('nodeOSSettings').adminUserName, ' ', parameters('adminPassword'))]"
     }
   },
   "resources": [
