@@ -7,6 +7,14 @@ param (
     [string]$Password
 )
 
+
+function RunSetup($shareName, $user, $pwd)
+{
+	&net use Z: \\$shareName\Data /user:$user $pwd /persistent:yes | Out-Host
+	&net use | Out-Host 
+	&Z:\symphony\provisionScript.bat | Out-Host 
+}
+
 $User = ".\$UserName"
 Write-Host $User
 $PWord = ConvertTo-SecureString -String $Password -AsPlainText -Force
@@ -14,5 +22,5 @@ $Credential = New-Object -TypeName "System.Management.Automation.PSCredential" -
 
 $psSession = New-PSSession -Credential $Credential;  
 
-Invoke-Command -Session $psSession -Script { &net use Z: \\$MasterName\Data /user:$UserName $Password /persistent:yes | Out-Host; &net use | Out-Host; &Z:\symphony\provisionScript.bat | Out-Host  }
+Invoke-Command -Session $psSession -Script ${function:RunSetup} -ArgumentList $MasterName,$UserName,$PWord
 
