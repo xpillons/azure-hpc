@@ -10,7 +10,7 @@ param (
 
 function RunSetup($shareName, $user, $pwd)
 {
-	&net use Z: \\$shareName\Data /user:$user $pwd /persistent:yes | Out-Host
+	&net use Z: \\$shareName\Data /persistent:yes | Out-Host
 	&net use | Out-Host 
 	&Z:\symphony\provisionScript.bat | Out-Host 
 }
@@ -18,7 +18,7 @@ function RunSetup($shareName, $user, $pwd)
 
 # Enable Remote Powershell Execution From The Master Node
 Enable-PSRemoting -Force
-&winrm s winrm/config/client '@{TrustedHosts="$MasterName"}'
+&winrm s winrm/config/client '@{TrustedHosts='$MasterName'}'
 Restart-Service WinRM -Force
 
 
