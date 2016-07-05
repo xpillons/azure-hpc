@@ -18,7 +18,7 @@ function RunSetup($shareName, $user, $pwd)
 
 # Enable Remote Powershell Execution From The Master Node
 Enable-PSRemoting -Force
-&winrm s winrm/config/client '@{TrustedHosts=\"$MasterName\"}'
+&winrm s winrm/config/client '@{TrustedHosts="$MasterName"}'
 Restart-Service WinRM -Force
 
 
