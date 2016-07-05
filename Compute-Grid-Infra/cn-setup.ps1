@@ -17,6 +17,7 @@ function RunSetup($shareName, $user, $pwd)
 
 
 # Enable Remote Powershell Execution From The Master Node
+# don't put these lines into the script called by the session because it will close the session :-)
 Enable-PSRemoting -Force
 $trustedHosts="@{TrustedHosts=\""+$MasterName\""}"
 
@@ -31,4 +32,3 @@ $Credential = New-Object -TypeName "System.Management.Automation.PSCredential" -
 $psSession = New-PSSession -Credential $Credential;  
 Invoke-Command -Session $psSession -Script ${function:RunSetup} -ArgumentList $MasterName,$UserName,$Password
 
-#RunSetup $MasterName, $UserName, $Password
