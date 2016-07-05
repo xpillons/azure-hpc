@@ -23,7 +23,6 @@ Restart-Service WinRM -Force
 
 
 $User = ".\$UserName"
-Write-Host $User
 $PWord = ConvertTo-SecureString -String $Password -AsPlainText -Force
 $Credential = New-Object -TypeName "System.Management.Automation.PSCredential" -ArgumentList $User, $PWord
 
