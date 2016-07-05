@@ -22,11 +22,12 @@ Enable-PSRemoting -Force
 Restart-Service WinRM -Force
 
 
-$User = ".\$UserName"
-Write-Host $User
-$PWord = ConvertTo-SecureString -String $Password -AsPlainText -Force
-$Credential = New-Object -TypeName "System.Management.Automation.PSCredential" -ArgumentList $User, $PWord
+#$User = ".\$UserName"
+#Write-Host $User
+#$PWord = ConvertTo-SecureString -String $Password -AsPlainText -Force
+#$Credential = New-Object -TypeName "System.Management.Automation.PSCredential" -ArgumentList $User, $PWord
 
-$psSession = New-PSSession -Credential $Credential;  
-Invoke-Command -Session $psSession -Script ${function:RunSetup} -ArgumentList $MasterName,$UserName,$Password
+#$psSession = New-PSSession -Credential $Credential;  
+#Invoke-Command -Session $psSession -Script ${function:RunSetup} -ArgumentList $MasterName,$UserName,$Password
 
+RunSetup $MasterName, $UserName, $Password
