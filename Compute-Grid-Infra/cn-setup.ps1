@@ -10,7 +10,7 @@ param (
 
 function RunSetup($shareName, $user, $pwd)
 {
-	&net use Z: \\$shareName\Data /user:$user /persistent:yes | Out-Host
+	&net use Z: \\$shareName\Data /user:$user /pass:$pwd /persistent:yes | Out-Host
 	&net use | Out-Host 
 	&Z:\symphony\provisionScript.bat | Out-Host 
 }
