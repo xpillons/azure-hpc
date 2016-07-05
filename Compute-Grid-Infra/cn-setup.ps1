@@ -19,7 +19,7 @@ function RunSetup($shareName, $user, $pwd)
 # Enable Remote Powershell Execution From The Master Node
 # don't put these lines into the script called by the session because it will close the session :-)
 Enable-PSRemoting -Force
-$trustedHosts="@{TrustedHosts=\""+$MasterName\""}"
+$trustedHosts="@{TrustedHosts=\""$MasterName\""}"
 
 &winrm s winrm/config/client $trustedHosts
 Restart-Service WinRM -Force
