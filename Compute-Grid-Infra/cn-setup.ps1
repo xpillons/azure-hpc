@@ -24,6 +24,8 @@ $trustedHosts="@{TrustedHosts=\""$MasterName\""}"
 &winrm s winrm/config/client $trustedHosts
 Restart-Service WinRM -Force
 
+
+# Create local credential to run the installation script
 $User = ".\$UserName"
 $PWord = ConvertTo-SecureString -String $Password -AsPlainText -Force
 $Credential = New-Object -TypeName "System.Management.Automation.PSCredential" -ArgumentList $User, $PWord
@@ -31,4 +33,10 @@ $Credential = New-Object -TypeName "System.Management.Automation.PSCredential" -
 $psSession = New-PSSession -Credential $Credential;  
 Invoke-Command -Session $psSession -Script ${function:RunSetup} -ArgumentList $MasterName,$UserName,$Password
 
-Add-Computer -DomainName "Grid" -Restart
+
+# Add the local computer to the GRID domain
+$User = "Grid\$UserName"
+$PWord = ConvertTo-SecureString -String $Password -AsPlainText -Force
+$Credential = New-Object -TypeName "System.Management.Automation.PSCredential" -ArgumentList $User, $PWord
+
+Add-Computer -DomainName "Grid" -Credential $Credential -Server $MasterName -Restart
