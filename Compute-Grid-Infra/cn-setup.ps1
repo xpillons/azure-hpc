@@ -24,7 +24,6 @@ $trustedHosts="@{TrustedHosts=\""$MasterName\""}"
 &winrm s winrm/config/client $trustedHosts
 Restart-Service WinRM -Force
 
-
 $User = ".\$UserName"
 $PWord = ConvertTo-SecureString -String $Password -AsPlainText -Force
 $Credential = New-Object -TypeName "System.Management.Automation.PSCredential" -ArgumentList $User, $PWord
@@ -32,3 +31,4 @@ $Credential = New-Object -TypeName "System.Management.Automation.PSCredential" -
 $psSession = New-PSSession -Credential $Credential;  
 Invoke-Command -Session $psSession -Script ${function:RunSetup} -ArgumentList $MasterName,$UserName,$Password
 
+Add-Computer -DomainName "Grid" -Restart
