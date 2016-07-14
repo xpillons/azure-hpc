@@ -34,9 +34,3 @@ $psSession = New-PSSession -Credential $Credential;
 Invoke-Command -Session $psSession -Script ${function:RunSetup} -ArgumentList $MasterName,$UserName,$Password
 
 
-# Add the local computer to the GRID domain
-$User = "Grid\$UserName"
-$PWord = ConvertTo-SecureString -String $Password -AsPlainText -Force
-$Credential = New-Object -TypeName "System.Management.Automation.PSCredential" -ArgumentList $User, $PWord
-
-Add-Computer -DomainName "Grid" -Credential $Credential -Server $MasterName -Restart
