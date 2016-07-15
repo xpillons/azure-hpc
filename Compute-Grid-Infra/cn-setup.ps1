@@ -21,7 +21,7 @@ function RunSetup($shareName, $user, $pwd)
 	$array=$ip.IPAddressToString.Split('.')
 	$name=$array[3]+"."+$array[2]
 
-	Add-DnsServerResourceRecordPtr -ComputerName symmaster.southcentralus.cloudapp.azure.com -Name $name -ZoneName "0.10.in-addr.arpa" -PtrDomainName $env:COMPUTERNAME
+	Add-DnsServerResourceRecordPtr -ComputerName $shareName -Name $name -ZoneName "0.10.in-addr.arpa" -PtrDomainName $env:COMPUTERNAME
 
 	&Z:\symphony\provisionScript.bat | Out-Host 
 }
