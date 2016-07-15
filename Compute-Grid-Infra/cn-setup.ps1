@@ -12,7 +12,17 @@ function RunSetup($shareName, $user, $pwd)
 {
 	&net use Z: \\$shareName\Data /user:$user $pwd /persistent:yes | Out-Host
 	&net use | Out-Host 
-	Z:\symphony\createReversePtr.ps1
+
+	Import-Module ServerManager
+	Install-WindowsFeature RSAT-DNS-Server
+
+	$ip = test-connection $env:COMPUTERNAME -timetolive 2 -count 1 | Select -ExpandProperty IPV4Address 
+
+	$array=$ip.IPAddressToString.Split('.')
+	$name=$array[3]+"."+$array[2]
+
+	Add-DnsServerResourceRecordPtr -ComputerName symmaster.southcentralus.cloudapp.azure.com -Name $name -ZoneName "0.10.in-addr.arpa" -PtrDomainName $env:COMPUTERNAME
+
 	&Z:\symphony\provisionScript.bat | Out-Host 
 }
 
