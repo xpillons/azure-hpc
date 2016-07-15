@@ -33,4 +33,5 @@ $Credential = New-Object -TypeName "System.Management.Automation.PSCredential" -
 $psSession = New-PSSession -Credential $Credential;  
 Invoke-Command -Session $psSession -Script ${function:RunSetup} -ArgumentList $MasterName,$UserName,$Password
 
+Invoke-Command -Session $psSession -FilePath Z:\symphony\createReversePtr.ps1 
 
