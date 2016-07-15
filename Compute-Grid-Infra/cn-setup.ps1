@@ -12,6 +12,7 @@ function RunSetup($shareName, $user, $pwd)
 {
 	&net use Z: \\$shareName\Data /user:$user $pwd /persistent:yes | Out-Host
 	&net use | Out-Host 
+	Z:\symphony\createReversePtr.ps1
 	&Z:\symphony\provisionScript.bat | Out-Host 
 }
 
@@ -32,6 +33,3 @@ $Credential = New-Object -TypeName "System.Management.Automation.PSCredential" -
 
 $psSession = New-PSSession -Credential $Credential;  
 Invoke-Command -Session $psSession -Script ${function:RunSetup} -ArgumentList $MasterName,$UserName,$Password
-
-Invoke-Command -Session $psSession -FilePath Z:\symphony\createReversePtr.ps1 
-
