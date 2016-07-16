@@ -13,6 +13,11 @@ function RunSetup($shareName, $user, $pwd)
 	&net use Z: \\$shareName\Data /user:$user $pwd /persistent:yes | Out-Host
 	&net use | Out-Host 
 
+	&reg add HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters /v Domain /d southcentralus.cloudapp.azure.com /f
+	&reg add HKLM\System\currentcontrolset\services\tcpip\parameters /v SearchList /d southcentralus.cloudapp.azure.com /f
+	&netsh interface ipv4 add dnsserver "Ethernet" address=10.0.8.4 index=1
+	&ipconfig /registerdns
+
 	Import-Module ServerManager
 	Install-WindowsFeature RSAT-DNS-Server
 
@@ -20,10 +25,11 @@ function RunSetup($shareName, $user, $pwd)
 
 	$array=$ip.IPAddressToString.Split('.')
 	$name=$array[3]+"."+$array[2]
+	$zone=$array[1]+"."+$array[0]+".in-addr.arpa"
 
-	Add-DnsServerResourceRecordPtr -ComputerName $shareName -Name $name -ZoneName "0.10.in-addr.arpa" -PtrDomainName $env:COMPUTERNAME
+	Add-DnsServerResourceRecordPtr -ComputerName $shareName -Name $name -ZoneName $zone -PtrDomainName $env:COMPUTERNAME
 
-	&Z:\symphony\provisionScript.bat | Out-Host 
+	#&Z:\symphony\provisionScript.bat | Out-Host 
 }
 
 
