@@ -27,7 +27,7 @@ function RunSetup($shareName, $user, $pwd)
 	$name=$array[3]+"."+$array[2]
 	$zone=$array[1]+"."+$array[0]+".in-addr.arpa"
 
-	Add-DnsServerResourceRecordPtr -ComputerName symmaster -Name $ip.IPAddressToString -PtrDomainName $env:COMPUTERNAME
+	Add-DnsServerResourceRecordPtr -ComputerName $shareName -Name $name -ZoneName $zone -PtrDomainName $env:COMPUTERNAME
 
 	#&Z:\symphony\provisionScript.bat | Out-Host 
 }
@@ -48,4 +48,4 @@ $PWord = ConvertTo-SecureString -String $Password -AsPlainText -Force
 $Credential = New-Object -TypeName "System.Management.Automation.PSCredential" -ArgumentList $User, $PWord
 
 $psSession = New-PSSession -Credential $Credential;  
-Invoke-Command -Session $psSession -Script ${function:RunSetup} -ArgumentList $MasterName,$UserName,$Password
+#Invoke-Command -Session $psSession -Script ${function:RunSetup} -ArgumentList $MasterName,$UserName,$Password
