@@ -27,7 +27,7 @@ function RunSetup($shareName, $user, $pwd)
 	$name=$array[3]+"."+$array[2]
 	$zone=$array[1]+"."+$array[0]+".in-addr.arpa"
 
-	Add-DnsServerResourceRecordPtr -ComputerName $shareName -Name $name -ZoneName $zone -PtrDomainName $env:COMPUTERNAME
+	Add-DnsServerResourceRecordPtr -ComputerName symmaster -Name $name -ZoneName $zone -PtrDomainName $env:COMPUTERNAME
 
 	#&Z:\symphony\provisionScript.bat | Out-Host 
 }
