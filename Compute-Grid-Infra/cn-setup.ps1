@@ -8,11 +8,8 @@ param (
 )
 
 
-function RunSetup($shareName, $user, $pwd)
+function RegisterReverseDNS($shareName)
 {
-	&net use Z: \\$shareName\Data /user:$user $pwd /persistent:yes | Out-Host
-	&net use | Out-Host 
-
 	&reg add HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters /v Domain /d southcentralus.cloudapp.azure.com /f
 	&reg add HKLM\System\currentcontrolset\services\tcpip\parameters /v SearchList /d southcentralus.cloudapp.azure.com /f
 	&netsh interface ipv4 add dnsserver "Ethernet" address=10.0.8.4 index=1
@@ -29,7 +26,13 @@ function RunSetup($shareName, $user, $pwd)
 
 	Add-DnsServerResourceRecordPtr -ComputerName $shareName -Name $name -ZoneName $zone -PtrDomainName $env:COMPUTERNAME
 
-	#&Z:\symphony\provisionScript.bat | Out-Host 
+}
+function RunSetup($shareName, $user, $pwd)
+{
+	&net use Z: \\$shareName\Data /user:$user $pwd /persistent:yes | Out-Host
+	&net use | Out-Host 
+
+	&Z:\symphony\provisionScript.bat | Out-Host 
 }
 
 
@@ -41,11 +44,12 @@ $trustedHosts="@{TrustedHosts=\""$MasterName\""}"
 &winrm s winrm/config/client $trustedHosts
 Restart-Service WinRM -Force
 
+RegisterReverseDNS $MasterName
 
 # Create local credential to run the installation script
 $User = ".\$UserName"
 $PWord = ConvertTo-SecureString -String $Password -AsPlainText -Force
 $Credential = New-Object -TypeName "System.Management.Automation.PSCredential" -ArgumentList $User, $PWord
 
-$psSession = New-PSSession -Credential $Credential;  
+$psSession = New-PSSession -Credential $Credential
 #Invoke-Command -Session $psSession -Script ${function:RunSetup} -ArgumentList $MasterName,$UserName,$Password
