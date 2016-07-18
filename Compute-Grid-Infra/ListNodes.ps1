@@ -10,6 +10,6 @@ param (
         $vmIndex = $_.InstanceId
         $vmName = $_.OsProfile.ComputerName
         $ip = (Get-AzureRmNetworkInterface -ResourceGroupName $ResourceGroupName -VirtualMachineScaleSetName $vmssName -VirtualMachineIndex $vmIndex).IpConfigurations[0].PrivateIpAddress
-        Write-Host $vmName $ip
+        Write-Output "$vmName $ip"
     }
 }
