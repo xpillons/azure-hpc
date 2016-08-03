@@ -15,20 +15,26 @@ function RegisterReverseDNS($shareName)
 	&netsh interface ipv4 add dnsserver "Ethernet" address=10.0.8.4 index=1
 	&ipconfig /registerdns
 
-	Import-Module ServerManager
-	Install-WindowsFeature RSAT-DNS-Server
+	# commenting out the following lines until we fix the Add-DnsServerResourceRecordPtr exception issue
+	#Import-Module ServerManager
+	#Install-WindowsFeature RSAT-DNS-Server
 
-	$ip = test-connection $env:COMPUTERNAME -timetolive 2 -count 1 | Select -ExpandProperty IPV4Address 
+	#$ip = test-connection $env:COMPUTERNAME -timetolive 2 -count 1 | Select -ExpandProperty IPV4Address 
 
-	$array=$ip.IPAddressToString.Split('.')
-	$name=$array[3]+"."+$array[2]
-	$zone=$array[1]+"."+$array[0]+".in-addr.arpa"
+	#$array=$ip.IPAddressToString.Split('.')
+	#$name=$array[3]+"."+$array[2]
+	#$zone=$array[1]+"."+$array[0]+".in-addr.arpa"
 
 	#Add-DnsServerResourceRecordPtr -ComputerName $shareName -Name $name -ZoneName $zone -PtrDomainName $env:COMPUTERNAME
 
 }
+
+
 function RunSetup($shareName, $user, $pwd)
 {
+
+	RegisterReverseDNS $shareName
+
 	&net use Z: \\$shareName\Data /user:$user $pwd /persistent:yes | Out-Host
 	&net use | Out-Host 
 
