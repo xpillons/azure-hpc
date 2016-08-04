@@ -33,8 +33,6 @@ function RegisterReverseDNS($shareName)
 function RunSetup($shareName, $user, $pwd)
 {
 
-	RegisterReverseDNS $shareName
-
 	&net use Z: \\$shareName\Data /user:$user $pwd /persistent:yes | Out-Host
 	&net use | Out-Host 
 
