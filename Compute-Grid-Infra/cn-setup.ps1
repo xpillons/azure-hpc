@@ -15,7 +15,6 @@ function RegisterReverseDNS($shareName)
 	&netsh interface ipv4 add dnsserver "Ethernet" address=10.0.8.4 index=1
 	&ipconfig /registerdns
 
-	# commenting out the following lines until we fix the Add-DnsServerResourceRecordPtr exception issue
 	#Import-Module ServerManager
 	#Install-WindowsFeature RSAT-DNS-Server
 
@@ -26,6 +25,21 @@ function RegisterReverseDNS($shareName)
 	#$zone=$array[1]+"."+$array[0]+".in-addr.arpa"
 
 	#Add-DnsServerResourceRecordPtr -ComputerName $shareName -Name $name -ZoneName $zone -PtrDomainName $env:COMPUTERNAME
+}
+
+function AddRunCommands()
+{
+	#$command = "reg add HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters /v Domain /d southcentralus.cloudapp.azure.com /f"
+	#&reg add HKLM\Software\Microsoft\Windows\CurrentVersion\Run /v Domain /f /d $command
+
+	#$command = "reg add HKLM\System\currentcontrolset\services\tcpip\parameters /v SearchList /d southcentralus.cloudapp.azure.com /f"
+	#&reg add HKLM\Software\Microsoft\Windows\CurrentVersion\Run /v SearchList /f /d $command
+	
+	$command = "netsh interface ipv4 add dnsserver 'Ethernet' address=10.0.8.4 index=1"
+	&reg add HKLM\Software\Microsoft\Windows\CurrentVersion\Run /v adddns /f /d $command
+	
+	$command = "ipconfig /registerdns"
+	&reg add HKLM\Software\Microsoft\Windows\CurrentVersion\Run /v registerdns /f /d $command
 
 }
 
@@ -49,6 +63,7 @@ $trustedHosts="@{TrustedHosts=\""$MasterName\""}"
 Restart-Service WinRM -Force
 
 RegisterReverseDNS $MasterName
+AddRunCommands 
 
 # Create local credential to run the installation script
 $User = ".\$UserName"
