@@ -33,7 +33,7 @@
         "description": "Number of VM instances (100 or less)."
       },
       "defaultValue": 1,
-      "maxValue": 100
+      "maxValue": 40
     },
     "newStorageAccountSuffix": {
       "type": "string"
@@ -51,10 +51,7 @@
     "namingInfix": "[toLower(substring(concat(parameters('vmssName'), uniqueString(resourceGroup().id)), 0, 9))]",
     "uniqueStringArray": [
       "[concat(uniqueString(concat(resourceGroup().id, parameters('newStorageAccountSuffix'), '0')))]",
-      "[concat(uniqueString(concat(resourceGroup().id, parameters('newStorageAccountSuffix'), '1')))]",
-      "[concat(uniqueString(concat(resourceGroup().id, parameters('newStorageAccountSuffix'), '2')))]",
-      "[concat(uniqueString(concat(resourceGroup().id, parameters('newStorageAccountSuffix'), '3')))]",
-      "[concat(uniqueString(concat(resourceGroup().id, parameters('newStorageAccountSuffix'), '4')))]"
+      "[concat(uniqueString(concat(resourceGroup().id, parameters('newStorageAccountSuffix'), '1')))]"
     ],
     "saCount": "[length(variables('uniqueStringArray'))]",
     "vhdContainerName": "[concat(variables('namingInfix'), 'vhd')]",
@@ -105,7 +102,7 @@
         "capacity": "[parameters('instanceCount')]"
       },
       "properties": {
-        "overprovision": "false",
+        "overprovision": "true",
         "upgradePolicy": {
           "mode": "Manual"
         },
@@ -140,10 +137,7 @@
             "osDisk": {
               "vhdContainers": [
                 "[concat('https://', variables('uniqueStringArray')[0], parameters('newStorageAccountSuffix'), '.blob.core.windows.net/', variables('vhdContainerName'))]",
-                "[concat('https://', variables('uniqueStringArray')[1], parameters('newStorageAccountSuffix'), '.blob.core.windows.net/', variables('vhdContainerName'))]",
-                "[concat('https://', variables('uniqueStringArray')[2], parameters('newStorageAccountSuffix'), '.blob.core.windows.net/', variables('vhdContainerName'))]",
-                "[concat('https://', variables('uniqueStringArray')[3], parameters('newStorageAccountSuffix'), '.blob.core.windows.net/', variables('vhdContainerName'))]",
-                "[concat('https://', variables('uniqueStringArray')[4], parameters('newStorageAccountSuffix'), '.blob.core.windows.net/', variables('vhdContainerName'))]"
+                "[concat('https://', variables('uniqueStringArray')[1], parameters('newStorageAccountSuffix'), '.blob.core.windows.net/', variables('vhdContainerName'))]"
               ],
               "name": "[variables('osDiskName')]",
               "caching": "ReadOnly",
