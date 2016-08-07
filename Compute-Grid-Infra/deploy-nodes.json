@@ -25,7 +25,7 @@
     "instanceCountPerVMSS": {
       "type": "int",
       "metadata": {
-        "description": "Number of VM instances per Scaleset (20 or less)."
+        "description": "Number of VM instances per Scaleset (100 or less)."
       },
       "defaultValue": 2,
       "maxValue": 100
@@ -33,9 +33,9 @@
     "numberOfVMSS": {
       "type": "int",
       "defaultValue": 1,
-      "maxValue": 10,
+      "maxValue": 100,
       "metadata": {
-        "description": "Number of VMSSes to deploy (max of 10)"
+        "description": "Number of VMSSes to deploy (max of 100)"
       }
     },
     "RGvnetName": {
