@@ -4,10 +4,10 @@
   "parameters": {
     "masterImage": {
       "type": "string",
-      "defaultValue": "CentOS_6.7",
+      "defaultValue": "CentOS_7.2",
       "allowedValues": [
         "CentOS_6.7",
-        "CentOS_7.0",
+        "CentOS_7.2",
         "RHEL_7.2",
         "W2012R2"
       ],
@@ -68,6 +68,7 @@
       "virtualNetworkName": "[variables('virtualNetworkName')]",
       "addressPrefix": "10.0.0.0/20",
       "computeSubnetPrefix": "10.0.0.0/21",
+      "storageSubnetPrefix": "10.0.10.0/25",
       "infraSubnetPrefix": "10.0.8.0/28",
       "gatewaySubnetPrefix": "10.0.9.0/29",
       "infraSubnetRef": "[concat(variables('vnetID'),'/subnets/infraSubnet/')]"
@@ -89,14 +90,14 @@
       "osType": "[variables('osTypes')[parameters('masterImage')]]",
       "adminUserName": "[parameters('adminUserName')]",
       "sshKeyData": "[parameters('sshKeyData')]",
-      "imageReference": "[variables('computeNodeImages')[parameters('masterImage')]]"
+      "imageReference": "[variables('computeImages')[parameters('masterImage')]]"
     },
 
     "osTypes": {
       "CentOS_6.7": {
         "os": "linux"
       },
-      "CentOS_7.0": {
+      "CentOS_7.2": {
         "os": "linux"
       },
       "RHEL_7.2": {
@@ -106,17 +107,17 @@
         "os": "windows"
       }
     },
-    "computeNodeImages": {
+    "computeImages": {
       "CentOS_6.7": {
         "publisher": "OpenLogic",
         "offer": "CentOS",
         "sku": "6.7",
         "version": "latest"
       },
-      "CentOS_7.0": {
+      "CentOS_7.2": {
         "publisher": "OpenLogic",
         "offer": "CentOS",
-        "sku": "7.0",
+        "sku": "7.2",
         "version": "latest"
       },
       "RHEL_7.2": {

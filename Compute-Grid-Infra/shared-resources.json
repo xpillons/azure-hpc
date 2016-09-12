@@ -39,6 +39,12 @@
             }
           },
           {
+            "name": "storageSubnet",
+            "properties": {
+              "addressPrefix": "[parameters('networkSettings').storageSubnetPrefix]"
+            }
+          },
+          {
             "name": "infraSubnet",
             "properties": {
               "addressPrefix": "[parameters('networkSettings').infraSubnetPrefix]"
