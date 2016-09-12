@@ -119,7 +119,7 @@
           "osDisk": {
             "name": "[variables('osDiskName')]",
             "vhd": {
-              "uri": "[concat('https://', variables('uniqueStringArray')[0], variables('newStorageAccountSuffix'), '.blob.core.windows.net/', variables('vhdContainerName'))]"
+              "uri": "[concat('https://', variables('uniqueStringArray')[0], variables('newStorageAccountSuffix'), '.blob.core.windows.net/vhds/', variables('osDiskName'), '.vhd')]"
             },
             "caching": "ReadOnly",
             "createOption": "FromImage"
