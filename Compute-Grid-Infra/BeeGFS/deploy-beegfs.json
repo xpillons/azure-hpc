@@ -1,0 +1,131 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.1",
+  "parameters": {
+    "StorageInstanceCount": {
+      "type": "int",
+      "metadata": {
+        "description": "Number Storage Nodes (100 or less)."
+      },
+      "defaultValue": 1,
+      "maxValue": 100
+    },
+    "MetadataInstanceCount": {
+      "type": "int",
+      "metadata": {
+        "description": "Number Metadata Nodes (100 or less)."
+      },
+      "defaultValue": 1,
+      "maxValue": 100
+    },
+    "RGvnetName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the RG of the virtual network to use."
+      }
+    },
+    "adminUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "Admin username on all VMs."
+      }
+    },
+    "sshKeyData": {
+      "type": "string",
+      "metadata": {
+        "description": "SSH rsa public key file as a string."
+      }
+    },
+    "masterName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of master VM name"
+      }
+    }
+  },
+  "variables": {
+    "vmImage": "CentOS_7.2",
+    "deploymentApiVersion": "2015-11-01",
+    "baseTemplateUri": "https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/BeeGFS/",
+    "metadataNodeSettings": {
+      "VMsku": "Standard_DS3_v2",
+      "vnetRG": "[parameters('RGvnetName')]",
+      "vnetName": "grid-vnet",
+      "subnetName": "storageSubnet",
+      "MasterName": "[parameters('masterName')]",
+      "avsetName":  "metadataAV"
+    },
+    "osTypes": {
+      "CentOS_7.2": {
+        "os": "linux"
+      },
+      "RHEL_7.2": {
+        "os": "linux"
+      }
+    },
+    "computeNodeImages": {
+      "CentOS_7.2": {
+        "publisher": "OpenLogic",
+        "offer": "CentOS",
+        "sku": "7.2",
+        "version": "latest"
+      },
+      "RHEL_7.2": {
+        "publisher": "RedHat",
+        "offer": "RHEL",
+        "sku": "7.2",
+        "version": "latest"
+      }
+    },
+    "nodeOSSettings": {
+      "osType": "[variables('osTypes')[variables('vmImage')]]",
+      "adminUserName": "[parameters('adminUserName')]",
+      "sshKeyData": "[parameters('sshKeyData')]",
+      "imageReference": "[variables('computeNodeImages')[variables('vmImage')]]"
+    },
+    "storageNode-templateUrl": "[concat(variables('baseTemplateUri'), 'storage-node-resources.json')]",
+    "metaDataNode-templateUrl": "[concat(variables('baseTemplateUri'), 'metadata-node-resources.json')]",
+    "avApiVersion": "2015-06-15"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Compute/availabilitySets",
+      "name": "[variables('metadataNodeSettings').avsetName]",
+      "apiVersion": "[variables('avApiVersion')]",
+      "location": "[resourceGroup().location]",
+      "properties": { }
+    },
+    {
+      "name": "[concat('create-metadatanode-', padLeft(string(copyIndex()), 3, '0'))]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "[variables('deploymentApiVersion')]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/availabilitySets/', variables('metadataNodeSettings').avsetName)]"
+      ],
+      "copy": {
+        "name": "metadataIndex",
+        "count": "[parameters('MetadataInstanceCount')]"
+      },
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('metaDataNode-templateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "nodeSettings": {
+            "value": "[variables('metadataNodeSettings')]"
+          },
+          "nodeOSSettings": {
+            "value": "[variables('nodeOSSettings')]"
+          },
+          "vmPrefix": {
+            "value": "metadata"
+          }
+        }
+      }
+    }
+
+  ]
+}
+
