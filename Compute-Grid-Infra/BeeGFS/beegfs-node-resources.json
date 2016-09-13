@@ -111,7 +111,7 @@
       {
         "name": "metadatadisk0",
         "diskSizeGB": "[variables('metadataDiskSize')]",
-        "lun": 0,
+        "lun": 20,
         "vhd": {
           "uri": "[concat('http://',variables('dataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-metadatadisk0.vhd')]"
         },
@@ -121,7 +121,7 @@
       {
         "name": "metadatadisk1",
         "diskSizeGB": "[variables('metadataDiskSize')]",
-        "lun": 1,
+        "lun": 21,
         "vhd": {
           "uri": "[concat('http://',variables('dataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-metadatadisk1.vhd')]"
         },
@@ -131,7 +131,7 @@
       {
         "name": "metadatadisk2",
         "diskSizeGB": "[variables('metadataDiskSize')]",
-        "lun": 2,
+        "lun": 22,
         "vhd": {
           "uri": "[concat('http://',variables('dataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-metadatadisk2.vhd')]"
         },
@@ -141,7 +141,7 @@
       {
         "name": "metadatadisk3",
         "diskSizeGB": "[variables('metadataDiskSize')]",
-        "lun": 3,
+        "lun": 23,
         "vhd": {
           "uri": "[concat('http://',variables('dataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-metadatadisk3.vhd')]"
         },
