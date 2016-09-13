@@ -120,7 +120,7 @@
             "value": "[variables('nodeOSSettings')]"
           },
           "vmPrefix": {
-            "value": "[concat('metadata-', padLeft(string(copyIndex()), 2, '0'))]"
+            "value": "[concat('meta', padLeft(string(copyIndex()), 2, '0'))]"
           }
         }
       }
