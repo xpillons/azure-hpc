@@ -96,7 +96,7 @@
       "properties": { }
     },
     {
-      "name": "[concat('create-metadatanode-', padLeft(string(copyIndex()), 3, '0'))]",
+      "name": "[concat('create-metadatanode-', padLeft(string(copyIndex()), 2, '0'))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "[variables('deploymentApiVersion')]",
       "dependsOn": [
@@ -120,7 +120,7 @@
             "value": "[variables('nodeOSSettings')]"
           },
           "vmPrefix": {
-            "value": "metadata"
+            "value": "[concat('metadata-', padLeft(string(copyIndex()), 2, '0'))]"
           }
         }
       }
