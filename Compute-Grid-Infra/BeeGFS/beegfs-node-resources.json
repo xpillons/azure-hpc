@@ -238,9 +238,7 @@
             "typeHandlerVersion": "1.4",
             "autoUpgradeMinorVersion": true,
             "settings": {
-              "fileUris": [
-                "[variables('vmScripts').scriptsToDownload]"
-              ],
+              "fileUris": "[variables('vmScripts').scriptsToDownload]",
               "commandToExecute": "[variables('vmScripts').commandToExecute]"
             }
           }
