@@ -20,6 +20,14 @@
         "description": "String used as a base for naming resources. Must be 8 characters in length max"
       },
       "maxLength": 8
+    },
+    "InstanceCount": {
+      "type": "int",
+      "metadata": {
+        "description": "Number of nodes in the BeeGFS cluster"
+      },
+      "defaultValue": 1,
+      "maxValue": 100
     }
   },
   "variables": {
@@ -43,13 +51,15 @@
     "computeApiVersion": "2016-03-30",
     "networkApiVersion": "2016-03-30",
     "storageApiVersion": "2015-06-15",
-    "setupScript": "setup-metadata.sh",
+    "extensionApiVersion": "2015-06-15",
+    "setupScript": "install_beegfs.sh",
     "scriptUrl": "https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/BeeGFS/",
+    "installationCLI": "[concat('bash azuredeploy.sh ', parameters('InstanceCount'), ' ', variables('vmName'), ' ', parameters('nodeSettings').MasterName)]",
     "vmScripts": {
       "scriptsToDownload": [
         "[concat(variables('scriptUrl'), variables('setupScript'))]"
       ],
-      "commandToExecute": ""
+      "commandToExecute": "[variables('installationCLI')]"
     },
     "sshKeyPath": "[concat('/home/',parameters('nodeOSSettings').adminUserName,'/.ssh/authorized_keys')]",
     "storageDiskArray": [
@@ -209,7 +219,33 @@
             }
           ]
         }
-      }
+      },
+      "resources": [
+        {
+          "name": "InstallScript",
+          "type": "extensions",
+          "location": "[variables('location')]",
+          "apiVersion": "[variables('extensionApiVersion')]",
+          "dependsOn": [
+            "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
+          ],
+          "tags": {
+            "displayName": "InstallScript"
+          },
+          "properties": {
+            "publisher": "Microsoft.OSTCExtensions",
+            "type": "CustomScriptForLinux",
+            "typeHandlerVersion": "1.4",
+            "autoUpgradeMinorVersion": true,
+            "settings": {
+              "fileUris": [
+                "[variables('vmScripts').scriptsToDownload]"
+              ],
+              "commandToExecute": "[variables('vmScripts').commandToExecute]"
+            }
+          }
+        }
+      ]
     },
     {
       "type": "Microsoft.Storage/storageAccounts",
@@ -226,4 +262,3 @@
     }
   ]
 }
-

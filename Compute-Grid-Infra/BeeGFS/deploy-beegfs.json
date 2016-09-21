@@ -70,7 +70,7 @@
       "sshKeyData": "[parameters('sshKeyData')]",
       "imageReference": "[variables('computeNodeImages')[variables('vmImage')]]"
     },
-    "metaDataNode-templateUrl": "[concat(variables('baseTemplateUri'), 'beegfs-node-resources.json')]",
+    "beeGFSNode-templateUrl": "[concat(variables('baseTemplateUri'), 'beegfs-node-resources.json')]",
     "avApiVersion": "2015-06-15"
   },
   "resources": [
@@ -82,7 +82,7 @@
       "properties": { }
     },
     {
-      "name": "[concat('create-metadatanode-', padLeft(string(copyIndex()), 2, '0'))]",
+      "name": "[concat('create-BeeGFSnode-', padLeft(string(copyIndex()), 2, '0'))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "[variables('deploymentApiVersion')]",
       "dependsOn": [
@@ -95,7 +95,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[variables('metaDataNode-templateUrl')]",
+          "uri": "[variables('beeGFSNode-templateUrl')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -107,6 +107,9 @@
           },
           "vmPrefix": {
             "value": "[concat('beegfs', padLeft(string(copyIndex()), 2, '0'))]"
+          },
+          "InstanceCount": {
+            "value": [ "parameters('InstanceCount')" ]
           }
         }
       }
