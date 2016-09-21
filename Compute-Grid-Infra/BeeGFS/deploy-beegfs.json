@@ -39,13 +39,17 @@
     "vmImage": "CentOS_7.2",
     "deploymentApiVersion": "2015-11-01",
     "baseTemplateUri": "https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/BeeGFS/",
-    "metadataNodeSettings": {
+    "beeGFSNodeSettings": {
       "VMsku": "Standard_DS3_v2",
       "vnetRG": "[parameters('RGvnetName')]",
       "vnetName": "grid-vnet",
       "subnetName": "storageSubnet",
       "MasterName": "[parameters('masterName')]",
-      "avsetName":  "metadataAV"
+      "avsetName": "beeGFSav",
+      "storageDiskSize": 128,
+      "numStorageDisks": 2,
+      "metadataDiskSize": 128,
+      "numMetadataDisks": 2
     },
     "computeNodeImages": {
       "CentOS_7.2": {
@@ -72,7 +76,7 @@
   "resources": [
     {
       "type": "Microsoft.Compute/availabilitySets",
-      "name": "[variables('metadataNodeSettings').avsetName]",
+      "name": "[variables('beeGFSNodeSettings').avsetName]",
       "apiVersion": "[variables('avApiVersion')]",
       "location": "[resourceGroup().location]",
       "properties": { }
@@ -82,7 +86,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "[variables('deploymentApiVersion')]",
       "dependsOn": [
-        "[concat('Microsoft.Compute/availabilitySets/', variables('metadataNodeSettings').avsetName)]"
+        "[concat('Microsoft.Compute/availabilitySets/', variables('beeGFSNodeSettings').avsetName)]"
       ],
       "copy": {
         "name": "nodeIndex",
@@ -96,7 +100,7 @@
         },
         "parameters": {
           "nodeSettings": {
-            "value": "[variables('metadataNodeSettings')]"
+            "value": "[variables('beeGFSNodeSettings')]"
           },
           "nodeOSSettings": {
             "value": "[variables('nodeOSSettings')]"
