@@ -54,7 +54,7 @@
     "extensionApiVersion": "2015-06-15",
     "setupScript": "install_beegfs.sh",
     "scriptUrl": "https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/BeeGFS/",
-    "installationCLI": "[concat('bash azuredeploy.sh ', parameters('InstanceCount'), ' ', variables('vmName'), ' ', parameters('nodeSettings').MasterName)]",
+    "installationCLI": "[concat('bash ', variables('setupScript'), ' ', parameters('InstanceCount'), ' ', variables('vmName'), ' ', parameters('nodeSettings').MasterName)]",
     "vmScripts": {
       "scriptsToDownload": [
         "[concat(variables('scriptUrl'), variables('setupScript'))]"

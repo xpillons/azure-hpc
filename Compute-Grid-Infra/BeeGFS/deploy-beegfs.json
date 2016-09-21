@@ -109,7 +109,7 @@
             "value": "[concat('beegfs', padLeft(string(copyIndex()), 2, '0'))]"
           },
           "InstanceCount": {
-            "value": [ "parameters('InstanceCount')" ]
+            "value": "[parameters('InstanceCount')]"
           }
         }
       }
