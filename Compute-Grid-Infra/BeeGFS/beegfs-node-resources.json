@@ -37,13 +37,12 @@
     "vmName": "[toLower(parameters('vmPrefix'))]",
     "newStorageAccountSuffix": "[concat(variables('vmName'), 'sa')]",
     "uniqueStringArray": [
-      "[concat(uniqueString(concat(resourceGroup().id, variables('newStorageAccountSuffix'), '0')))]",
-      "[concat(uniqueString(concat(resourceGroup().id, variables('newStorageAccountSuffix'), '1')))]"
+      "[concat(uniqueString(concat(resourceGroup().id, variables('newStorageAccountSuffix'), '0')))]"
     ],
     "saCount": "[length(variables('uniqueStringArray'))]",
     "OSStoreSA": "[concat(variables('uniqueStringArray')[0], variables('newStorageAccountSuffix'))]",
     "dataStoreSA": "[concat(variables('uniqueStringArray')[0], variables('newStorageAccountSuffix'))]",
-    "metadataStoreSA": "[concat(variables('uniqueStringArray')[1], variables('newStorageAccountSuffix'))]",
+    "metadataStoreSA": "[concat(variables('uniqueStringArray')[0], variables('newStorageAccountSuffix'))]",
     "osDiskName": "[concat(variables('namingInfix'), 'osdisk')]",
     "vnetID": "[resourceId(parameters('nodeSettings').vnetRG, 'Microsoft.Network/virtualNetworks', parameters('nodeSettings').vnetName)]",
     "subnetRef": "[concat(variables('vnetID'),'/subnets/', parameters('nodeSettings').subnetName)]",
@@ -113,7 +112,7 @@
         "diskSizeGB": "[variables('metadataDiskSize')]",
         "lun": 20,
         "vhd": {
-          "uri": "[concat('http://',variables('dataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-metadatadisk0.vhd')]"
+          "uri": "[concat('http://',variables('metadataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-metadatadisk0.vhd')]"
         },
         "caching": "None",
         "createOption": "Empty"
@@ -123,7 +122,7 @@
         "diskSizeGB": "[variables('metadataDiskSize')]",
         "lun": 21,
         "vhd": {
-          "uri": "[concat('http://',variables('dataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-metadatadisk1.vhd')]"
+          "uri": "[concat('http://',variables('metadataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-metadatadisk1.vhd')]"
         },
         "caching": "None",
         "createOption": "Empty"
@@ -133,7 +132,7 @@
         "diskSizeGB": "[variables('metadataDiskSize')]",
         "lun": 22,
         "vhd": {
-          "uri": "[concat('http://',variables('dataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-metadatadisk2.vhd')]"
+          "uri": "[concat('http://',variables('metadataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-metadatadisk2.vhd')]"
         },
         "caching": "None",
         "createOption": "Empty"
@@ -143,7 +142,7 @@
         "diskSizeGB": "[variables('metadataDiskSize')]",
         "lun": 23,
         "vhd": {
-          "uri": "[concat('http://',variables('dataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-metadatadisk3.vhd')]"
+          "uri": "[concat('http://',variables('metadataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-metadatadisk3.vhd')]"
         },
         "caching": "None",
         "createOption": "Empty"

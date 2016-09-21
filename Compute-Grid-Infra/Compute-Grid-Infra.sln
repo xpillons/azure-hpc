@@ -1,0 +1,39 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E3BE2F83-EF47-465C-8066-915F86E2D5C6}"
+	ProjectSection(SolutionItems) = preProject
+		cn-setup.bat = cn-setup.bat
+		cn-setup.ps1 = cn-setup.ps1
+		cn-setup.sh = cn-setup.sh
+		deploy-keyvault.json = deploy-keyvault.json
+		deploy-master.json = deploy-master.json
+		deploy-nodes.json = deploy-nodes.json
+		ListNodes.ps1 = ListNodes.ps1
+		master-linux-resources.json = master-linux-resources.json
+		master-setup.ps1 = master-setup.ps1
+		master-setup.sh = master-setup.sh
+		master-shared-resources.json = master-shared-resources.json
+		master-windows-resources.json = master-windows-resources.json
+		nodes-linux-resources.json = nodes-linux-resources.json
+		nodes-windows-resources.json = nodes-windows-resources.json
+		shared-resources.json = shared-resources.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BeeGFS", "BeeGFS", "{61C5DCA9-5630-40B9-8C6E-DBB067C1AFE8}"
+	ProjectSection(SolutionItems) = preProject
+		BeeGFS\beegfs-node-resources.json = BeeGFS\beegfs-node-resources.json
+		BeeGFS\deploy-beegfs.json = BeeGFS\deploy-beegfs.json
+		BeeGFS\install_beegfs.sh = BeeGFS\install_beegfs.sh
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{61C5DCA9-5630-40B9-8C6E-DBB067C1AFE8} = {E3BE2F83-EF47-465C-8066-915F86E2D5C6}
+	EndGlobalSection
+EndGlobal
