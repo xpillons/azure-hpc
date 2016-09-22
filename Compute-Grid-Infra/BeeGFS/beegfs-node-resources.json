@@ -161,7 +161,7 @@
       "apiVersion": "[variables('computeApiVersion')]",
       "dependsOn": [
         "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]",
-        "[variables('dataStoreSA')]"
+        "[concat('Microsoft.Storage/storageAccounts/', variables('dataStoreSA'))]"
       ],
       "properties": {
         "availabilitySet": {
