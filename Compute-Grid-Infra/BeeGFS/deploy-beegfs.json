@@ -105,7 +105,7 @@
           "nodeOSSettings": {
             "value": "[variables('nodeOSSettings')]"
           },
-          "vmPrefix": {
+          "vmName": {
             "value": "[concat('beegfs', padLeft(string(copyIndex()), 2, '0'))]"
           }
         }

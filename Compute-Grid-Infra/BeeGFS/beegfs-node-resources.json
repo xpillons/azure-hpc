@@ -14,10 +14,10 @@
         "Description": "node OS settings object"
       }
     },
-    "vmPrefix": {
+    "vmName": {
       "type": "string",
       "metadata": {
-        "description": "String used as a base for naming resources. Must be 8 characters in length max"
+        "description": "Name of the VM"
       },
       "maxLength": 8
     }
@@ -25,8 +25,7 @@
   "variables": {
     "storageAccountType": "Premium_LRS",
     "location": "[resourceGroup().location]",
-    "namingInfix": "[toLower(substring(concat(parameters('vmPrefix'), uniqueString(resourceGroup().id)), 0, 9))]",
-    "vmName": "[toLower(parameters('vmPrefix'))]",
+    "vmName": "[toLower(parameters('vmName'))]",
     "dataStoreSA": "[concat(resourceGroup().id, variables('vmName'), 'sa')]",
     "osDiskName": "[concat(variables('vmName'), 'osdisk')]",
     "vnetID": "[resourceId(parameters('nodeSettings').vnetRG, 'Microsoft.Network/virtualNetworks', parameters('nodeSettings').vnetName)]",
@@ -160,8 +159,8 @@
       "location": "[variables('location')]",
       "apiVersion": "[variables('computeApiVersion')]",
       "dependsOn": [
-        "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]",
-        "[concat('Microsoft.Storage/storageAccounts/', variables('dataStoreSA'))]"
+        "[concat('Microsoft.Storage/storageAccounts/', variables('dataStoreSA'))]",
+        "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]"
       ],
       "properties": {
         "availabilitySet": {
