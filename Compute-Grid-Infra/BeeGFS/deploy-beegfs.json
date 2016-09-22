@@ -5,7 +5,7 @@
     "InstanceCount": {
       "type": "int",
       "metadata": {
-        "description": "Number Instance Nodes (100 or less)."
+        "description": "Number of BeeGFS Nodes (100 or less)."
       },
       "defaultValue": 1,
       "maxValue": 100
@@ -107,9 +107,6 @@
           },
           "vmPrefix": {
             "value": "[concat('beegfs', padLeft(string(copyIndex()), 2, '0'))]"
-          },
-          "InstanceCount": {
-            "value": "[parameters('InstanceCount')]"
           }
         }
       }

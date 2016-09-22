@@ -20,14 +20,6 @@
         "description": "String used as a base for naming resources. Must be 8 characters in length max"
       },
       "maxLength": 8
-    },
-    "InstanceCount": {
-      "type": "int",
-      "metadata": {
-        "description": "Number of nodes in the BeeGFS cluster"
-      },
-      "defaultValue": 1,
-      "maxValue": 100
     }
   },
   "variables": {
@@ -35,14 +27,7 @@
     "location": "[resourceGroup().location]",
     "namingInfix": "[toLower(substring(concat(parameters('vmPrefix'), uniqueString(resourceGroup().id)), 0, 9))]",
     "vmName": "[toLower(parameters('vmPrefix'))]",
-    "newStorageAccountSuffix": "[concat(variables('vmName'), 'sa')]",
-    "uniqueStringArray": [
-      "[concat(uniqueString(concat(resourceGroup().id, variables('newStorageAccountSuffix'), '0')))]"
-    ],
-    "saCount": "[length(variables('uniqueStringArray'))]",
-    "OSStoreSA": "[concat(variables('uniqueStringArray')[0], variables('newStorageAccountSuffix'))]",
-    "dataStoreSA": "[concat(variables('uniqueStringArray')[0], variables('newStorageAccountSuffix'))]",
-    "metadataStoreSA": "[concat(variables('uniqueStringArray')[0], variables('newStorageAccountSuffix'))]",
+    "dataStoreSA": "[concat(resourceGroup().id, variables('vmName'), 'sa')]",
     "osDiskName": "[concat(variables('vmName'), 'osdisk')]",
     "vnetID": "[resourceId(parameters('nodeSettings').vnetRG, 'Microsoft.Network/virtualNetworks', parameters('nodeSettings').vnetName)]",
     "subnetRef": "[concat(variables('vnetID'),'/subnets/', parameters('nodeSettings').subnetName)]",
@@ -54,7 +39,7 @@
     "extensionApiVersion": "2015-06-15",
     "setupScript": "install_beegfs.sh",
     "scriptUrl": "https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/BeeGFS/",
-    "installationCLI": "[concat('bash ', variables('setupScript'), ' ', parameters('InstanceCount'), ' ', variables('vmName'), ' ', parameters('nodeSettings').MasterName)]",
+    "installationCLI": "[concat('bash ', variables('setupScript'), ' ', parameters('nodeSettings').MasterName)]",
     "vmScripts": {
       "scriptsToDownload": [
         "[concat(variables('scriptUrl'), variables('setupScript'))]"
@@ -110,7 +95,7 @@
         "diskSizeGB": "[parameters('nodeSettings').metadataDiskSize]",
         "lun": 20,
         "vhd": {
-          "uri": "[concat('http://',variables('metadataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-metadatadisk0.vhd')]"
+          "uri": "[concat('http://',variables('dataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-metadatadisk0.vhd')]"
         },
         "caching": "None",
         "createOption": "Empty"
@@ -120,7 +105,7 @@
         "diskSizeGB": "[parameters('nodeSettings').metadataDiskSize]",
         "lun": 21,
         "vhd": {
-          "uri": "[concat('http://',variables('metadataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-metadatadisk1.vhd')]"
+          "uri": "[concat('http://',variables('dataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-metadatadisk1.vhd')]"
         },
         "caching": "None",
         "createOption": "Empty"
@@ -130,7 +115,7 @@
         "diskSizeGB": "[parameters('nodeSettings').metadataDiskSize]",
         "lun": 22,
         "vhd": {
-          "uri": "[concat('http://',variables('metadataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-metadatadisk2.vhd')]"
+          "uri": "[concat('http://',variables('dataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-metadatadisk2.vhd')]"
         },
         "caching": "None",
         "createOption": "Empty"
@@ -140,7 +125,7 @@
         "diskSizeGB": "[parameters('nodeSettings').metadataDiskSize]",
         "lun": 23,
         "vhd": {
-          "uri": "[concat('http://',variables('metadataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-metadatadisk3.vhd')]"
+          "uri": "[concat('http://',variables('dataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-metadatadisk3.vhd')]"
         },
         "caching": "None",
         "createOption": "Empty"
@@ -176,7 +161,7 @@
       "apiVersion": "[variables('computeApiVersion')]",
       "dependsOn": [
         "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]",
-        "storageLoop"
+        "[variables('dataStoreSA')]"
       ],
       "properties": {
         "availabilitySet": {
@@ -205,7 +190,7 @@
           "osDisk": {
             "name": "[variables('osDiskName')]",
             "vhd": {
-              "uri": "[concat('https://', variables('OSStoreSA'), '.blob.core.windows.net/vhds/', variables('osDiskName'), '.vhd')]"
+              "uri": "[concat('https://', variables('dataStoreSA'), '.blob.core.windows.net/vhds/', variables('osDiskName'), '.vhd')]"
             },
             "caching": "ReadOnly",
             "createOption": "FromImage"
@@ -248,13 +233,9 @@
     },
     {
       "type": "Microsoft.Storage/storageAccounts",
-      "name": "[concat(variables('uniqueStringArray')[copyIndex()], variables('newStorageAccountSuffix'))]",
+      "name": "[variables('dataStoreSA')]",
       "location": "[variables('location')]",
       "apiVersion": "[variables('storageApiVersion')]",
-      "copy": {
-        "name": "storageLoop",
-        "count": "[variables('saCount')]"
-      },
       "properties": {
         "accountType": "[variables('storageAccountType')]"
       }
