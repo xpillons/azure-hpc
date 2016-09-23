@@ -173,7 +173,7 @@
                   "settings": {
                     "fileUris": "[variables('vmScripts').scriptsToDownload]",
                     "commandToExecute": "[variables('vmScripts').commandToExecute]",
-                    "protectedSettings": { }
+                    "timestamp": 12
                   }
                 }
               }
