@@ -51,9 +51,19 @@
     "namingInfix": "[toLower(substring(concat(parameters('vmssName'), uniqueString(resourceGroup().id)), 0, 9))]",
     "uniqueStringArray": [
       "[concat(uniqueString(concat(resourceGroup().id, parameters('newStorageAccountSuffix'), '0')))]",
-      "[concat(uniqueString(concat(resourceGroup().id, parameters('newStorageAccountSuffix'), '1')))]"
+      "[concat(uniqueString(concat(resourceGroup().id, parameters('newStorageAccountSuffix'), '1')))]",
+      "[concat(uniqueString(concat(resourceGroup().id, parameters('newStorageAccountSuffix'), '2')))]",
+      "[concat(uniqueString(concat(resourceGroup().id, parameters('newStorageAccountSuffix'), '3')))]",
+      "[concat(uniqueString(concat(resourceGroup().id, parameters('newStorageAccountSuffix'), '4')))]"
     ],
-    "saCount": "[length(variables('uniqueStringArray'))]",
+    "vhdContainers": [
+      "[concat('https://', variables('uniqueStringArray')[0], parameters('newStorageAccountSuffix'), '.blob.core.windows.net/', variables('vhdContainerName'))]",
+      "[concat('https://', variables('uniqueStringArray')[1], parameters('newStorageAccountSuffix'), '.blob.core.windows.net/', variables('vhdContainerName'))]",
+      "[concat('https://', variables('uniqueStringArray')[2], parameters('newStorageAccountSuffix'), '.blob.core.windows.net/', variables('vhdContainerName'))]",
+      "[concat('https://', variables('uniqueStringArray')[3], parameters('newStorageAccountSuffix'), '.blob.core.windows.net/', variables('vhdContainerName'))]",
+      "[concat('https://', variables('uniqueStringArray')[4], parameters('newStorageAccountSuffix'), '.blob.core.windows.net/', variables('vhdContainerName'))]"
+    ],
+    "saCount": 2,
     "vhdContainerName": "[concat(variables('namingInfix'), 'vhd')]",
     "osDiskName": "[concat(variables('namingInfix'), 'osdisk')]",
     "vnetID": "[resourceId(parameters('nodeSettings').vnetRG, 'Microsoft.Network/virtualNetworks', parameters('nodeSettings').vnetName)]",
@@ -145,10 +155,7 @@
           "storageProfile": {
             "imageReference": "[parameters('nodeOSSettings').imageReference]",
             "osDisk": {
-              "vhdContainers": [
-                "[concat('https://', variables('uniqueStringArray')[0], parameters('newStorageAccountSuffix'), '.blob.core.windows.net/', variables('vhdContainerName'))]",
-                "[concat('https://', variables('uniqueStringArray')[1], parameters('newStorageAccountSuffix'), '.blob.core.windows.net/', variables('vhdContainerName'))]"
-              ],
+              "vhdContainers": "[take(variables('vhdContainers'),variables('saCount'))]",
               "name": "[variables('osDiskName')]",
               "caching": "ReadOnly",
               "createOption": "FromImage"
@@ -159,13 +166,14 @@
               {
                 "name": "installCN",
                 "properties": {
-                  "publisher": "Microsoft.OSTCExtensions",
-                  "type": "CustomScriptForLinux",
-                  "typeHandlerVersion": "1.5",
+                  "publisher": "Microsoft.Azure.Extensions",
+                  "type": "CustomScript",
+                  "typeHandlerVersion": "2.0",
                   "autoUpgradeMinorVersion": true,
                   "settings": {
                     "fileUris": "[variables('vmScripts').scriptsToDownload]",
-                    "commandToExecute": "[variables('vmScripts').commandToExecute]"
+                    "commandToExecute": "[variables('vmScripts').commandToExecute]",
+                    "protectedSettings": { }
                   }
                 }
               }
