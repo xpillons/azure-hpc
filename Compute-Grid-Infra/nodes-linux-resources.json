@@ -70,7 +70,7 @@
       "scriptsToDownload": [
         "[concat(variables('scriptUrl'), 'cn-setup.sh')]"
       ],
-      "commandToExecute": ""
+      "commandToExecute": "[concat('bash ', variables('cnSetupScript'), ' -m ', parameters('nodeSettings').MasterName)]"
     },
     "sshKeyPath": "[concat('/home/',parameters('nodeOSSettings').adminUserName,'/.ssh/authorized_keys')]"
   },
@@ -165,7 +165,7 @@
                   "autoUpgradeMinorVersion": true,
                   "settings": {
                     "fileUris": "[variables('vmScripts').scriptsToDownload]",
-                    "commandToExecute": "[concat('sh ', variables('cnSetupScript'), ' -a ', parameters('commonSettings').DataSAName, ' -k ', listKeys(variables('sharedAccountId'), variables('storageApiVersion')).key1, ' -m ', parameters('nodeSettings').MasterName)]"
+                    "commandToExecute": "[variables('vmScripts').commandToExecute]"
                   }
                 }
               }
