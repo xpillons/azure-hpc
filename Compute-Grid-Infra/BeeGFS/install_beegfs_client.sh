@@ -40,16 +40,8 @@ install_beegfs()
     sed -i 's/SELINUX=.*/SELINUX=disabled/g' /etc/selinux/config
     setenforce 0
 
-    yum install -y beegfs-mgmtd beegfs-client beegfs-helperd beegfs-utils beegfs-admon
+    yum install -y beegfs-client beegfs-helperd beegfs-utils
         
-    # Install management server and client
-    mkdir -p /data/beegfs/mgmtd
-    sed -i 's|^storeMgmtdDirectory.*|storeMgmtdDirectory = /data/beegfs/mgmt|g' /etc/beegfs/beegfs-mgmtd.conf
-    sed -i 's/^sysMgmtdHost.*/sysMgmtdHost = '$MGMT_HOSTNAME'/g' /etc/beegfs/beegfs-admon.conf
-    systemctl daemon-reload
-    systemctl enable beegfs-mgmtd.service
-	systemctl enable beegfs-admon.service
-
     # setup client
     sed -i 's/^sysMgmtdHost.*/sysMgmtdHost = '$MGMT_HOSTNAME'/g' /etc/beegfs/beegfs-client.conf
     sed -i  's/Type=oneshot.*/Type=oneshot\nRestart=always\nRestartSec=5/g' /etc/systemd/system/multi-user.target.wants/beegfs-client.service

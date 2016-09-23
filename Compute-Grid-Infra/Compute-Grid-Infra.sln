@@ -27,6 +27,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BeeGFS", "BeeGFS", "{61C5DC
 		BeeGFS\beegfs-node-resources.json = BeeGFS\beegfs-node-resources.json
 		BeeGFS\deploy-beegfs.json = BeeGFS\deploy-beegfs.json
 		BeeGFS\install_beegfs.sh = BeeGFS\install_beegfs.sh
+		BeeGFS\install_beegfs_client.sh = BeeGFS\install_beegfs_client.sh
+		BeeGFS\install_beegfs_mgmt.sh = BeeGFS\install_beegfs_mgmt.sh
 	EndProjectSection
 EndProject
 Global
