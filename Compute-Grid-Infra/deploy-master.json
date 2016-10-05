@@ -2,6 +2,14 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "artifactsBaseUrl": {
+      "type": "string",
+      "defaultValue": "https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra",
+      "metadata": {
+        "description": "Base URL of the solution template gallery package",
+        "artifactsBaseUrl": ""
+      }
+    },
     "masterImage": {
       "type": "string",
       "defaultValue": "CentOS_7.2",
@@ -15,7 +23,7 @@
         "description": "The VM image of the compute nodes"
       }
     },
-    "vmSSPrefix": {
+    "vmPrefix": {
       "type": "string",
       "metadata": {
         "description": "Base string for naming resources (max length of 8)"
@@ -55,8 +63,8 @@
   },
   "variables": {
     "location": "[resourceGroup().location]",
-    "namingInfix": "[toLower(substring(concat(parameters('vmSSPrefix'), uniqueString(resourceGroup().id)), 0, 9))]",
-    "longNamingInfix": "[toLower(parameters('vmSSPrefix'))]",
+    "namingInfix": "[toLower(substring(concat(parameters('vmPrefix'), uniqueString(resourceGroup().id)), 0, 9))]",
+    "longNamingInfix": "[toLower(parameters('vmPrefix'))]",
     "newStorageAccountSuffix": "[concat(variables('longNamingInfix'), 'sa')]",
     "virtualNetworkName": "grid-vnet",
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
@@ -138,10 +146,10 @@
     "storageApiVersion": "2015-06-15",
     "extensionApiVersion": "2015-06-15",
     "deploymentApiVersion": "2015-01-01",
-    "baseTemplateUri": "https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/",
-    "sharedTemplateUrl": "[concat(variables('baseTemplateUri'), 'shared-resources.json')]",
-    "master-sharedTemplateUrl": "[concat(variables('baseTemplateUri'), 'master-shared-resources.json')]",
-    "master-OSTemplateUrl": "[concat(variables('baseTemplateUri'), 'master-', variables('masterOSSettings').osType.os, '-resources.json')]"
+    "baseUrl": "[concat(parameters('artifactsBaseUrl'),'/')]",
+    "sharedTemplateUrl": "[concat(variables('baseUrl'), 'shared-resources.json')]",
+    "master-sharedTemplateUrl": "[concat(variables('baseUrl'), 'master-shared-resources.json')]",
+    "master-OSTemplateUrl": "[concat(variables('baseUrl'), 'master-', variables('masterOSSettings').osType.os, '-resources.json')]"
   },
   "resources": [
     {
@@ -205,6 +213,9 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
+          "artifactsBaseUrl": {
+            "value": "[parameters('artifactsBaseUrl')]"
+          },
           "commonSettings": {
             "value": "[variables('commonSettings')]"
           },

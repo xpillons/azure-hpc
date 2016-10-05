@@ -2,6 +2,13 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
+    "artifactsBaseUrl": {
+      "type": "string",
+      "metadata": {
+        "description": "Base URL of the solution template gallery package",
+        "artifactsBaseUrl": ""
+      }
+    },
     "commonSettings": {
       "type": "object",
       "metadata": {
@@ -37,11 +44,11 @@
     "location": "[resourceGroup().location]",
     "vmScripts": {
       "scriptsToDownload": [
-        "[concat(variables('scriptUrl'), 'master-setup.ps1')]"
+        "[concat(variables('baseUrl'), 'master-setup.ps1')]"
       ],
       "commandToExecute": ""
     },
-    "scriptUrl": "https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/",
+    "baseUrl": "[concat(parameters('artifactsBaseUrl'),'/')]",
     "sharedAccountId": "[resourceId(parameters('commonSettings').RGStorageName, 'Microsoft.Storage/storageAccounts', parameters('commonSettings').DataSAName)]",
     "computeApiVersion": "2016-03-30",
     "storageApiVersion": "2015-06-15"
