@@ -31,11 +31,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BeeGFS", "BeeGFS", "{61C5DC
 		BeeGFS\install_beegfs_mgmt.sh = BeeGFS\install_beegfs_mgmt.sh
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PBSPro", "PBSPro", "{992206B4-5289-43B8-8E4B-529FCCEDA380}"
+	ProjectSection(SolutionItems) = preProject
+		PBSPro\install_pbspro.sh = PBSPro\install_pbspro.sh
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{61C5DCA9-5630-40B9-8C6E-DBB067C1AFE8} = {E3BE2F83-EF47-465C-8066-915F86E2D5C6}
+		{992206B4-5289-43B8-8E4B-529FCCEDA380} = {E3BE2F83-EF47-465C-8066-915F86E2D5C6}
 	EndGlobalSection
 EndGlobal
