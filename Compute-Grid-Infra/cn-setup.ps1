@@ -53,22 +53,34 @@ function RunSetup($shareName, $user, $pwd)
 	&Z:\symphony\provisionScript.bat | Out-Host 
 }
 
+function Main()
+{
+	# Enable Remote Powershell Execution From The Master Node
+	# don't put these lines into the script called by the session because it will close the session :-)
+	Enable-PSRemoting -Force
+	$trustedHosts="@{TrustedHosts=\""$MasterName\""}"
 
-# Enable Remote Powershell Execution From The Master Node
-# don't put these lines into the script called by the session because it will close the session :-)
-Enable-PSRemoting -Force
-$trustedHosts="@{TrustedHosts=\""$MasterName\""}"
+	&winrm s winrm/config/client $trustedHosts
+	Restart-Service WinRM -Force
 
-&winrm s winrm/config/client $trustedHosts
-Restart-Service WinRM -Force
+	RegisterReverseDNS $MasterName
+	AddRunCommands 
 
-RegisterReverseDNS $MasterName
-AddRunCommands 
+	# Create local credential to run the installation script
+	$User = ".\$UserName"
+	$PWord = ConvertTo-SecureString -String $Password -AsPlainText -Force
+	$Credential = New-Object -TypeName "System.Management.Automation.PSCredential" -ArgumentList $User, $PWord
 
-# Create local credential to run the installation script
-$User = ".\$UserName"
-$PWord = ConvertTo-SecureString -String $Password -AsPlainText -Force
-$Credential = New-Object -TypeName "System.Management.Automation.PSCredential" -ArgumentList $User, $PWord
+	$psSession = New-PSSession -Credential $Credential
+	Invoke-Command -Session $psSession -Script ${function:RunSetup} -ArgumentList $MasterName,$UserName,$Password
+    New-Item -Path C:\ -Name customscript.txt -ItemType File
+}
 
-$psSession = New-PSSession -Credential $Credential
-Invoke-Command -Session $psSession -Script ${function:RunSetup} -ArgumentList $MasterName,$UserName,$Password
+$touch = (Test-Path -Path C:\customscript.txt)
+
+if ($touch -eq $false)
+{
+    Main
+}
+
+
