@@ -63,7 +63,6 @@ function Main()
 	&winrm s winrm/config/client $trustedHosts
 	Restart-Service WinRM -Force
 
-	RegisterReverseDNS $MasterName
 	AddRunCommands 
 
 	# Create local credential to run the installation script
@@ -75,6 +74,8 @@ function Main()
 	Invoke-Command -Session $psSession -Script ${function:RunSetup} -ArgumentList $MasterName,$UserName,$Password
     New-Item -Path C:\ -Name customscript.txt -ItemType File
 }
+
+RegisterReverseDNS $MasterName
 
 $touch = (Test-Path -Path C:\customscript.txt)
 
