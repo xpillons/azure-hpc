@@ -93,7 +93,7 @@
       "RGStorageName": "[parameters('RGStorageName')]"
     },
     "nodeSettings": {
-      "VMsku": "Standard_DS5_v2",
+      "VMsku": "Standard_D5_v2",
       "vnetRG": "[parameters('RGvnetName')]",
       "vnetName": "grid-vnet",
       "subnetName": "computeSubnet",

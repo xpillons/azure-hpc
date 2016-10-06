@@ -46,7 +46,7 @@
     }
   },
   "variables": {
-    "storageAccountType": "Premium_LRS",
+    "storageAccountType": "LRS",
     "location": "[resourceGroup().location]",
     "namingInfix": "[toLower(substring(concat(parameters('vmssName'), uniqueString(resourceGroup().id)), 0, 9))]",
     "uniqueStringArray": [
