@@ -79,6 +79,9 @@ RegisterReverseDNS $MasterName
 
 $touch = (Test-Path -Path C:\customscript.txt)
 
+&net stop LIM
+&net start LIM
+
 if ($touch -eq $false)
 {
     Main
