@@ -73,8 +73,7 @@ function Main()
 	# don't put these lines into the script called by the session because it will close the session :-)
 	Enable-PSRemoting -Force
 	$trustedHosts="@{TrustedHosts=\""$MasterName\""}"
-
-	Write-Host "Call WinRM"
+	Write-Host "Config WinRM for $trustedHosts"
 	&winrm s winrm/config/client $trustedHosts
 
 	Write-Host "Restart WinRM"
