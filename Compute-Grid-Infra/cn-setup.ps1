@@ -76,8 +76,11 @@ function Main()
 
 	Write-Host "Call WinRM"
 	&winrm s winrm/config/client $trustedHosts
+
+	Write-Host "Restart WinRM"
 	Restart-Service WinRM -Force
 
+	Write-Host "Add commands to run on startup"
 	AddRunCommands $MasterName
 
 	# Create local credential to run the installation script
