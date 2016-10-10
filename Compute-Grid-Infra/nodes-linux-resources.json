@@ -46,7 +46,6 @@
     }
   },
   "variables": {
-    "storageAccountType": "Premium_LRS",
     "location": "[resourceGroup().location]",
     "namingInfix": "[toLower(substring(concat(parameters('vmssName'), uniqueString(resourceGroup().id)), 0, 9))]",
     "uniqueStringArray": [
@@ -96,7 +95,7 @@
         "count": "[variables('saCount')]"
       },
       "properties": {
-        "accountType": "[variables('storageAccountType')]"
+        "accountType": "[parameters('nodeSettings').storageAccountType]"
       }
     },
     {
