@@ -10,6 +10,7 @@ param (
 
 function RegisterReverseDNS($shareName)
 {
+	Write-Host "Register Reverse DNS $shareName"
 	$ip = test-connection $shareName -timetolive 2 -count 1 | Select -ExpandProperty IPV4Address 
 
 	&reg add HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters /v Domain /d southcentralus.cloudapp.azure.com /f
@@ -50,11 +51,12 @@ function AddRunCommands($shareName)
 
 function RunSetup($shareName, $user, $pwd)
 {
+	Write-Host "Run setup $shareName $user"
+	&net use Z: \\$shareName\Data /user:$user $pwd /persistent:yes 
+	&net use  
 
-	&net use Z: \\$shareName\Data /user:$user $pwd /persistent:yes | Out-Host
-	&net use | Out-Host 
-
-	&Z:\symphony\provisionScript.bat | Out-Host 
+	Write-Host "Run provisionScript"
+	&Z:\symphony\provisionScript.bat 
 }
 
 function Main()
