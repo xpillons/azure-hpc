@@ -10,9 +10,11 @@ param (
 
 function RegisterReverseDNS($shareName)
 {
+	$ip = test-connection $shareName -timetolive 2 -count 1 | Select -ExpandProperty IPV4Address 
+
 	&reg add HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters /v Domain /d southcentralus.cloudapp.azure.com /f
 	&reg add HKLM\System\currentcontrolset\services\tcpip\parameters /v SearchList /d southcentralus.cloudapp.azure.com /f
-	&netsh interface ipv4 add dnsserver "Ethernet" address=10.0.8.4 index=1
+	&netsh interface ipv4 add dnsserver "Ethernet" address=$ip.IPAddressToString index=1
 	&ipconfig /registerdns
 
 	#Import-Module ServerManager
@@ -27,15 +29,17 @@ function RegisterReverseDNS($shareName)
 	#Add-DnsServerResourceRecordPtr -ComputerName $shareName -Name $name -ZoneName $zone -PtrDomainName $env:COMPUTERNAME
 }
 
-function AddRunCommands()
+function AddRunCommands($shareName)
 {
+	$ip = test-connection $shareName -timetolive 2 -count 1 | Select -ExpandProperty IPV4Address 
+
 	#$command = "reg add HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters /v Domain /d southcentralus.cloudapp.azure.com /f"
 	#&reg add HKLM\Software\Microsoft\Windows\CurrentVersion\Run /v Domain /f /d $command
 
 	#$command = "reg add HKLM\System\currentcontrolset\services\tcpip\parameters /v SearchList /d southcentralus.cloudapp.azure.com /f"
 	#&reg add HKLM\Software\Microsoft\Windows\CurrentVersion\Run /v SearchList /f /d $command
 	
-	$command = "netsh interface ipv4 add dnsserver 'Ethernet' address=10.0.8.4 index=1"
+	$command = "netsh interface ipv4 add dnsserver 'Ethernet' address=$ip.IPAddressToString index=1"
 	&reg add HKLM\Software\Microsoft\Windows\CurrentVersion\Run /v adddns /f /d $command
 	
 	$command = "ipconfig /registerdns"
@@ -63,7 +67,7 @@ function Main()
 	&winrm s winrm/config/client $trustedHosts
 	Restart-Service WinRM -Force
 
-	AddRunCommands 
+	AddRunCommands $MasterName
 
 	# Create local credential to run the installation script
 	$User = ".\$UserName"
