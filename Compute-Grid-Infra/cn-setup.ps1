@@ -14,12 +14,13 @@ function RegisterReverseDNS($shareName)
 	$ip = test-connection $shareName -timetolive 2 -count 1 | Select -ExpandProperty IPV4Address 
 
 	Write-Host "$shareName is $ip.IPAddressToString"
+	$ip4Value = $ip.IPAddressToString
 
 	&reg add HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters /v Domain /d southcentralus.cloudapp.azure.com /f
 	&reg add HKLM\System\currentcontrolset\services\tcpip\parameters /v SearchList /d southcentralus.cloudapp.azure.com /f
 
 	Write-Host "running netsh"
-	&netsh interface ipv4 add dnsserver "Ethernet" address=$ip.IPAddressToString index=1
+	&netsh interface ipv4 add dnsserver "Ethernet" address=$ip4Value index=1
 
 	Write-Host "running IPCONFIG"
 	&ipconfig /registerdns
@@ -39,6 +40,7 @@ function RegisterReverseDNS($shareName)
 function AddRunCommands($shareName)
 {
 	$ip = test-connection $shareName -timetolive 2 -count 1 | Select -ExpandProperty IPV4Address 
+	$ip4Value = $ip.IPAddressToString
 
 	#$command = "reg add HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters /v Domain /d southcentralus.cloudapp.azure.com /f"
 	#&reg add HKLM\Software\Microsoft\Windows\CurrentVersion\Run /v Domain /f /d $command
@@ -46,7 +48,7 @@ function AddRunCommands($shareName)
 	#$command = "reg add HKLM\System\currentcontrolset\services\tcpip\parameters /v SearchList /d southcentralus.cloudapp.azure.com /f"
 	#&reg add HKLM\Software\Microsoft\Windows\CurrentVersion\Run /v SearchList /f /d $command
 	
-	$command = "netsh interface ipv4 add dnsserver 'Ethernet' address=$ip.IPAddressToString index=1"
+	$command = "netsh interface ipv4 add dnsserver 'Ethernet' address=$ip4Value index=1"
 	&reg add HKLM\Software\Microsoft\Windows\CurrentVersion\Run /v adddns /f /d $command
 	
 	$command = "ipconfig /registerdns"
