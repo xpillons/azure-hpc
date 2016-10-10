@@ -71,14 +71,18 @@ function Main()
 {
 	# Enable Remote Powershell Execution From The Master Node
 	# don't put these lines into the script called by the session because it will close the session :-)
-	Enable-PSRemoting -Force
-	$trustedHosts="@{TrustedHosts=\""$MasterName\""}"
-	Write-Host "Config WinRM for $trustedHosts"
-	&winrm s winrm/config/client $trustedHosts
+	try {
+		Enable-PSRemoting -Force
+		$trustedHosts="@{TrustedHosts=\""$MasterName\""}"
+		Write-Host "Config WinRM for $trustedHosts"
+		&winrm s winrm/config/client $trustedHosts
 
-	Write-Host "Restart WinRM"
-	Restart-Service WinRM -Force
+		Write-Host "Restart WinRM"
+		Restart-Service WinRM -Force
+	}
+	catch {
 
+	}
 	Write-Host "Add commands to run on startup"
 	AddRunCommands $MasterName
 
