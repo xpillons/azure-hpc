@@ -10,19 +10,9 @@ param (
 
 function RegisterReverseDNS($shareName)
 {
-	Write-Host "Register Reverse DNS $shareName"
-	$ip = test-connection $shareName -timetolive 2 -count 1 | Select -ExpandProperty IPV4Address 
-
-	Write-Host "$shareName is $ip.IPAddressToString"
-	$ip4Value = $ip.IPAddressToString
-
 	&reg add HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters /v Domain /d southcentralus.cloudapp.azure.com /f
 	&reg add HKLM\System\currentcontrolset\services\tcpip\parameters /v SearchList /d southcentralus.cloudapp.azure.com /f
-
-	Write-Host "running netsh"
-	&netsh interface ipv4 add dnsserver "Ethernet" address=$ip4Value index=1
-
-	Write-Host "running IPCONFIG"
+	&netsh interface ipv4 add dnsserver "Ethernet" address=10.0.8.4 index=1
 	&ipconfig /registerdns
 
 	#Import-Module ServerManager
@@ -37,18 +27,15 @@ function RegisterReverseDNS($shareName)
 	#Add-DnsServerResourceRecordPtr -ComputerName $shareName -Name $name -ZoneName $zone -PtrDomainName $env:COMPUTERNAME
 }
 
-function AddRunCommands($shareName)
+function AddRunCommands()
 {
-	$ip = test-connection $shareName -timetolive 2 -count 1 | Select -ExpandProperty IPV4Address 
-	$ip4Value = $ip.IPAddressToString
-
 	#$command = "reg add HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters /v Domain /d southcentralus.cloudapp.azure.com /f"
 	#&reg add HKLM\Software\Microsoft\Windows\CurrentVersion\Run /v Domain /f /d $command
 
 	#$command = "reg add HKLM\System\currentcontrolset\services\tcpip\parameters /v SearchList /d southcentralus.cloudapp.azure.com /f"
 	#&reg add HKLM\Software\Microsoft\Windows\CurrentVersion\Run /v SearchList /f /d $command
 	
-	$command = "netsh interface ipv4 add dnsserver 'Ethernet' address=$ip4Value index=1"
+	$command = "netsh interface ipv4 add dnsserver 'Ethernet' address=10.0.8.4 index=1"
 	&reg add HKLM\Software\Microsoft\Windows\CurrentVersion\Run /v adddns /f /d $command
 	
 	$command = "ipconfig /registerdns"
@@ -59,45 +46,32 @@ function AddRunCommands($shareName)
 
 function RunSetup($shareName, $user, $pwd)
 {
-	Write-Host "Run setup $shareName $user"
-	&net use Z: \\$shareName\Data /user:$user $pwd /persistent:yes 
-	&net use  
 
-	Write-Host "Run provisionScript"
-	&Z:\symphony\provisionScript.bat 
+	&net use Z: \\$shareName\Data /user:$user $pwd /persistent:yes | Out-Host
+	&net use | Out-Host 
+
+	&Z:\symphony\provisionScript.bat | Out-Host 
 }
 
 function Main()
 {
 	# Enable Remote Powershell Execution From The Master Node
 	# don't put these lines into the script called by the session because it will close the session :-)
-	try {
-		Enable-PSRemoting -Force
-		$trustedHosts="@{TrustedHosts=\""$MasterName\""}"
-		Write-Host "Config WinRM for $trustedHosts"
-		&winrm s winrm/config/client $trustedHosts
+	Enable-PSRemoting -Force
+	$trustedHosts="@{TrustedHosts=\""$MasterName\""}"
 
-		Write-Host "Restart WinRM"
-		Restart-Service WinRM -Force
-	}
-	catch {
+	&winrm s winrm/config/client $trustedHosts
+	Restart-Service WinRM -Force
 
-	}
-	Write-Host "Add commands to run on startup"
-	AddRunCommands $MasterName
+	AddRunCommands 
 
 	# Create local credential to run the installation script
-	Write-Host "Create Local Credentials"
 	$User = ".\$UserName"
 	$PWord = ConvertTo-SecureString -String $Password -AsPlainText -Force
 	$Credential = New-Object -TypeName "System.Management.Automation.PSCredential" -ArgumentList $User, $PWord
 
-	Write-Host "Create New PS Session"
 	$psSession = New-PSSession -Credential $Credential
-	Write-Host "Invoke RunSetup"
 	Invoke-Command -Session $psSession -Script ${function:RunSetup} -ArgumentList $MasterName,$UserName,$Password
-
-	Write-Host "Create Marker"
     New-Item -Path C:\ -Name customscript.txt -ItemType File
 }
 
@@ -105,13 +79,11 @@ RegisterReverseDNS $MasterName
 
 $touch = (Test-Path -Path C:\customscript.txt)
 
-Write-Host "Restart LIM"
 &net stop LIM
 &net start LIM
 
 if ($touch -eq $false)
 {
-	Write-Host "Marker file doesn't exists"
     Main
 }
 
