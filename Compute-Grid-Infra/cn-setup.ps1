@@ -13,9 +13,15 @@ function RegisterReverseDNS($shareName)
 	Write-Host "Register Reverse DNS $shareName"
 	$ip = test-connection $shareName -timetolive 2 -count 1 | Select -ExpandProperty IPV4Address 
 
+	Write-Host "$shareName is $ip.IPAddressToString"
+
 	&reg add HKLM\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters /v Domain /d southcentralus.cloudapp.azure.com /f
 	&reg add HKLM\System\currentcontrolset\services\tcpip\parameters /v SearchList /d southcentralus.cloudapp.azure.com /f
+
+	Write-Host "running netsh"
 	&netsh interface ipv4 add dnsserver "Ethernet" address=$ip.IPAddressToString index=1
+
+	Write-Host "running IPCONFIG"
 	&ipconfig /registerdns
 
 	#Import-Module ServerManager
@@ -66,18 +72,24 @@ function Main()
 	Enable-PSRemoting -Force
 	$trustedHosts="@{TrustedHosts=\""$MasterName\""}"
 
+	Write-Host "Call WinRM"
 	&winrm s winrm/config/client $trustedHosts
 	Restart-Service WinRM -Force
 
 	AddRunCommands $MasterName
 
 	# Create local credential to run the installation script
+	Write-Host "Create Local Credentials"
 	$User = ".\$UserName"
 	$PWord = ConvertTo-SecureString -String $Password -AsPlainText -Force
 	$Credential = New-Object -TypeName "System.Management.Automation.PSCredential" -ArgumentList $User, $PWord
 
+	Write-Host "Create New PS Session"
 	$psSession = New-PSSession -Credential $Credential
+	Write-Host "Invoke RunSetup"
 	Invoke-Command -Session $psSession -Script ${function:RunSetup} -ArgumentList $MasterName,$UserName,$Password
+
+	Write-Host "Create Marker"
     New-Item -Path C:\ -Name customscript.txt -ItemType File
 }
 
@@ -85,11 +97,13 @@ RegisterReverseDNS $MasterName
 
 $touch = (Test-Path -Path C:\customscript.txt)
 
+Write-Host "Restart LIM"
 &net stop LIM
 &net start LIM
 
 if ($touch -eq $false)
 {
+	Write-Host "Marker file doesn't exists"
     Main
 }
 
