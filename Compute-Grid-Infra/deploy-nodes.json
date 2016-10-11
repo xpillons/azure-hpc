@@ -97,7 +97,8 @@
       "vnetRG": "[parameters('RGvnetName')]",
       "vnetName": "grid-vnet",
       "subnetName": "computeSubnet",
-      "MasterName": "[parameters('masterName')]"
+      "MasterName": "[parameters('masterName')]",
+      "storageAccountType": "Standard_LRS"
     },
     "osTypes": {
       "CentOS_6.7": {
