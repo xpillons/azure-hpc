@@ -98,7 +98,7 @@
       "infraSubnetPrefix": "10.0.8.0/28",
       "gatewaySubnetPrefix": "10.0.9.0/29",
       "infraSubnetRef": "[concat(variables('vnetID'),'/subnets/infraSubnet/')]",
-      "nsgName": "nsgmaster"
+      "nsgName": "nsg-master"
     },
     "masterBoxName": "[concat(variables('longNamingInfix'), 'master')]",
     "masterSettings": {
@@ -202,7 +202,7 @@
         },
         "parameters": {
           "nsgName": {
-            "value": "nsg-master"
+            "value": "[variables('networkSettings').nsgName]"
           }
         }
       }
