@@ -17,7 +17,6 @@
   },
   "variables": {
     "location": "[resourceGroup().location]",
-    "storageAccountType": "Premium_LRS",
     "networkApiVersion": "2016-03-30",
     "storageApiVersion": "2015-06-15"
   },
@@ -28,7 +27,7 @@
       "location": "[variables('location')]",
       "apiVersion": "[variables('storageApiVersion')]",
       "properties": {
-        "accountType": "[variables('storageAccountType')]"
+        "accountType": "[parameters('masterSettings').SAType]"
       }
     },
     {

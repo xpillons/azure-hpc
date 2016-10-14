@@ -10,6 +10,16 @@
         "artifactsBaseUrl": ""
       }
     },
+    "VMsku": {
+      "type": "string",
+      "allowedValues": [
+        "Standard_DS1_v2", "Standard_DS2_v2", "Standard_DS3_v2", "Standard_DS4_v2", "Standard_DS5_v2",
+        "Standard_DS11_v2", "Standard_DS12_v2", "Standard_DS13_v2", "Standard_DS14_v2", "Standard_DS15_v2"
+      ],
+      "metadata": {
+        "description": "sku to use for the master VM"
+      }
+    },
     "masterImage": {
       "type": "string",
       "defaultValue": "CentOS_7.2",
@@ -84,13 +94,14 @@
     "masterBoxName": "[concat(variables('longNamingInfix'), 'master')]",
     "masterSettings": {
       "Name": "[variables('masterBoxName')]",
+      "SAType": "Premium_LRS",
       "SAName": "[concat(uniqueString(concat(resourceGroup().id, variables('newStorageAccountSuffix'), 'masterboxsa')), 'master')]",
       "DiagSAName": "[concat(uniqueString(concat(resourceGroup().id, variables('newStorageAccountSuffix'), 'masterboxsadiag')), 'diag')]",
       "OSDiskName": "[concat(variables('masterBoxName'), 'osdisk')]",
       "VHDContainerName": "[concat(variables('masterBoxName'), 'vhd')]",
       "IPConfigName": "[concat(variables('masterBoxName'), 'ipconfig')]",
       "NicName": "[concat(variables('masterBoxName'), 'nic')]",
-      "VMsku": "Standard_DS3_v2",
+      "VMsku": "[parameters('VMsku')]",
       "publicIPAddressName": "[concat(variables('masterBoxName'), 'pip')]",
       "publicIPDomainName": "[variables('namingInfix')]"
     },
