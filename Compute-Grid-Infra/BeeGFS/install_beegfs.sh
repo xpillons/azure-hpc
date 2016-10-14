@@ -9,7 +9,7 @@ if [[ $(id -u) -ne 0 ]] ; then
 fi
 
 if [ $# != 1 ]; then
-    echo "Usage: $0 <ManagementHost> "
+    echo "Usage: $0 <ManagementHost>"
     exit 1
 fi
 
@@ -103,9 +103,12 @@ setup_disks()
     storageDiskSize=`fdisk -l | grep '^Disk /dev/' | grep -v $rootDevice | grep -v $tmpDevice | awk '{print $3}' | sort -n | tail -1`
 
     if [ $metadataDiskSize -eq $storageDiskSize ]; then
-        # If metadata and storage disks are the same size, we grab 6 for meta, 10 for storage
-        metadataDevices="`fdisk -l | grep '^Disk /dev/' | grep $metadataDiskSize | awk '{print $2}' | awk -F: '{print $1}' | sort | head -6 | tr '\n' ' ' | sed 's|/dev/||g'`"
-        storageDevices="`fdisk -l | grep '^Disk /dev/' | grep $storageDiskSize | awk '{print $2}' | awk -F: '{print $1}' | sort | tail -10 | tr '\n' ' ' | sed 's|/dev/||g'`"
+        # If metadata and storage disks are the same size, we grab 1/3 for meta, 2/3 for storage
+		# TODO : Compute number of disks
+		nbMetadaDisks = 1
+		nbStorageDisks = 3
+        metadataDevices="`fdisk -l | grep '^Disk /dev/' | grep $metadataDiskSize | awk '{print $2}' | awk -F: '{print $1}' | sort | head -$nbMetadaDisks | tr '\n' ' ' | sed 's|/dev/||g'`"
+        storageDevices="`fdisk -l | grep '^Disk /dev/' | grep $storageDiskSize | awk '{print $2}' | awk -F: '{print $1}' | sort | tail -$nbStorageDisks | tr '\n' ' ' | sed 's|/dev/||g'`"
     else
         # Based on the known disk sizes, grab the meta and storage devices
         metadataDevices="`fdisk -l | grep '^Disk /dev/' | grep $metadataDiskSize | awk '{print $2}' | awk -F: '{print $1}' | sort | tr '\n' ' ' | sed 's|/dev/||g'`"
