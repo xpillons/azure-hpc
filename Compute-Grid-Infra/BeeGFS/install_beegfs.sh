@@ -104,9 +104,12 @@ setup_disks()
 
     if [ "$metadataDiskSize" == "$storageDiskSize" ]; then
         # If metadata and storage disks are the same size, we grab 1/3 for meta, 2/3 for storage
-		# TODO : Compute number of disks
-		nbMetadaDisks = 1
-		nbStorageDisks = 3
+		# Compute number of disks
+		nbDisks=`fdisk -l | grep '^Disk /dev/' | grep -v $rootDevice | grep -v $tmpDevice | wc -l`
+		echo "nbDisks=$nbDisks"
+		nbMetadaDisks=nbDisks/3
+		nbStorageDisks=nbDisks-nbMetadaDisks
+		echo "nbMetadaDisks=$nbMetadaDisks nbStorageDisks=$nbStorageDisks"
         metadataDevices="`fdisk -l | grep '^Disk /dev/' | grep $metadataDiskSize | awk '{print $2}' | awk -F: '{print $1}' | sort | head -$nbMetadaDisks | tr '\n' ' ' | sed 's|/dev/||g'`"
         storageDevices="`fdisk -l | grep '^Disk /dev/' | grep $storageDiskSize | awk '{print $2}' | awk -F: '{print $1}' | sort | tail -$nbStorageDisks | tr '\n' ' ' | sed 's|/dev/||g'`"
     else
