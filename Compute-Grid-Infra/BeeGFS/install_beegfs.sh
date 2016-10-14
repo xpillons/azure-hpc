@@ -102,7 +102,7 @@ setup_disks()
     metadataDiskSize=`fdisk -l | grep '^Disk /dev/' | grep -v $rootDevice | grep -v $tmpDevice | awk '{print $3}' | sort -n -r | tail -1`
     storageDiskSize=`fdisk -l | grep '^Disk /dev/' | grep -v $rootDevice | grep -v $tmpDevice | awk '{print $3}' | sort -n | tail -1`
 
-    if [ $metadataDiskSize -eq $storageDiskSize ]; then
+    if [ "$metadataDiskSize" == "$storageDiskSize" ]; then
         # If metadata and storage disks are the same size, we grab 1/3 for meta, 2/3 for storage
 		# TODO : Compute number of disks
 		nbMetadaDisks = 1
