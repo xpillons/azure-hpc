@@ -9,7 +9,7 @@ if [[ $(id -u) -ne 0 ]] ; then
 fi
 
 if [ $# != 1 ]; then
-    echo "Usage: $0 <ManagementHost>"
+    echo "Usage: $0 <ManagementHost> "
     exit 1
 fi
 
@@ -54,11 +54,18 @@ w
 EOF
         createdPartitions="$createdPartitions /dev/${disk}1"
     done
+    
+    sleep 10
 
     # Create RAID-0 volume
     if [ -n "$createdPartitions" ]; then
         devices=`echo $createdPartitions | wc -w`
         mdadm --create /dev/$raidDevice --level 0 --raid-devices $devices $createdPartitions
+        
+        sleep 10
+        
+        mdadm /dev/$raidDevice
+
         if [ "$filesystem" == "xfs" ]; then
             mkfs -t $filesystem /dev/$raidDevice
             echo "/dev/$raidDevice $mountPoint $filesystem rw,noatime,attr2,inode64,nobarrier,sunit=1024,swidth=4096,nofail 0 2" >> /etc/fstab
@@ -68,6 +75,9 @@ EOF
             tune2fs -o user_xattr /dev/$raidDevice
             echo "/dev/$raidDevice $mountPoint $filesystem noatime,nodiratime,nobarrier,nofail 0 2" >> /etc/fstab
         fi
+        
+        sleep 10
+        
         mount /dev/$raidDevice
     fi
 }
@@ -75,26 +85,47 @@ EOF
 setup_disks()
 {
     mkdir -p $SHARE_SCRATCH
-    
+       
     # Dump the current disk config for debugging
     fdisk -l
     
     # Dump the scsi config
     lsscsi
+    
+    # Get the root/OS disk so we know which device it uses and can ignore it later
+    rootDevice=`mount | grep "on / type" | awk '{print $1}' | sed 's/[0-9]//g'`
+    
+    # Get the TMP disk so we know which device and can ignore it later
+    tmpDevice=`mount | grep "on /mnt/resource type" | awk '{print $1}' | sed 's/[0-9]//g'`
 
-    # Configure metadata and storage disks
+    # Get the metadata and storage disk sizes from fdisk, we ignore the disks above
+    metadataDiskSize=`fdisk -l | grep '^Disk /dev/' | grep -v $rootDevice | grep -v $tmpDevice | awk '{print $3}' | sort -n -r | tail -1`
+    storageDiskSize=`fdisk -l | grep '^Disk /dev/' | grep -v $rootDevice | grep -v $tmpDevice | awk '{print $3}' | sort -n | tail -1`
+
+    if [ $metadataDiskSize -eq $storageDiskSize ]; then
+        # If metadata and storage disks are the same size, we grab 6 for meta, 10 for storage
+        metadataDevices="`fdisk -l | grep '^Disk /dev/' | grep $metadataDiskSize | awk '{print $2}' | awk -F: '{print $1}' | sort | head -6 | tr '\n' ' ' | sed 's|/dev/||g'`"
+        storageDevices="`fdisk -l | grep '^Disk /dev/' | grep $storageDiskSize | awk '{print $2}' | awk -F: '{print $1}' | sort | tail -10 | tr '\n' ' ' | sed 's|/dev/||g'`"
+    else
+        # Based on the known disk sizes, grab the meta and storage devices
+        metadataDevices="`fdisk -l | grep '^Disk /dev/' | grep $metadataDiskSize | awk '{print $2}' | awk -F: '{print $1}' | sort | tr '\n' ' ' | sed 's|/dev/||g'`"
+        storageDevices="`fdisk -l | grep '^Disk /dev/' | grep $storageDiskSize | awk '{print $2}' | awk -F: '{print $1}' | sort | tr '\n' ' ' | sed 's|/dev/||g'`"
+    fi
+
     mkdir -p $BEEGFS_STORAGE
     mkdir -p $BEEGFS_METADATA
-
-	# TODO : need to build the device list dynamically based on the number of disks required for storage and metadata
-    setup_data_disks $BEEGFS_STORAGE "xfs" "sdc sdd" "md10"
-    setup_data_disks $BEEGFS_METADATA "ext4" "sde sdf" "md20"
+    
+    setup_data_disks $BEEGFS_STORAGE "xfs" "$storageDevices" "md10"
+    setup_data_disks $BEEGFS_METADATA "ext4" "$metadataDevices" "md20"
 
     mount -a
 }
 
 install_beegfs()
 {
+    systemctl stop firewalld
+    systemctl disable firewalld
+	
     # Install BeeGFS repo
     wget -O beegfs-rhel7.repo http://www.beegfs.com/release/latest-stable/dists/beegfs-rhel7.repo
     mv beegfs-rhel7.repo /etc/yum.repos.d/beegfs.repo
@@ -105,21 +136,21 @@ install_beegfs()
     setenforce 0
     
 	# setup metata data
-    yum install -y beegfs-meta
-    sed -i 's|^storeMetaDirectory.*|storeMetaDirectory = '$BEEGFS_METADATA'|g' /etc/beegfs/beegfs-meta.conf
-    sed -i 's/^sysMgmtdHost.*/sysMgmtdHost = '$MGMT_HOSTNAME'/g' /etc/beegfs/beegfs-meta.conf
-    systemctl daemon-reload
-    systemctl enable beegfs-meta.service
-        
-    # See http://www.beegfs.com/wiki/MetaServerTuning#xattr
-    echo deadline > /sys/block/sdX/queue/scheduler
-    
+	yum install -y beegfs-meta
+	sed -i 's|^storeMetaDirectory.*|storeMetaDirectory = '$BEEGFS_METADATA'|g' /etc/beegfs/beegfs-meta.conf
+	sed -i 's/^sysMgmtdHost.*/sysMgmtdHost = '$MGMT_HOSTNAME'/g' /etc/beegfs/beegfs-meta.conf
+	systemctl daemon-reload
+	systemctl enable beegfs-meta.service
+	
+	# See http://www.beegfs.com/wiki/MetaServerTuning#xattr
+	echo deadline > /sys/block/sdX/queue/scheduler
+		   
 	# setup storage
-    yum install -y beegfs-storage
-    sed -i 's|^storeStorageDirectory.*|storeStorageDirectory = '$BEEGFS_STORAGE'|g' /etc/beegfs/beegfs-storage.conf
-    sed -i 's/^sysMgmtdHost.*/sysMgmtdHost = '$MGMT_HOSTNAME'/g' /etc/beegfs/beegfs-storage.conf
-    systemctl daemon-reload
-    systemctl enable beegfs-storage.service
+	yum install -y beegfs-storage
+	sed -i 's|^storeStorageDirectory.*|storeStorageDirectory = '$BEEGFS_STORAGE'|g' /etc/beegfs/beegfs-storage.conf
+	sed -i 's/^sysMgmtdHost.*/sysMgmtdHost = '$MGMT_HOSTNAME'/g' /etc/beegfs/beegfs-storage.conf
+	systemctl daemon-reload
+	systemctl enable beegfs-storage.service
 }
 
 setup_swap()
@@ -131,6 +162,13 @@ setup_swap()
 	echo "/mnt/resource/swap   none  swap  sw  0 0" >> /etc/fstab
 }
 
+tune_tcp()
+{
+    echo "net.ipv4.neigh.default.gc_thresh1=1100" >> /etc/sysctl.conf
+    echo "net.ipv4.neigh.default.gc_thresh2=2200" >> /etc/sysctl.conf
+    echo "net.ipv4.neigh.default.gc_thresh3=4400" >> /etc/sysctl.conf
+}
+
 SETUP_MARKER=/var/tmp/configured
 if [ -e "$SETUP_MARKER" ]; then
     echo "We're already configured, exiting..."
@@ -140,6 +178,7 @@ fi
 setup_swap
 install_pkgs
 setup_disks
+tune_tcp
 install_beegfs
 
 # Create marker file so we know we're configured

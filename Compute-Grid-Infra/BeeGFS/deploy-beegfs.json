@@ -2,6 +2,14 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.1",
   "parameters": {
+    "artifactsBaseUrl": {
+      "type": "string",
+      "defaultValue": "https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/BeeGFS",
+      "metadata": {
+        "description": "Base URL of the solution template gallery package",
+        "artifactsBaseUrl": ""
+      }
+    },
     "InstanceCount": {
       "type": "int",
       "metadata": {
@@ -9,6 +17,25 @@
       },
       "defaultValue": 1,
       "maxValue": 100
+    },
+    "VMsku": {
+      "type": "string",
+      "defaultValue": "Standard_DS3_v2",
+      "allowedValues": [
+        "Standard_DS1_v2",
+        "Standard_DS2_v2",
+        "Standard_DS3_v2",
+        "Standard_DS4_v2",
+        "Standard_DS5_v2",
+        "Standard_DS11_v2",
+        "Standard_DS12_v2",
+        "Standard_DS13_v2",
+        "Standard_DS14_v2",
+        "Standard_DS15_v2"
+      ],
+      "metadata": {
+        "description": "sku to use for the storage nodes - only premium disks VMs are allowed"
+      }
     },
     "RGvnetName": {
       "type": "string",
@@ -33,23 +60,74 @@
       "metadata": {
         "description": "Name of master VM name"
       }
+    },
+    "storageDiskSize": {
+      "type": "string",
+      "defaultValue": "P10",
+      "allowedValues": [
+        "P10",
+        "P20",
+        "P30"
+      ],
+      "metadata": {
+        "description": "Premium storage disk size used for the storage services"
+      }
+    },
+    "nbStorageDisks": {
+      "type": "int",
+      "defaultValue": 1,
+      "maxValue": 32,
+      "metadata": {
+        "description": "Number of storage disks"
+      }
+    },
+    "metaDiskSize": {
+      "type": "string",
+      "defaultValue": "P10",
+      "allowedValues": [
+        "P10",
+        "P20",
+        "P30"
+      ],
+      "metadata": {
+        "description": "Premium storage disk size used for the metadata services"
+      }
+    },
+    "nbMetaDisks": {
+      "type": "int",
+      "defaultValue": 1,
+      "maxValue": 32,
+      "metadata": {
+        "description": "Number of metadate disks"
+      }
     }
   },
   "variables": {
+    "PremiumStorageMap": {
+      "P10": {
+        "size": 128
+      },
+      "P20": {
+        "size": 512
+      },
+      "P30": {
+        "size": 1024
+      }
+    },
     "vmImage": "CentOS_7.2",
     "deploymentApiVersion": "2015-11-01",
-    "baseTemplateUri": "https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/BeeGFS/",
+    "baseUrl": "[concat(parameters('artifactsBaseUrl'),'/')]",
     "beeGFSNodeSettings": {
-      "VMsku": "Standard_DS3_v2",
+      "VMsku": "[parameters('VMsku')]",
       "vnetRG": "[parameters('RGvnetName')]",
       "vnetName": "grid-vnet",
       "subnetName": "storageSubnet",
       "MasterName": "[parameters('masterName')]",
       "avsetName": "beeGFSav",
-      "storageDiskSize": 128,
-      "numStorageDisks": 2,
-      "metadataDiskSize": 128,
-      "numMetadataDisks": 2
+      "storageDiskSize": "[variables('PremiumStorageMap')[parameters('storageDiskSize')].size]",
+      "numStorageDisks": "[parameters('nbStorageDisks')]",
+      "metadataDiskSize": "[variables('PremiumStorageMap')[parameters('metaDiskSize')].size]",
+      "numMetadataDisks": "[parameters('nbMetaDisks')]"
     },
     "computeNodeImages": {
       "CentOS_7.2": {
@@ -70,7 +148,7 @@
       "sshKeyData": "[parameters('sshKeyData')]",
       "imageReference": "[variables('computeNodeImages')[variables('vmImage')]]"
     },
-    "beeGFSNode-templateUrl": "[concat(variables('baseTemplateUri'), 'beegfs-node-resources.json')]",
+    "beeGFSNode-templateUrl": "[concat(variables('baseUrl'), 'beegfs-node-resources.json')]",
     "avApiVersion": "2015-06-15"
   },
   "resources": [
@@ -99,6 +177,9 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
+          "artifactsBaseUrl": {
+            "value": "[parameters('artifactsBaseUrl')]"
+          },
           "nodeSettings": {
             "value": "[variables('beeGFSNodeSettings')]"
           },
