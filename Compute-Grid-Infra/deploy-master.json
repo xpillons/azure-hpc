@@ -13,8 +13,16 @@
     "VMsku": {
       "type": "string",
       "allowedValues": [
-        "Standard_DS1_v2", "Standard_DS2_v2", "Standard_DS3_v2", "Standard_DS4_v2", "Standard_DS5_v2",
-        "Standard_DS11_v2", "Standard_DS12_v2", "Standard_DS13_v2", "Standard_DS14_v2", "Standard_DS15_v2"
+        "Standard_DS1_v2",
+        "Standard_DS2_v2",
+        "Standard_DS3_v2",
+        "Standard_DS4_v2",
+        "Standard_DS5_v2",
+        "Standard_DS11_v2",
+        "Standard_DS12_v2",
+        "Standard_DS13_v2",
+        "Standard_DS14_v2",
+        "Standard_DS15_v2"
       ],
       "metadata": {
         "description": "sku to use for the master VM"
@@ -89,7 +97,8 @@
       "storageSubnetPrefix": "10.0.10.0/25",
       "infraSubnetPrefix": "10.0.8.0/28",
       "gatewaySubnetPrefix": "10.0.9.0/29",
-      "infraSubnetRef": "[concat(variables('vnetID'),'/subnets/infraSubnet/')]"
+      "infraSubnetRef": "[concat(variables('vnetID'),'/subnets/infraSubnet/')]",
+      "nsgName": "nsgmaster"
     },
     "masterBoxName": "[concat(variables('longNamingInfix'), 'master')]",
     "masterSettings": {
@@ -160,7 +169,8 @@
     "baseUrl": "[concat(parameters('artifactsBaseUrl'),'/')]",
     "sharedTemplateUrl": "[concat(variables('baseUrl'), 'shared-resources.json')]",
     "master-sharedTemplateUrl": "[concat(variables('baseUrl'), 'master-shared-resources.json')]",
-    "master-OSTemplateUrl": "[concat(variables('baseUrl'), 'master-', variables('masterOSSettings').osType.os, '-resources.json')]"
+    "master-OSTemplateUrl": "[concat(variables('baseUrl'), 'master-', variables('masterOSSettings').osType.os, '-resources.json')]",
+    "master-NSGTemplateUrl": "[concat(variables('baseUrl'), 'nsg-master-', variables('masterOSSettings').osType.os, '.json')]"
   },
   "resources": [
     {
@@ -181,11 +191,29 @@
       }
     },
     {
+      "name": "master-nsg",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "[variables('deploymentApiVersion')]",
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('master-NSGTemplateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "nsgName": {
+            "value": "nsg-master"
+          }
+        }
+      }
+    },
+    {
       "name": "master-shared-resources",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "[variables('deploymentApiVersion')]",
       "dependsOn": [
-        "shared-resources"
+        "shared-resources",
+        "master-nsg"
       ],
       "properties": {
         "mode": "Incremental",
