@@ -107,8 +107,8 @@ setup_disks()
 		# Compute number of disks
 		nbDisks=`fdisk -l | grep '^Disk /dev/' | grep -v $rootDevice | grep -v $tmpDevice | wc -l`
 		echo "nbDisks=$nbDisks"
-		nbMetadaDisks=nbDisks/3
-		nbStorageDisks=nbDisks-nbMetadaDisks
+		let nbMetadaDisks=nbDisks/3
+		let nbStorageDisks=nbDisks-nbMetadaDisks
 		echo "nbMetadaDisks=$nbMetadaDisks nbStorageDisks=$nbStorageDisks"
         metadataDevices="`fdisk -l | grep '^Disk /dev/' | grep $metadataDiskSize | awk '{print $2}' | awk -F: '{print $1}' | sort | head -$nbMetadaDisks | tr '\n' ' ' | sed 's|/dev/||g'`"
         storageDevices="`fdisk -l | grep '^Disk /dev/' | grep $storageDiskSize | awk '{print $2}' | awk -F: '{print $1}' | sort | tail -$nbStorageDisks | tr '\n' ' ' | sed 's|/dev/||g'`"
