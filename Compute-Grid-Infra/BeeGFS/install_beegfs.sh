@@ -107,7 +107,12 @@ setup_disks()
 		# Compute number of disks
 		nbDisks=`fdisk -l | grep '^Disk /dev/' | grep -v $rootDevice | grep -v $tmpDevice | wc -l`
 		echo "nbDisks=$nbDisks"
+		
+		# minimum number of disks has to be 2
 		let nbMetadaDisks=nbDisks/3
+		if [ $nbMetadaDisks -lt 2 ]
+			let nbMetadaDisks=2
+			
 		let nbStorageDisks=nbDisks-nbMetadaDisks
 		echo "nbMetadaDisks=$nbMetadaDisks nbStorageDisks=$nbStorageDisks"
         metadataDevices="`fdisk -l | grep '^Disk /dev/' | grep $metadataDiskSize | awk '{print $2}' | awk -F: '{print $1}' | sort | head -$nbMetadaDisks | tr '\n' ' ' | sed 's|/dev/||g'`"
