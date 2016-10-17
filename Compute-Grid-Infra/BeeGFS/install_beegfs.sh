@@ -110,9 +110,10 @@ setup_disks()
 		
 		# minimum number of disks has to be 2
 		let nbMetadaDisks=nbDisks/3
-		if [ $nbMetadaDisks -lt 2 ]
+		if [ $nbMetadaDisks -lt 2 ]; then
 			let nbMetadaDisks=2
-			
+		fi
+		
 		let nbStorageDisks=nbDisks-nbMetadaDisks
 		echo "nbMetadaDisks=$nbMetadaDisks nbStorageDisks=$nbStorageDisks"
         metadataDevices="`fdisk -l | grep '^Disk /dev/' | grep $metadataDiskSize | awk '{print $2}' | awk -F: '{print $1}' | sort | head -$nbMetadaDisks | tr '\n' ' ' | sed 's|/dev/||g'`"
