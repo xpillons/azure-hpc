@@ -112,6 +112,10 @@ Write-Host "Restart LIM"
 &net stop LIM
 &net start LIM
 
+Write-Host "set env variables"
+&setx PLATCOMMDRV_TCP_RECV_BUFFER_SIZE 1000000 /m
+&setx PLATCOMMDRV_TCP_SEND_BUFFER_SIZE 1000000 /m
+
 if ($touch -eq $false)
 {
 	Write-Host "Marker file doesn't exists"
