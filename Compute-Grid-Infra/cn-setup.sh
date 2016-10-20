@@ -86,7 +86,7 @@ install_beegfs_client()
 	bash install_beegfs_client.sh ${MASTER_NAME}
 }
 
-setup_disks()
+setup_user()
 {
     mkdir -p $SHARE_HOME
     mkdir -p $SHARE_SCRATCH
@@ -94,10 +94,7 @@ setup_disks()
 	echo "$MASTER_NAME:$SHARE_HOME $SHARE_HOME    nfs4    rw,auto,_netdev 0 0" >> /etc/fstab
 	mount -a
 	mount
-}
 
-setup_user()
-{
     # disable selinux
     sed -i 's/enforcing/disabled/g' /etc/selinux/config
     setenforce permissive
@@ -119,7 +116,6 @@ setup_user()
 #install_azure_files
 #mount_nfs
 #install_applications
-setup_disks
 setup_user
 install_beegfs_client
 

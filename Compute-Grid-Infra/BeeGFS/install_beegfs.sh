@@ -16,9 +16,16 @@ fi
 MGMT_HOSTNAME=$1
 
 # Shares
+SHARE_HOME=/share/home
 SHARE_SCRATCH=/share/scratch
 BEEGFS_METADATA=/data/beegfs/meta
 BEEGFS_STORAGE=/data/beegfs/storage
+
+# User
+HPC_USER=hpcuser
+HPC_UID=7007
+HPC_GROUP=hpc
+HPC_GID=7007
 
 # Installs all required packages.
 #
@@ -181,6 +188,33 @@ tune_tcp()
     echo "net.ipv4.neigh.default.gc_thresh3=4400" >> /etc/sysctl.conf
 }
 
+setup_user()
+{
+    mkdir -p $SHARE_HOME
+    mkdir -p $SHARE_SCRATCH
+
+	echo "$MASTER_NAME:$SHARE_HOME $SHARE_HOME    nfs4    rw,auto,_netdev 0 0" >> /etc/fstab
+	mount -a
+	mount
+
+    # disable selinux
+    sed -i 's/enforcing/disabled/g' /etc/selinux/config
+    setenforce permissive
+    
+    groupadd -g $HPC_GID $HPC_GROUP
+
+    # Don't require password for HPC user sudo
+    echo "$HPC_USER ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+    
+    # Disable tty requirement for sudo
+    sed -i 's/^Defaults[ ]*requiretty/# Defaults requiretty/g' /etc/sudoers
+
+	useradd -c "HPC User" -g $HPC_GROUP -d $SHARE_HOME/$HPC_USER -s /bin/bash -u $HPC_UID $HPC_USER
+
+    chown $HPC_USER:$HPC_GROUP $SHARE_SCRATCH	
+}
+
+
 SETUP_MARKER=/var/tmp/configured
 if [ -e "$SETUP_MARKER" ]; then
     echo "We're already configured, exiting..."
@@ -190,6 +224,7 @@ fi
 setup_swap
 install_pkgs
 setup_disks
+setup_user
 tune_tcp
 install_beegfs
 
