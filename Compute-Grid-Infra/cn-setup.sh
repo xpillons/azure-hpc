@@ -1,6 +1,16 @@
 #!/bin/bash
 export MOUNT_POINT=/mnt/azure
 
+# Shares
+SHARE_HOME=/share/home
+SHARE_SCRATCH=/share/scratch
+
+# User
+HPC_USER=hpcuser
+HPC_UID=7007
+HPC_GROUP=hpc
+HPC_GID=7007
+
 #############################################################################
 log()
 {
@@ -71,38 +81,46 @@ mount_nfs()
 
 install_beegfs_client()
 {
-	SHARE_SCRATCH=/share/scratch
-	mkdir -p $SHARE_SCRATCH
-	MGMT_HOSTNAME=${MASTER_NAME}
+	yum -y install wget
+    wget -O install_beegfs_client.sh https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/BeeGFS/install_beegfs_client.sh
+	bash install_beegfs_client.sh ${MASTER_NAME}
+}
 
-	yum -y install epel-release
-    yum -y install zlib zlib-devel bzip2 bzip2-devel bzip2-libs openssl openssl-devel openssl-libs gcc gcc-c++ nfs-utils rpcbind mdadm wget python-pip kernel kernel-devel openmpi openmpi-devel automake autoconf
+setup_disks()
+{
+    mkdir -p $SHARE_HOME
+    mkdir -p $SHARE_SCRATCH
 
-    # Install BeeGFS repo
-    wget -O beegfs-rhel7.repo http://www.beegfs.com/release/latest-stable/dists/beegfs-rhel7.repo
-    mv beegfs-rhel7.repo /etc/yum.repos.d/beegfs.repo
-    rpm --import http://www.beegfs.com/release/latest-stable/gpg/RPM-GPG-KEY-beegfs
+	echo "$MASTER_NAME:$SHARE_HOME $SHARE_HOME    nfs4    rw,auto,_netdev 0 0" >> /etc/fstab
+	mount -a
+	mount
+}
+
+setup_user()
+{
+    # disable selinux
+    sed -i 's/enforcing/disabled/g' /etc/selinux/config
+    setenforce permissive
     
-    # Disable SELinux
-    sed -i 's/SELINUX=.*/SELINUX=disabled/g' /etc/selinux/config
-    setenforce 0
+    groupadd -g $HPC_GID $HPC_GROUP
 
-    yum install -y beegfs-client beegfs-helperd beegfs-utils
-        
-    # setup client
-    sed -i 's/^sysMgmtdHost.*/sysMgmtdHost = '$MGMT_HOSTNAME'/g' /etc/beegfs/beegfs-client.conf
-    sed -i  's/Type=oneshot.*/Type=oneshot\nRestart=always\nRestartSec=5/g' /etc/systemd/system/multi-user.target.wants/beegfs-client.service
-    echo "$SHARE_SCRATCH /etc/beegfs/beegfs-client.conf" > /etc/beegfs/beegfs-mounts.conf
-    systemctl daemon-reload
-    systemctl enable beegfs-helperd.service
-    systemctl enable beegfs-client.service
+    # Don't require password for HPC user sudo
+    echo "$HPC_USER ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+    
+    # Disable tty requirement for sudo
+    sed -i 's/^Defaults[ ]*requiretty/# Defaults requiretty/g' /etc/sudoers
 
+	useradd -c "HPC User" -g $HPC_GROUP -d $SHARE_HOME/$HPC_USER -s /bin/bash -u $HPC_UID $HPC_USER
+
+    chown $HPC_USER:$HPC_GROUP $SHARE_SCRATCH	
 }
 
 #install_azure_cli
 #install_azure_files
 #mount_nfs
 #install_applications
+setup_disks
+setup_user
 install_beegfs_client
 
 shutdown -r +1 &
