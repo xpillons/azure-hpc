@@ -19,6 +19,66 @@ while getopts :a:k:u:t:p optname; do
   esac
 done
 
+# Shares
+SHARE_HOME=/share/home
+
+# User
+HPC_USER=hpcuser
+HPC_UID=7007
+HPC_GROUP=hpc
+HPC_GID=7007
+
+setup_disks()
+{
+    mkdir -p $SHARE_HOME
+    
+	echo "$SHARE_HOME    *(rw,async)" >> /etc/exports
+	systemctl enable rpcbind || echo "Already enabled"
+	systemctl enable nfs-server || echo "Already enabled"
+	systemctl start rpcbind || echo "Already enabled"
+	systemctl start nfs-server || echo "Already enabled"
+}
+
+setup_user()
+{
+    # disable selinux
+    sed -i 's/enforcing/disabled/g' /etc/selinux/config
+    setenforce permissive
+    
+    groupadd -g $HPC_GID $HPC_GROUP
+
+    # Don't require password for HPC user sudo
+    echo "$HPC_USER ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+    
+    # Disable tty requirement for sudo
+    sed -i 's/^Defaults[ ]*requiretty/# Defaults requiretty/g' /etc/sudoers
+   
+	useradd -c "HPC User" -g $HPC_GROUP -m -d $SHARE_HOME/$HPC_USER -s /bin/bash -u $HPC_UID $HPC_USER
+
+	mkdir -p $SHARE_HOME/$HPC_USER/.ssh
+	
+	# Configure public key auth for the HPC user
+	ssh-keygen -t rsa -f $SHARE_HOME/$HPC_USER/.ssh/id_rsa -q -P ""
+	cat $SHARE_HOME/$HPC_USER/.ssh/id_rsa.pub >> $SHARE_HOME/$HPC_USER/.ssh/authorized_keys
+
+	echo "Host *" > $SHARE_HOME/$HPC_USER/.ssh/config
+	echo "    StrictHostKeyChecking no" >> $SHARE_HOME/$HPC_USER/.ssh/config
+	echo "    UserKnownHostsFile /dev/null" >> $SHARE_HOME/$HPC_USER/.ssh/config
+	echo "    PasswordAuthentication no" >> $SHARE_HOME/$HPC_USER/.ssh/config
+
+	# Fix .ssh folder ownership
+	chown -R $HPC_USER:$HPC_GROUP $SHARE_HOME/$HPC_USER
+
+	# Fix permissions
+	chmod 700 $SHARE_HOME/$HPC_USER/.ssh
+	chmod 644 $SHARE_HOME/$HPC_USER/.ssh/config
+	chmod 644 $SHARE_HOME/$HPC_USER/.ssh/authorized_keys
+	chmod 600 $SHARE_HOME/$HPC_USER/.ssh/id_rsa
+	chmod 644 $SHARE_HOME/$HPC_USER/.ssh/id_rsa.pub
+    
+    chown $HPC_USER:$HPC_GROUP $SHARE_SCRATCH
+    chown $HPC_USER:$HPC_GROUP $LOCAL_SCRATCH
+}
 
 ######################################################################
 install_azure_cli()
@@ -49,5 +109,7 @@ install_azure_files()
 	
 }
 
-install_azure_cli
-install_azure_files
+#install_azure_cli
+#install_azure_files
+setup_disks
+setup_user
