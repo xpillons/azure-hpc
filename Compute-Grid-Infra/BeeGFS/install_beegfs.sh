@@ -193,7 +193,7 @@ setup_user()
     mkdir -p $SHARE_HOME
     mkdir -p $SHARE_SCRATCH
 
-	echo "$MASTER_NAME:$SHARE_HOME $SHARE_HOME    nfs4    rw,auto,_netdev 0 0" >> /etc/fstab
+	echo "$MGMT_HOSTNAME:$SHARE_HOME $SHARE_HOME    nfs4    rw,auto,_netdev 0 0" >> /etc/fstab
 	mount -a
 	mount
 
