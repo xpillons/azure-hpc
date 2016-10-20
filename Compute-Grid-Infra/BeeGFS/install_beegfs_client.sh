@@ -26,6 +26,9 @@ install_pkgs()
 {
     yum -y install epel-release
     yum -y install zlib zlib-devel bzip2 bzip2-devel bzip2-libs openssl openssl-devel openssl-libs gcc gcc-c++ nfs-utils rpcbind mdadm wget python-pip kernel kernel-devel openmpi openmpi-devel automake autoconf
+	
+	systemctl stop firewalld
+	systemctl disable firewalld	
 }
 
 
@@ -51,7 +54,7 @@ install_beegfs()
     systemctl enable beegfs-client.service
 }
 
-SETUP_MARKER=/var/tmp/configured
+SETUP_MARKER=/var/tmp/install_beegfs_client.marker
 if [ -e "$SETUP_MARKER" ]; then
     echo "We're already configured, exiting..."
     exit 0

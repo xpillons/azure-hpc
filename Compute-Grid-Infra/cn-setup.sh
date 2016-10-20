@@ -88,6 +88,8 @@ install_beegfs_client()
 
 setup_user()
 {
+	yum -y install nfs-utils nfs-utils-lib
+
     mkdir -p $SHARE_HOME
     mkdir -p $SHARE_SCRATCH
 
@@ -112,12 +114,21 @@ setup_user()
     chown $HPC_USER:$HPC_GROUP $SHARE_SCRATCH	
 }
 
+SETUP_MARKER=/var/tmp/cn-setup.marker
+if [ -e "$SETUP_MARKER" ]; then
+    echo "We're already configured, exiting..."
+    exit 0
+fi
+
 #install_azure_cli
 #install_azure_files
 #mount_nfs
 #install_applications
 setup_user
 install_beegfs_client
+
+# Create marker file so we know we're configured
+touch $SETUP_MARKER
 
 shutdown -r +1 &
 exit 0

@@ -59,7 +59,7 @@ install_beegfs()
     systemctl enable beegfs-client.service
 }
 
-SETUP_MARKER=/var/tmp/configured
+SETUP_MARKER=/var/tmp/install_beegfs_mgmt.marker
 if [ -e "$SETUP_MARKER" ]; then
     echo "We're already configured, exiting..."
     exit 0
