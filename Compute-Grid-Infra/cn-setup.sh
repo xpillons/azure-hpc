@@ -83,7 +83,7 @@ install_beegfs_client()
 {
 	yum -y install wget
     wget -O install_beegfs_client.sh https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/BeeGFS/install_beegfs_client.sh
-	bash install_beegfs_client.sh ${MASTER_NAME}
+	#bash install_beegfs_client.sh ${MASTER_NAME}
 }
 
 setup_user()
