@@ -10,28 +10,24 @@
         "artifactsBaseUrl": ""
       }
     },
-    "ConvergedCount": {
-      "type": "int",
+    "nodeType": {
+      "type": "string",
+      "defaultValue": "both",
+      "allowedValues": [
+        "both",
+        "meta",
+        "storage"
+      ],
       "metadata": {
-        "description": "Number of BeeGFS converged (storage+meta) nodes (100 or less)."
-      },
-      "defaultValue": 0,
-      "maxValue": 100
+        "description": "type of beegfs node to deploy"
+      }
     },
-    "StorageCount": {
+    "nodeCount": {
       "type": "int",
       "metadata": {
-        "description": "Number of BeeGFS Storage Nodes (100 or less)."
+        "description": "Number of BeeGFS nodes (100 or less)."
       },
-      "defaultValue": 0,
-      "maxValue": 100
-    },
-    "MetaCount": {
-      "type": "int",
-      "metadata": {
-        "description": "Number of BeeGFS Metadata Nodes (100 or less)."
-      },
-      "defaultValue": 0,
+      "defaultValue": 1,
       "maxValue": 100
     },
     "VMsku": {
@@ -143,7 +139,8 @@
       "storageDiskSize": "[variables('PremiumStorageMap')[parameters('storageDiskSize')].size]",
       "numStorageDisks": "[parameters('nbStorageDisks')]",
       "metadataDiskSize": "[variables('PremiumStorageMap')[parameters('metaDiskSize')].size]",
-      "numMetadataDisks": "[parameters('nbMetaDisks')]"
+      "numMetadataDisks": "[parameters('nbMetaDisks')]",
+      "nodeType": "[parameters('nodeType')]"
     },
     "computeNodeImages": {
       "CentOS_7.2": {
@@ -176,7 +173,7 @@
       "properties": { }
     },
     {
-      "name": "[concat('create-BeeGFS-Converged-Node', padLeft(string(copyIndex()), 2, '0'))]",
+      "name": "[concat('create-BeeGFS-', variables('beeGFSNodeSettings').nodeType, padLeft(string(copyIndex()), 2, '0'))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "[variables('deploymentApiVersion')]",
       "dependsOn": [
@@ -184,7 +181,7 @@
       ],
       "copy": {
         "name": "nodeIndex",
-        "count": "[parameters('ConvergedCount')]"
+        "count": "[parameters('NodeCount')]"
       },
       "properties": {
         "mode": "Incremental",
@@ -201,81 +198,6 @@
           },
           "nodeOSSettings": {
             "value": "[variables('nodeOSSettings')]"
-          },
-          "nodeType": {
-            "value": "both"
-          },
-          "vmIndex": {
-            "value": "[padLeft(string(copyIndex()), 2, '0')]"
-          }
-        }
-      }
-    },
-    {
-      "name": "[concat('create-BeeGFS-Meta-Node', padLeft(string(copyIndex()), 2, '0'))]",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "[variables('deploymentApiVersion')]",
-      "dependsOn": [
-        "[concat('Microsoft.Compute/availabilitySets/', variables('beeGFSNodeSettings').avsetName)]"
-      ],
-      "copy": {
-        "name": "nodeIndex",
-        "count": "[parameters('MetaCount')]"
-      },
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[variables('beeGFSNode-templateUrl')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "artifactsBaseUrl": {
-            "value": "[parameters('artifactsBaseUrl')]"
-          },
-          "nodeSettings": {
-            "value": "[variables('beeGFSNodeSettings')]"
-          },
-          "nodeOSSettings": {
-            "value": "[variables('nodeOSSettings')]"
-          },
-          "nodeType": {
-            "value": "meta"
-          },
-          "vmIndex": {
-            "value": "[padLeft(string(copyIndex()), 2, '0')]"
-          }
-        }
-      }
-    },
-    {
-      "name": "[concat('create-BeeGFS-Storage-Node', padLeft(string(copyIndex()), 2, '0'))]",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "[variables('deploymentApiVersion')]",
-      "dependsOn": [
-        "[concat('Microsoft.Compute/availabilitySets/', variables('beeGFSNodeSettings').avsetName)]"
-      ],
-      "copy": {
-        "name": "nodeIndex",
-        "count": "[parameters('StorageCount')]"
-      },
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[variables('beeGFSNode-templateUrl')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "artifactsBaseUrl": {
-            "value": "[parameters('artifactsBaseUrl')]"
-          },
-          "nodeSettings": {
-            "value": "[variables('beeGFSNodeSettings')]"
-          },
-          "nodeOSSettings": {
-            "value": "[variables('nodeOSSettings')]"
-          },
-          "nodeType": {
-            "value": "storage"
           },
           "vmIndex": {
             "value": "[padLeft(string(copyIndex()), 2, '0')]"
