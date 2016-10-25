@@ -36,6 +36,20 @@
             }
           },
           {
+            "name": "web-rule",
+            "properties": {
+              "description": "Allow Web",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "80",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 1000,
+              "direction": "Inbound"
+            }
+          },
+          {
             "name": "beegfs-admon",
             "properties": {
               "description": "Allow BeeGFS admin UI",

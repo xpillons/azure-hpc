@@ -13,7 +13,7 @@ if [ $# != 1 ]; then
     exit 1
 fi
 
-# Use the first storage server for management server
+# management server
 MGMT_HOSTNAME=$1
 
 # Shares

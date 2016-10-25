@@ -81,9 +81,16 @@ mount_nfs()
 
 install_beegfs_client()
 {
-	yum -y install wget
-    wget -O install_beegfs_client.sh https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/BeeGFS/install_beegfs_client.sh
+	#yum -y install wget
+    #wget -O install_beegfs_client.sh https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/BeeGFS/install_beegfs_client.sh
 	bash install_beegfs_client.sh ${MASTER_NAME}
+}
+
+install_ganglia()
+{
+	#yum -y install wget
+    #wget -O install_gmond.sh https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/Ganglia/install_gmond.sh
+	bash install_gmond.sh ${MASTER_NAME}
 }
 
 setup_user()

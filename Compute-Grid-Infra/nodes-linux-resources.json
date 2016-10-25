@@ -78,7 +78,9 @@
     "sharedAccountId": "[resourceId(parameters('commonSettings').RGStorageName, 'Microsoft.Storage/storageAccounts', parameters('commonSettings').DataSAName)]",
     "vmScripts": {
       "scriptsToDownload": [
-        "[concat(variables('scriptUrl'), 'cn-setup.sh')]"
+        "[concat(variables('scriptUrl'), 'cn-setup.sh')]",
+        "[concat(variables('scriptUrl'), 'BeeGFS/install_beegfs_client.sh')]",
+        "[concat(variables('scriptUrl'), 'Ganglia/install_gmond.sh')]"
       ],
       "commandToExecute": "[concat('bash ', variables('cnSetupScript'), ' -m ', parameters('nodeSettings').MasterName)]"
     },
