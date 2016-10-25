@@ -35,6 +35,7 @@ install_ganglia_metad()
 	#configure Ganglia server	
 	sed -i 's/^data_source.*/datasource "'$MGMT_HOSTNAME' cluster" '$MGMT_HOSTNAME'/g' /etc/ganglia/gmetad.conf	
 	sed -i 's/^#setuid off.*/setuid off/g' /etc/ganglia/gmetad.conf	
+	sed -i 's/^#gridname "MyGrid".*/gridname "MyGrid"/g' /etc/ganglia/gmetad.conf	
 	
 	#configure Ganglia monitoring
 	sed -i '0,/name = "unspecified"/{s/name = "unspecified"/name = "'$MGMT_HOSTNAME' cluster"/}'  /etc/ganglia/gmond.conf 
