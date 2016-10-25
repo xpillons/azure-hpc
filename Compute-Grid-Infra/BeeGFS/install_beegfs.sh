@@ -124,7 +124,7 @@ EOF
     fi
 }
 
-setup_disks_converged()
+setup_disks()
 {      
     # Dump the current disk config for debugging
     fdisk -l
@@ -225,7 +225,7 @@ install_ganglia()
 {
 	yum -y install wget
     wget -O install_gmond.sh https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/Ganglia/install_gmond.sh
-	bash install_gmond.sh ${MASTER_NAME}
+	bash install_gmond.sh ${MGMT_HOSTNAME}
 }
 
 setup_swap()
