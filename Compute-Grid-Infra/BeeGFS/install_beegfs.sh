@@ -30,8 +30,8 @@ HPC_GID=7007
 
 is_metanode()
 {
-	if ["$BEEGFS_NODE_TYPE" -eq "meta" || 
-		"$BEEGFS_NODE_TYPE" -eq "META" ||
+	if ["$BEEGFS_NODE_TYPE" == "meta" || 
+		"$BEEGFS_NODE_TYPE" == "META" ||
 		is_convergednode ]; then 
 		return 1
 	fi
@@ -42,8 +42,8 @@ is_metanode()
 
 is_storagenode()
 {
-	if ["$BEEGFS_NODE_TYPE" -eq "storage" || 
-		"$BEEGFS_NODE_TYPE" -eq "STORAGE" ||
+	if ["$BEEGFS_NODE_TYPE" == "storage" || 
+		"$BEEGFS_NODE_TYPE" == "STORAGE" ||
 		is_convergednode ]; then 
 		return 1
 	fi
@@ -54,7 +54,8 @@ is_storagenode()
 
 is_convergednode()
 {
-	if ["$BEEGFS_NODE_TYPE" -eq "both" || "$BEEGFS_NODE_TYPE" -eq "BOTH"]; then 
+	if ["$BEEGFS_NODE_TYPE" == "both" || 
+		"$BEEGFS_NODE_TYPE" == "BOTH"]; then 
 		return 1
 	fi
 
