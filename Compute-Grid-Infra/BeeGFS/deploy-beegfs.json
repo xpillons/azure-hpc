@@ -10,12 +10,28 @@
         "artifactsBaseUrl": ""
       }
     },
-    "InstanceCount": {
+    "ConvergedCount": {
       "type": "int",
       "metadata": {
-        "description": "Number of BeeGFS Nodes (100 or less)."
+        "description": "Number of BeeGFS converged (storage+meta) nodes (100 or less)."
       },
-      "defaultValue": 1,
+      "defaultValue": 0,
+      "maxValue": 100
+    },
+    "StorageCount": {
+      "type": "int",
+      "metadata": {
+        "description": "Number of BeeGFS Storage Nodes (100 or less)."
+      },
+      "defaultValue": 0,
+      "maxValue": 100
+    },
+    "MetaCount": {
+      "type": "int",
+      "metadata": {
+        "description": "Number of BeeGFS Metadata Nodes (100 or less)."
+      },
+      "defaultValue": 0,
       "maxValue": 100
     },
     "VMsku": {
@@ -160,7 +176,7 @@
       "properties": { }
     },
     {
-      "name": "[concat('create-BeeGFSnode-', padLeft(string(copyIndex()), 2, '0'))]",
+      "name": "[concat('create-BeeGFS-Converged-Node', padLeft(string(copyIndex()), 2, '0'))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "[variables('deploymentApiVersion')]",
       "dependsOn": [
@@ -168,7 +184,7 @@
       ],
       "copy": {
         "name": "nodeIndex",
-        "count": "[parameters('InstanceCount')]"
+        "count": "[parameters('ConvergedCount')]"
       },
       "properties": {
         "mode": "Incremental",
@@ -186,8 +202,83 @@
           "nodeOSSettings": {
             "value": "[variables('nodeOSSettings')]"
           },
-          "vmName": {
-            "value": "[concat('beegfs', padLeft(string(copyIndex()), 2, '0'))]"
+          "nodeType": {
+            "value": "both"
+          },
+          "vmIndex": {
+            "value": "[padLeft(string(copyIndex()), 2, '0')]"
+          }
+        }
+      }
+    },
+    {
+      "name": "[concat('create-BeeGFS-Meta-Node', padLeft(string(copyIndex()), 2, '0'))]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "[variables('deploymentApiVersion')]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/availabilitySets/', variables('beeGFSNodeSettings').avsetName)]"
+      ],
+      "copy": {
+        "name": "nodeIndex",
+        "count": "[parameters('MetaCount')]"
+      },
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('beeGFSNode-templateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "artifactsBaseUrl": {
+            "value": "[parameters('artifactsBaseUrl')]"
+          },
+          "nodeSettings": {
+            "value": "[variables('beeGFSNodeSettings')]"
+          },
+          "nodeOSSettings": {
+            "value": "[variables('nodeOSSettings')]"
+          },
+          "nodeType": {
+            "value": "meta"
+          },
+          "vmIndex": {
+            "value": "[padLeft(string(copyIndex()), 2, '0')]"
+          }
+        }
+      }
+    },
+    {
+      "name": "[concat('create-BeeGFS-Storage-Node', padLeft(string(copyIndex()), 2, '0'))]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "[variables('deploymentApiVersion')]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/availabilitySets/', variables('beeGFSNodeSettings').avsetName)]"
+      ],
+      "copy": {
+        "name": "nodeIndex",
+        "count": "[parameters('StorageCount')]"
+      },
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('beeGFSNode-templateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "artifactsBaseUrl": {
+            "value": "[parameters('artifactsBaseUrl')]"
+          },
+          "nodeSettings": {
+            "value": "[variables('beeGFSNodeSettings')]"
+          },
+          "nodeOSSettings": {
+            "value": "[variables('nodeOSSettings')]"
+          },
+          "nodeType": {
+            "value": "storage"
+          },
+          "vmIndex": {
+            "value": "[padLeft(string(copyIndex()), 2, '0')]"
           }
         }
       }

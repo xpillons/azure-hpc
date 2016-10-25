@@ -20,18 +20,41 @@
         "Description": "node OS settings object"
       }
     },
-    "vmName": {
+    "nodeType": {
+      "type": "string",
+      "defaultValue": "both",
+      "allowedValues": [
+        "both",
+        "meta",
+        "storage"
+      ],
+      "metadata": {
+        "description": "type of beegfs node to deploy"
+      }
+    },
+    "vmIndex": {
       "type": "string",
       "metadata": {
-        "description": "Name of the VM"
+        "description": "Index number of the VM"
       },
-      "maxLength": 8
+      "maxLength": 2
     }
   },
   "variables": {
+    "vmPrefix": {
+      "both": {
+        "prefix": "beegfs"
+      },
+      "meta": {
+        "prefix": "meta"
+      },
+      "storage": {
+        "prefix": "store"
+      }
+    },
     "storageAccountType": "Premium_LRS",
     "location": "[resourceGroup().location]",
-    "vmName": "[toLower(parameters('vmName'))]",
+    "vmName": "[concat(toLower(variables('vmPrefix')[parameters('nodeType')]), parameters('vmIndex'))]",
     "dataStoreSA": "[concat(uniquestring(resourceGroup().id, variables('vmName')), variables('vmName'), 'sa')]",
     "osDiskName": "[concat(variables('vmName'), 'osdisk')]",
     "vnetID": "[resourceId(parameters('nodeSettings').vnetRG, 'Microsoft.Network/virtualNetworks', parameters('nodeSettings').vnetName)]",
@@ -44,7 +67,7 @@
     "extensionApiVersion": "2015-06-15",
     "setupScript": "install_beegfs.sh",
     "baseUrl": "[concat(parameters('artifactsBaseUrl'),'/')]",
-    "installationCLI": "[concat('bash ', variables('setupScript'), ' ', parameters('nodeSettings').MasterName)]",
+    "installationCLI": "[concat('bash ', variables('setupScript'), ' ', parameters('nodeSettings').MasterName, ' ', parameters('nodeType'))]",
     "vmScripts": {
       "scriptsToDownload": [
         "[concat(variables('baseUrl'), variables('setupScript'))]"
