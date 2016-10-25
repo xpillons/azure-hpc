@@ -172,6 +172,13 @@ install_beegfs()
 	systemctl enable beegfs-storage.service
 }
 
+install_ganglia()
+{
+	yum -y install wget
+    wget -O install_gmond.sh https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/Ganglia/install_gmond.sh
+	bash install_gmond.sh ${MASTER_NAME}
+}
+
 setup_swap()
 {
     fallocate -l 5g /mnt/resource/swap
@@ -227,6 +234,7 @@ setup_disks
 setup_user
 tune_tcp
 install_beegfs
+install_ganglia
 
 # Create marker file so we know we're configured
 touch $SETUP_MARKER
