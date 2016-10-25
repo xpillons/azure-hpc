@@ -14,7 +14,7 @@ if [ $# != 2 ]; then
 fi
 
 MGMT_HOSTNAME=$1
-BEEGFS_NODE_TYPE=$2
+BEEGFS_NODE_TYPE="$2"
 
 # Shares
 SHARE_HOME=/share/home
@@ -28,39 +28,33 @@ HPC_UID=7007
 HPC_GROUP=hpc
 HPC_GID=7007
 
-is_metanode()
+is_metadatanode()
 {
-	if ["$BEEGFS_NODE_TYPE" == "meta" || 
-		"$BEEGFS_NODE_TYPE" == "META" ||
-		is_convergednode ]; then 
-		return 1
+	if [ "$BEEGFS_NODE_TYPE" == "meta" || 
+		 "$BEEGFS_NODE_TYPE" == "META" ||
+		 is_convergednode ]; then 
+		return 0
 	fi
-
-	# not meta node
-	return 0
+	return 1
 }
 
 is_storagenode()
 {
-	if ["$BEEGFS_NODE_TYPE" == "storage" || 
-		"$BEEGFS_NODE_TYPE" == "STORAGE" ||
-		is_convergednode ]; then 
-		return 1
+	if [ "$BEEGFS_NODE_TYPE" == "storage" || 
+		 "$BEEGFS_NODE_TYPE" == "STORAGE" ||
+		 is_convergednode ]; then 
+		return 0
 	fi
-
-	# not storage node
-	return 0
+	return 1
 }
 
 is_convergednode()
 {
-	if ["$BEEGFS_NODE_TYPE" == "both" || 
-		"$BEEGFS_NODE_TYPE" == "BOTH"]; then 
-		return 1
+	if [ "$BEEGFS_NODE_TYPE" == "both" || 
+		 "$BEEGFS_NODE_TYPE" == "BOTH" ]; then 
+		return 0
 	fi
-
-	# not storage node
-	return 0
+	return 1
 }
 
 # Installs all required packages.
