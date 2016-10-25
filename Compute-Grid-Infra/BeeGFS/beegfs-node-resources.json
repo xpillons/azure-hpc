@@ -42,7 +42,7 @@
     },
     "storageAccountType": "Premium_LRS",
     "location": "[resourceGroup().location]",
-    "vmName": "[concat(toLower(variables('vmPrefix')[parameters('nodeSettings')].nodeType), parameters('vmIndex'))]",
+    "vmName": "[concat(toLower(variables('vmPrefix')[parameters('nodeSettings').nodeType].prefix), parameters('vmIndex'))]",
     "dataStoreSA": "[concat(uniquestring(resourceGroup().id, variables('vmName')), variables('vmName'), 'sa')]",
     "osDiskName": "[concat(variables('vmName'), 'osdisk')]",
     "vnetID": "[resourceId(parameters('nodeSettings').vnetRG, 'Microsoft.Network/virtualNetworks', parameters('nodeSettings').vnetName)]",
