@@ -30,7 +30,7 @@ HPC_GID=7007
 
 is_metadatanode()
 {
-	if [ "$BEEGFS_NODE_TYPE" == "meta" ] || [ is_convergednode ]; then 
+	if [ "$BEEGFS_NODE_TYPE" == "meta" ] || is_convergednode ; then 
 		return 0
 	fi
 	return 1
@@ -38,7 +38,7 @@ is_metadatanode()
 
 is_storagenode()
 {
-	if [ "$BEEGFS_NODE_TYPE" == "storage" ] || [ is_convergednode ]; then 
+	if [ "$BEEGFS_NODE_TYPE" == "storage" ] || is_convergednode ; then 
 		return 0
 	fi
 	return 1
