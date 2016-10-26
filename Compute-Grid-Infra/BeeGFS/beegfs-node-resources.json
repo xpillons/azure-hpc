@@ -40,6 +40,8 @@
         "prefix": "store"
       }
     },
+    "numStorageDisks": "[parameters('nodeSettings').numStorageDisks]",
+    "numMetaDisks": "[parameters('nodeSettings').numMetadataDisks]",
     "storageAccountType": "Premium_LRS",
     "location": "[resourceGroup().location]",
     "vmName": "[concat(toLower(variables('vmPrefix')[parameters('nodeSettings').nodeType].prefix), parameters('vmIndex'))]",
@@ -67,7 +69,7 @@
       {
         "name": "datadisk0",
         "diskSizeGB": "[parameters('nodeSettings').storageDiskSize]",
-        "lun": 4,
+        "lun": "[add(variables('numMetaDisks'), 0)]",
         "vhd": {
           "uri": "[concat('http://',variables('dataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-datadisk0.vhd')]"
         },
@@ -77,7 +79,7 @@
       {
         "name": "datadisk1",
         "diskSizeGB": "[parameters('nodeSettings').storageDiskSize]",
-        "lun": 5,
+        "lun": "[add(variables('numMetaDisks'), 1)]",
         "vhd": {
           "uri": "[concat('http://',variables('dataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-datadisk1.vhd')]"
         },
@@ -87,7 +89,7 @@
       {
         "name": "datadisk2",
         "diskSizeGB": "[parameters('nodeSettings').storageDiskSize]",
-        "lun": 6,
+        "lun": "[add(variables('numMetaDisks'), 2)]",
         "vhd": {
           "uri": "[concat('http://',variables('dataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-datadisk2.vhd')]"
         },
@@ -97,7 +99,7 @@
       {
         "name": "datadisk3",
         "diskSizeGB": "[parameters('nodeSettings').storageDiskSize]",
-        "lun": 7,
+        "lun": "[add(variables('numMetaDisks'), 3)]",
         "vhd": {
           "uri": "[concat('http://',variables('dataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-datadisk3.vhd')]"
         },
@@ -107,7 +109,7 @@
       {
         "name": "datadisk4",
         "diskSizeGB": "[parameters('nodeSettings').storageDiskSize]",
-        "lun": 8,
+        "lun": "[add(variables('numMetaDisks'), 4)]",
         "vhd": {
           "uri": "[concat('http://',variables('dataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-datadisk4.vhd')]"
         },
@@ -117,7 +119,7 @@
       {
         "name": "datadisk5",
         "diskSizeGB": "[parameters('nodeSettings').storageDiskSize]",
-        "lun": 9,
+        "lun": "[add(variables('numMetaDisks'), 5)]",
         "vhd": {
           "uri": "[concat('http://',variables('dataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-datadisk5.vhd')]"
         },
@@ -127,7 +129,7 @@
       {
         "name": "datadisk6",
         "diskSizeGB": "[parameters('nodeSettings').storageDiskSize]",
-        "lun": 10,
+        "lun": "[add(variables('numMetaDisks'), 6)]",
         "vhd": {
           "uri": "[concat('http://',variables('dataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-datadisk6.vhd')]"
         },
@@ -137,7 +139,7 @@
       {
         "name": "datadisk7",
         "diskSizeGB": "[parameters('nodeSettings').storageDiskSize]",
-        "lun": 11,
+        "lun": "[add(variables('numMetaDisks'), 7)]",
         "vhd": {
           "uri": "[concat('http://',variables('dataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-datadisk7.vhd')]"
         },
@@ -149,7 +151,7 @@
       {
         "name": "metadatadisk0",
         "diskSizeGB": "[parameters('nodeSettings').metadataDiskSize]",
-        "lun": 0,
+        "lun": "0",
         "vhd": {
           "uri": "[concat('http://',variables('dataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-metadatadisk0.vhd')]"
         },
@@ -251,7 +253,7 @@
             "caching": "ReadOnly",
             "createOption": "FromImage"
           },
-          "dataDisks": "[concat(take(variables('storageDiskArray'),parameters('nodeSettings').numStorageDisks), take(variables('metadataDiskArray'),parameters('nodeSettings').numMetadataDisks))]"
+          "dataDisks": "[concat(take(variables('storageDiskArray'),variables('numStorageDisks')), take(variables('metadataDiskArray'), variables('numMetaDisks')))]"
         },
         "networkProfile": {
           "networkInterfaces": [
