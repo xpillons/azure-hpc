@@ -88,7 +88,7 @@
     "nbStorageDisks": {
       "type": "int",
       "defaultValue": 1,
-      "maxValue": 32,
+      "maxValue": 8,
       "metadata": {
         "description": "Number of storage disks"
       }
@@ -108,7 +108,7 @@
     "nbMetaDisks": {
       "type": "int",
       "defaultValue": 1,
-      "maxValue": 32,
+      "maxValue": 4,
       "metadata": {
         "description": "Number of metadate disks"
       }

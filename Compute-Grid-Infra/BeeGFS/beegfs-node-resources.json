@@ -67,7 +67,7 @@
       {
         "name": "datadisk0",
         "diskSizeGB": "[parameters('nodeSettings').storageDiskSize]",
-        "lun": 0,
+        "lun": 4,
         "vhd": {
           "uri": "[concat('http://',variables('dataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-datadisk0.vhd')]"
         },
@@ -77,7 +77,7 @@
       {
         "name": "datadisk1",
         "diskSizeGB": "[parameters('nodeSettings').storageDiskSize]",
-        "lun": 1,
+        "lun": 5,
         "vhd": {
           "uri": "[concat('http://',variables('dataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-datadisk1.vhd')]"
         },
@@ -87,7 +87,7 @@
       {
         "name": "datadisk2",
         "diskSizeGB": "[parameters('nodeSettings').storageDiskSize]",
-        "lun": 2,
+        "lun": 6,
         "vhd": {
           "uri": "[concat('http://',variables('dataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-datadisk2.vhd')]"
         },
@@ -97,9 +97,49 @@
       {
         "name": "datadisk3",
         "diskSizeGB": "[parameters('nodeSettings').storageDiskSize]",
-        "lun": 3,
+        "lun": 7,
         "vhd": {
           "uri": "[concat('http://',variables('dataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-datadisk3.vhd')]"
+        },
+        "caching": "None",
+        "createOption": "Empty"
+      },
+      {
+        "name": "datadisk4",
+        "diskSizeGB": "[parameters('nodeSettings').storageDiskSize]",
+        "lun": 8,
+        "vhd": {
+          "uri": "[concat('http://',variables('dataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-datadisk4.vhd')]"
+        },
+        "caching": "None",
+        "createOption": "Empty"
+      },
+      {
+        "name": "datadisk5",
+        "diskSizeGB": "[parameters('nodeSettings').storageDiskSize]",
+        "lun": 9,
+        "vhd": {
+          "uri": "[concat('http://',variables('dataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-datadisk5.vhd')]"
+        },
+        "caching": "None",
+        "createOption": "Empty"
+      },
+      {
+        "name": "datadisk6",
+        "diskSizeGB": "[parameters('nodeSettings').storageDiskSize]",
+        "lun": 10,
+        "vhd": {
+          "uri": "[concat('http://',variables('dataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-datadisk6.vhd')]"
+        },
+        "caching": "None",
+        "createOption": "Empty"
+      },
+      {
+        "name": "datadisk7",
+        "diskSizeGB": "[parameters('nodeSettings').storageDiskSize]",
+        "lun": 11,
+        "vhd": {
+          "uri": "[concat('http://',variables('dataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-datadisk7.vhd')]"
         },
         "caching": "None",
         "createOption": "Empty"
@@ -109,7 +149,7 @@
       {
         "name": "metadatadisk0",
         "diskSizeGB": "[parameters('nodeSettings').metadataDiskSize]",
-        "lun": 20,
+        "lun": 0,
         "vhd": {
           "uri": "[concat('http://',variables('dataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-metadatadisk0.vhd')]"
         },
@@ -119,7 +159,7 @@
       {
         "name": "metadatadisk1",
         "diskSizeGB": "[parameters('nodeSettings').metadataDiskSize]",
-        "lun": 21,
+        "lun": 1,
         "vhd": {
           "uri": "[concat('http://',variables('dataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-metadatadisk1.vhd')]"
         },
@@ -129,7 +169,7 @@
       {
         "name": "metadatadisk2",
         "diskSizeGB": "[parameters('nodeSettings').metadataDiskSize]",
-        "lun": 22,
+        "lun": 2,
         "vhd": {
           "uri": "[concat('http://',variables('dataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-metadatadisk2.vhd')]"
         },
@@ -139,7 +179,7 @@
       {
         "name": "metadatadisk3",
         "diskSizeGB": "[parameters('nodeSettings').metadataDiskSize]",
-        "lun": 23,
+        "lun": 3,
         "vhd": {
           "uri": "[concat('http://',variables('dataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-metadatadisk3.vhd')]"
         },
