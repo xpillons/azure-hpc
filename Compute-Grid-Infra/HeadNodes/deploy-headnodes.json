@@ -1,0 +1,163 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.1",
+  "parameters": {
+    "artifactsBaseUrl": {
+      "type": "string",
+      "defaultValue": "https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/HeadNodes",
+      "metadata": {
+        "description": "Base URL of the solution template gallery package",
+        "artifactsBaseUrl": ""
+      }
+    },
+    "nodeCount": {
+      "type": "int",
+      "metadata": {
+        "description": "Number of nodes (10 or less)."
+      },
+      "defaultValue": 1,
+      "maxValue": 10
+    },
+    "VMsku": {
+      "type": "string",
+      "defaultValue": "Standard_DS3_v2",
+      "allowedValues": [
+        "Standard_DS1_v2",
+        "Standard_DS2_v2",
+        "Standard_DS3_v2",
+        "Standard_DS4_v2",
+        "Standard_DS5_v2",
+        "Standard_DS11_v2",
+        "Standard_DS12_v2",
+        "Standard_DS13_v2",
+        "Standard_DS14_v2",
+        "Standard_DS15_v2"
+      ],
+      "metadata": {
+        "description": "sku to use only premium disks VMs are allowed"
+      }
+    },
+    "RGvnetName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the RG of the virtual network to use."
+      }
+    },
+    "adminUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "Admin username on all VMs."
+      }
+    },
+    "sshKeyData": {
+      "type": "string",
+      "metadata": {
+        "description": "SSH rsa public key file as a string."
+      }
+    },
+    "dataDiskSize": {
+      "type": "string",
+      "defaultValue": "P10",
+      "allowedValues": [
+        "P10",
+        "P20",
+        "P30"
+      ],
+      "metadata": {
+        "description": "Data storage disk size used"
+      }
+    },
+    "nbDataDisks": {
+      "type": "int",
+      "defaultValue": 1,
+      "maxValue": 8,
+      "metadata": {
+        "description": "Number of storage disks"
+      }
+    }
+  },
+  "variables": {
+    "PremiumStorageMap": {
+      "P10": {
+        "size": 128
+      },
+      "P20": {
+        "size": 512
+      },
+      "P30": {
+        "size": 1024
+      }
+    },
+    "vmImage": "CentOS_7.2",
+    "deploymentApiVersion": "2015-11-01",
+    "baseUrl": "[concat(parameters('artifactsBaseUrl'),'/')]",
+    "HeadNodeSettings": {
+      "VMsku": "[parameters('VMsku')]",
+      "vnetRG": "[parameters('RGvnetName')]",
+      "vnetName": "grid-vnet",
+      "subnetName": "infraSubnet",
+      "avsetName": "hnas",
+      "dataDiskSize": "[variables('PremiumStorageMap')[parameters('dataDiskSize')].size]",
+      "numDataDisks": "[parameters('nbDataDisks')]"
+    },
+    "computeNodeImages": {
+      "CentOS_7.2": {
+        "publisher": "OpenLogic",
+        "offer": "CentOS",
+        "sku": "7.2",
+        "version": "latest"
+      }
+    },
+    "nodeOSSettings": {
+      "adminUserName": "[parameters('adminUserName')]",
+      "sshKeyData": "[parameters('sshKeyData')]",
+      "imageReference": "[variables('computeNodeImages')[variables('vmImage')]]"
+    },
+    "headnode-templateUrl": "[concat(variables('baseUrl'), 'headnodes-resources.json')]",
+    "avApiVersion": "2015-06-15"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Compute/availabilitySets",
+      "name": "[variables('HeadNodeSettings').avsetName]",
+      "apiVersion": "[variables('avApiVersion')]",
+      "location": "[resourceGroup().location]",
+      "properties": { }
+    },
+    {
+      "name": "[concat('create-HeadNode-', padLeft(string(copyIndex()), 2, '0'))]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "[variables('deploymentApiVersion')]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/availabilitySets/', variables('HeadNodeSettings').avsetName)]"
+      ],
+      "copy": {
+        "name": "nodeIndex",
+        "count": "[parameters('NodeCount')]"
+      },
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('HeadNode-templateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "artifactsBaseUrl": {
+            "value": "[parameters('artifactsBaseUrl')]"
+          },
+          "nodeSettings": {
+            "value": "[variables('HeadNodeSettings')]"
+          },
+          "nodeOSSettings": {
+            "value": "[variables('nodeOSSettings')]"
+          },
+          "vmIndex": {
+            "value": "[padLeft(string(copyIndex()), 2, '0')]"
+          }
+        }
+      }
+    }
+
+  ]
+}
+
