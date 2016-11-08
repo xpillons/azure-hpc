@@ -29,7 +29,7 @@
     }
   },
   "variables": {
-    "vmPrefix": "HN-",
+    "vmPrefix": "HN",
     "numDataDisks": "[parameters('nodeSettings').numDataDisks]",
     "storageAccountType": "Premium_LRS",
     "location": "[resourceGroup().location]",
