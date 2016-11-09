@@ -4,10 +4,16 @@
   "parameters": {
     "artifactsBaseUrl": {
       "type": "string",
-      "defaultValue": "https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/HeadNodes",
+      "defaultValue": "https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/CustomImage",
       "metadata": {
         "description": "Base URL of the solution template gallery package",
         "artifactsBaseUrl": ""
+      }
+    },
+    "uniquePrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "This unique prefix will be used on all the objects created as part of this template."
       }
     },
     "nodeCount": {
@@ -74,6 +80,12 @@
       "metadata": {
         "description": "Number of storage disks"
       }
+    },
+    "imageLocation": {
+      "type": "string",
+      "metadata": {
+        "description": "URL of the base custom image, in the format of https://accountname.blob.core.windows.net/container/image.vhd."
+      }
     }
   },
   "variables": {
@@ -89,16 +101,13 @@
       }
     },
     "vmImage": "CentOS_7.2",
-    "deploymentApiVersion": "2015-11-01",
     "baseUrl": "[concat(parameters('artifactsBaseUrl'),'/')]",
-    "HeadNodeSettings": {
+    "transfer-templateUrl": "[concat(variables('baseUrl'), 'transferVM.json')]",
+    "transferNodeSettings": {
       "VMsku": "[parameters('VMsku')]",
       "vnetRG": "[parameters('RGvnetName')]",
       "vnetName": "grid-vnet",
-      "subnetName": "infraSubnet",
-      "avsetName": "hnas",
-      "dataDiskSize": "[variables('PremiumStorageMap')[parameters('dataDiskSize')].size]",
-      "numDataDisks": "[parameters('nbDataDisks')]"
+      "subnetName": "infraSubnet"
     },
     "computeNodeImages": {
       "CentOS_7.2": {
@@ -113,32 +122,36 @@
       "sshKeyData": "[parameters('sshKeyData')]",
       "imageReference": "[variables('computeNodeImages')[variables('vmImage')]]"
     },
-    "headnode-templateUrl": "[concat(variables('baseUrl'), 'headnodes-resources.json')]",
-    "avApiVersion": "2015-06-15"
+    "deploymentApiVersion": "2015-11-01",
+    "storageApiVersion": "2015-06-15",
+    "storageAccountType": "Premium_LRS"
   },
   "resources": [
     {
-      "type": "Microsoft.Compute/availabilitySets",
-      "name": "[variables('HeadNodeSettings').avsetName]",
-      "apiVersion": "[variables('avApiVersion')]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "comments": "Create one storage account per VM",
+      "name": "[concat(uniqueString(concat(resourceGroup().id, parameters('uniquePrefix'), copyIndex())), parameters('uniquePrefix'))]",
+      "apiVersion": "[variables('storageApiVersion')]",
+      "copy": {
+        "name": "storageLoop",
+        "count": "[parameters('nodeCount')]"
+      },
       "location": "[resourceGroup().location]",
-      "properties": { }
+      "properties": {
+        "accountType": "[variables('storageAccountType')]"
+      }
     },
     {
-      "name": "[concat('create-HeadNode-', padLeft(string(copyIndex()), 2, '0'))]",
+      "name": "transfer",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "[variables('deploymentApiVersion')]",
       "dependsOn": [
-        "[concat('Microsoft.Compute/availabilitySets/', variables('HeadNodeSettings').avsetName)]"
+        "storageLoop"
       ],
-      "copy": {
-        "name": "nodeIndex",
-        "count": "[parameters('NodeCount')]"
-      },
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[variables('HeadNode-templateUrl')]",
+          "uri": "[variables('transfer-templateUrl')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -146,13 +159,10 @@
             "value": "[parameters('artifactsBaseUrl')]"
           },
           "nodeSettings": {
-            "value": "[variables('HeadNodeSettings')]"
+            "value": "[variables('transferNodeSettings')]"
           },
           "nodeOSSettings": {
             "value": "[variables('nodeOSSettings')]"
-          },
-          "vmIndex": {
-            "value": "[padLeft(string(copyIndex()), 2, '0')]"
           }
         }
       }
