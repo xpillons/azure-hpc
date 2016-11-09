@@ -8,6 +8,12 @@
         "artifactsBaseUrl": ""
       }
     },
+    "uniquePrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "This unique prefix will be used on all the objects created as part of this template."
+      }
+    },
     "nodeSettings": {
       "type": "object",
       "metadata": {
@@ -22,10 +28,10 @@
     }
   },
   "variables": {
-    "vmPrefix": "transfer",
+    "uniquePrefix": "[toLower(parameters('uniquePrefix'))]",
+    "vmName": "[concat('transfer', variables('uniquePrefix'), 'vm')]",
     "storageAccountType": "Premium_LRS",
     "location": "[resourceGroup().location]",
-    "vmName": "[concat(toLower(variables('vmPrefix')), '')]",
     "transferSA": "[concat(uniquestring(resourceGroup().id, variables('vmName')), variables('vmName'), 'sa')]",
     "osDiskName": "[concat(variables('vmName'), 'osdisk')]",
     "vnetID": "[resourceId(parameters('nodeSettings').vnetRG, 'Microsoft.Network/virtualNetworks', parameters('nodeSettings').vnetName)]",

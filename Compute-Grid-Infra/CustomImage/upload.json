@@ -1,0 +1,44 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "type": "string"
+    },
+    "uniquePrefix": {
+      "type": "string"
+    },
+    "index": {
+      "type": "int"
+    },
+    "uploadScriptURI": {
+      "type": "string"
+    }
+  },
+  "variables": {
+    "storageApiVersion": "2015-06-15",
+    "extensionApiVersion": "2015-06-15"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat('transfer', parameters('uniquePrefix'), 'vm/ext')]",
+      "apiVersion": "[variables('extensionApiVersion')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "publisher": "Microsoft.Azure.Extensions",
+        "type": "CustomScript",
+        "typeHandlerVersion": "2.0",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "fileUris": [
+            "[parameters('uploadScriptURI')]"
+          ]
+        },
+        "protectedSettings": {
+          "commandToExecute": "[concat('bash upload.sh ', concat(uniqueString(concat(resourceGroup().id, parameters('uniquePrefix'), parameters('index'))), parameters('uniquePrefix')), ' ', listKeys(concat('Microsoft.Storage/storageAccounts/', concat(uniqueString(concat(resourceGroup().id, parameters('uniquePrefix'), parameters('index'))), parameters('uniquePrefix'))), variables('storageApiVersion')).key1)]"
+        }
+      }
+    }
+  ]
+}

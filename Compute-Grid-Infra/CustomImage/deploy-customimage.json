@@ -86,6 +86,12 @@
       "metadata": {
         "description": "URL of the base custom image, in the format of https://accountname.blob.core.windows.net/container/image.vhd."
       }
+    },
+    "storageAccountKey": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Storage Account key for accessing the base custom image."
+      }
     }
   },
   "variables": {
@@ -101,9 +107,13 @@
         "size": 1024
       }
     },
-    "vmImage": "CentOS_7.2",
+    "vmImage": "Ubuntu_15_10",
     "baseUrl": "[concat(parameters('artifactsBaseUrl'),'/')]",
     "transfer-templateUrl": "[concat(variables('baseUrl'), 'transferVM.json')]",
+    "downloadTemplateURI": "[concat(variables('baseUrl'), 'download.json')]",
+    "downloadScriptURI": "[concat(variables('baseUrl'), 'download.sh')]",
+    "uploadTemplateURI": "[concat(variables('baseUrl'), 'upload.json')]",
+    "uploadScriptURI": "[concat(variables('baseUrl'), 'upload.sh')]",
     "transferNodeSettings": {
       "VMsku": "[parameters('VMsku')]",
       "vnetRG": "[parameters('RGvnetName')]",
@@ -115,6 +125,12 @@
         "publisher": "OpenLogic",
         "offer": "CentOS",
         "sku": "7.2",
+        "version": "latest"
+      },
+      "Ubuntu_15_10": {
+        "publisher": "Canonical",
+        "offer": "UbuntuServer",
+        "sku": "15.10",
         "version": "latest"
       }
     },
@@ -143,7 +159,7 @@
       }
     },
     {
-      "name": "transfer",
+      "name": "[concat('transfer', variables('uniquePrefix'), 'vm')]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "[variables('deploymentApiVersion')]",
       "dependsOn": [
@@ -167,8 +183,29 @@
           }
         }
       }
+    },
+    {
+      "name": "[concat(variables('uniquePrefix'), 'script0')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "[variables('deploymentApiVersion')]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/transfer', variables('uniquePrefix'), 'vm')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('downloadTemplateURI')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "location": { "value": "[resourceGroup().location]" },
+          "uniquePrefix": { "value": "[variables('uniquePrefix')]" },
+          "imageLocation": { "value": "[parameters('imageLocation')]" },
+          "storageAccountKey": { "value": "[parameters('storageAccountKey')]" },
+          "downloadScriptURI": { "value": "[variables('downloadScriptURI')]" }
+        }
+      }
     }
-
   ]
 }
 
