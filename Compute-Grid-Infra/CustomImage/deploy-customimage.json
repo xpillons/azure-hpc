@@ -89,6 +89,7 @@
     }
   },
   "variables": {
+    "uniquePrefix": "[toLower(parameters('uniquePrefix'))]",
     "PremiumStorageMap": {
       "P10": {
         "size": 128
@@ -130,7 +131,7 @@
     {
       "type": "Microsoft.Storage/storageAccounts",
       "comments": "Create one storage account per VM",
-      "name": "[concat(uniqueString(concat(resourceGroup().id, parameters('uniquePrefix'), copyIndex())), parameters('uniquePrefix'))]",
+      "name": "[concat(uniqueString(concat(resourceGroup().id, variables('uniquePrefix'), copyIndex())), variables('uniquePrefix'))]",
       "apiVersion": "[variables('storageApiVersion')]",
       "copy": {
         "name": "storageLoop",
