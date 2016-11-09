@@ -110,10 +110,6 @@
     "vmImage": "Ubuntu_15_10",
     "baseUrl": "[concat(parameters('artifactsBaseUrl'),'/')]",
     "transfer-templateUrl": "[concat(variables('baseUrl'), 'transferVM.json')]",
-    "downloadTemplateURI": "[concat(variables('baseUrl'), 'download.json')]",
-    "downloadScriptURI": "[concat(variables('baseUrl'), 'download.sh')]",
-    "uploadTemplateURI": "[concat(variables('baseUrl'), 'upload.json')]",
-    "uploadScriptURI": "[concat(variables('baseUrl'), 'upload.sh')]",
     "transferNodeSettings": {
       "VMsku": "[parameters('VMsku')]",
       "vnetRG": "[parameters('RGvnetName')]",
@@ -180,32 +176,16 @@
           },
           "nodeOSSettings": {
             "value": "[variables('nodeOSSettings')]"
+          },
+          "imageLocation": {
+            "value": "[parameters('imageLocation')]"
+          },
+          "storageAccountKey": {
+            "value": "[parameters('storageAccountKey')]"
           }
         }
       }
     },
-    {
-      "name": "[concat(variables('uniquePrefix'), 'script0')]",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "[variables('deploymentApiVersion')]",
-      "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachines/transfer', variables('uniquePrefix'), 'vm')]"
-      ],
-      "properties": {
-        "mode": "Incremental",
-        "templateLink": {
-          "uri": "[variables('downloadTemplateURI')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "location": { "value": "[resourceGroup().location]" },
-          "uniquePrefix": { "value": "[variables('uniquePrefix')]" },
-          "imageLocation": { "value": "[parameters('imageLocation')]" },
-          "storageAccountKey": { "value": "[parameters('storageAccountKey')]" },
-          "downloadScriptURI": { "value": "[variables('downloadScriptURI')]" }
-        }
-      }
-    }
   ]
 }
 

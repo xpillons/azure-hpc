@@ -25,6 +25,18 @@
       "metadata": {
         "Description": "node OS settings object"
       }
+    },
+    "imageLocation": {
+      "type": "string",
+      "metadata": {
+        "description": "URL of the base custom image, in the format of https://accountname.blob.core.windows.net/container/image.vhd."
+      }
+    },
+    "storageAccountKey": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Storage Account key for accessing the base custom image."
+      }
     }
   },
   "variables": {
@@ -42,8 +54,13 @@
     "networkApiVersion": "2016-03-30",
     "storageApiVersion": "2015-06-15",
     "extensionApiVersion": "2015-06-15",
+    "deploymentApiVersion": "2015-11-01",
     "setupScript": "install_headnode.sh",
     "baseUrl": "[concat(parameters('artifactsBaseUrl'),'/')]",
+    "downloadTemplateURI": "[concat(variables('baseUrl'), 'download.json')]",
+    "downloadScriptURI": "[concat(variables('baseUrl'), 'download.sh')]",
+    "uploadTemplateURI": "[concat(variables('baseUrl'), 'upload.json')]",
+    "uploadScriptURI": "[concat(variables('baseUrl'), 'upload.sh')]",
     "sshKeyPath": "[concat('/home/',parameters('nodeOSSettings').adminUserName,'/.ssh/authorized_keys')]"
   },
   "resources": [
@@ -113,6 +130,28 @@
               "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]"
             }
           ]
+        }
+      }
+    },
+    {
+      "name": "[concat(variables('uniquePrefix'), 'script0')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "[variables('deploymentApiVersion')]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/transfer', variables('uniquePrefix'), 'vm')]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('downloadTemplateURI')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "location": { "value": "[resourceGroup().location]" },
+          "uniquePrefix": { "value": "[variables('uniquePrefix')]" },
+          "imageLocation": { "value": "[parameters('imageLocation')]" },
+          "storageAccountKey": { "value": "[parameters('storageAccountKey')]" },
+          "downloadScriptURI": { "value": "[variables('downloadScriptURI')]" }
         }
       }
     },
