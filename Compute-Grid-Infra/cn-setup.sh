@@ -121,6 +121,9 @@ setup_user()
     chown $HPC_USER:$HPC_GROUP $SHARE_SCRATCH	
 }
 
+mount_nfs
+install_applications
+
 SETUP_MARKER=/var/tmp/cn-setup.marker
 if [ -e "$SETUP_MARKER" ]; then
     echo "We're already configured, exiting..."
@@ -129,8 +132,8 @@ fi
 
 #install_azure_cli
 #install_azure_files
-mount_nfs
-install_applications
+#mount_nfs
+#install_applications
 #setup_user
 #install_beegfs_client
 
