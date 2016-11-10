@@ -83,6 +83,8 @@ mount_nfs()
 	log "mounting NFS on " ${MASTER_NAME}
 	showmount -e ${MASTER_NAME}
 	mount -t nfs ${MASTER_NAME}:/nfsdata/apps ${MOUNT_POINT}/	 
+	
+	echo "${MASTER_NAME}:/nfsdata/apps /apps nfs defaults  0 0" >> /etc/fstab
 }
 
 install_beegfs_client()
@@ -127,7 +129,6 @@ setup_user()
     chown $HPC_USER:$HPC_GROUP $SHARE_SCRATCH	
 }
 
-mount_nfs
 install_applications
 
 SETUP_MARKER=/var/tmp/cn-setup.marker
@@ -138,8 +139,9 @@ fi
 
 #install_azure_cli
 #install_azure_files
-#mount_nfs
+mount_nfs
 install_lsf
+install_applications
 #setup_user
 #install_beegfs_client
 
