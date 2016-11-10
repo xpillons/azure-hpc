@@ -60,10 +60,17 @@ install_azure_files()
 	
 }
 
+install_lsf()
+{
+	log "install lsf"
+	${MOUNT_POINT}/Azure/deployment.pex ${MOUNT_POINT}/Azure/plays/setup_clients.yml
+}
+
 install_applications()
 {
 	log "install applications"
-	${MOUNT_POINT}/Azure/deployment.pex ${MOUNT_POINT}/Azure/plays/setup_clients.yml
+		
+	${MOUNT_POINT}/Azure/deployment.pex ${MOUNT_POINT}/Azure/plays/setup_software.yml
 }
 
 mount_nfs()
@@ -133,7 +140,7 @@ fi
 #install_azure_cli
 #install_azure_files
 #mount_nfs
-#install_applications
+#install_lsf
 #setup_user
 #install_beegfs_client
 
