@@ -21,6 +21,7 @@ done
 
 # Shares
 SHARE_HOME=/share/home
+SHARE_SCRATCH=/share/scratch
 
 # User
 HPC_USER=hpcuser
@@ -28,9 +29,12 @@ HPC_UID=7007
 HPC_GROUP=hpc
 HPC_GID=7007
 
+MASTER_NAME=`hostname`
+
 setup_disks()
 {
     mkdir -p $SHARE_HOME
+    mkdir -p $SHARE_SCRATCH
     
 	echo "$SHARE_HOME    *(rw,async)" >> /etc/exports
 	systemctl enable rpcbind || echo "Already enabled"
@@ -75,9 +79,8 @@ setup_user()
 	chmod 644 $SHARE_HOME/$HPC_USER/.ssh/authorized_keys
 	chmod 600 $SHARE_HOME/$HPC_USER/.ssh/id_rsa
 	chmod 644 $SHARE_HOME/$HPC_USER/.ssh/id_rsa.pub
-    
-    chown $HPC_USER:$HPC_GROUP $SHARE_SCRATCH
-    chown $HPC_USER:$HPC_GROUP $LOCAL_SCRATCH
+	
+	chown $HPC_USER:$HPC_GROUP $SHARE_SCRATCH    
 }
 
 ######################################################################
@@ -109,7 +112,40 @@ install_azure_files()
 	
 }
 
+install_beegfs()
+{
+	yum -y install wget
+    wget -O install_beegfs_client.sh https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/BeeGFS/install_beegfs_mgmt.sh
+    wget -O install_beegfs_client.sh https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/BeeGFS/install_beegfs_client.sh
+
+	bash install_beegfs_mgmt.sh ${MASTER_NAME}
+	bash install_beegfs_client.sh ${MASTER_NAME}
+}
+
+install_ganglia()
+{
+	yum -y install wget
+    wget -O install_gmond.sh https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/Ganglia/install_gmond.sh
+    wget -O install_gmetad.sh https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/Ganglia/install_gmetad.sh
+	bash install_gmetad.sh
+	bash install_gmond.sh ${MASTER_NAME}
+}
+
+SETUP_MARKER=/var/tmp/master-setup.marker
+if [ -e "$SETUP_MARKER" ]; then
+    echo "We're already configured, exiting..."
+    exit 0
+fi
+
 #install_azure_cli
 #install_azure_files
 setup_disks
 setup_user
+install_ganglia
+install_beegfs
+
+# Create marker file so we know we're configured
+touch $SETUP_MARKER
+
+shutdown -r +1 &
+exit 0

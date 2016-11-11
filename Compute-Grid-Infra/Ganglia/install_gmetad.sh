@@ -37,6 +37,9 @@ install_ganglia_metad()
 	sed -i 's/^#setuid off.*/setuid off/g' /etc/ganglia/gmetad.conf	
 	sed -i 's/^#gridname "MyGrid".*/gridname "MyGrid"/g' /etc/ganglia/gmetad.conf	
 	
+	#TODO add authority server	
+	#sed -i 's,^#authority .*,authority "http://dnsname/ganglia/",g' /etc/ganglia/gmetad.conf	
+	
 	#configure Ganglia monitoring
 	sed -i '0,/name = "unspecified"/{s/name = "unspecified"/name = "'$MGMT_HOSTNAME' cluster"/}'  /etc/ganglia/gmond.conf 
 	sed -i '0,/mcast_join = 239.2.11.71/{s/mcast_join = 239.2.11.71/host = '$MGMT_HOSTNAME'/}'  /etc/ganglia/gmond.conf
