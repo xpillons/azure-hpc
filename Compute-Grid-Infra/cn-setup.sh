@@ -63,13 +63,13 @@ install_azure_files()
 install_lsf()
 {
 	log "install lsf"
-	${MOUNT_POINT}/Azure/deployment.pex ${MOUNT_POINT}/Azure/plays/setup_clients.yml
+	/apps/Azure/deployment.pex /apps/Azure/plays/setup_clients.yml
 }
 
 install_applications()
 {
 	log "install applications"		
-	${MOUNT_POINT}/Azure/deployment.pex ${MOUNT_POINT}/Azure/plays/setup_software.yml
+	/apps/Azure/deployment.pex /apps/Azure/plays/setup_software.yml
 }
 
 mount_nfs()
@@ -78,11 +78,11 @@ mount_nfs()
 
 	yum -y install nfs-utils nfs-utils-lib
 	
-	mkdir -p ${MOUNT_POINT}
+	mkdir -p /apps
 
 	log "mounting NFS on " ${MASTER_NAME}
 	showmount -e ${MASTER_NAME}
-	mount -t nfs ${MASTER_NAME}:/nfsdata/apps ${MOUNT_POINT}/	 
+	mount -t nfs ${MASTER_NAME}:/nfsdata/apps /apps/	 
 	
 	echo "${MASTER_NAME}:/nfsdata/apps /apps nfs defaults  0 0" >> /etc/fstab
 }
