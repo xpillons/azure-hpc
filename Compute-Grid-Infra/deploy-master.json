@@ -66,18 +66,18 @@
         "description": "SSH rsa public key file as a string."
       }
     },
-    "sharedDataAccount": {
-      "type": "string",
-      "metadata": {
-        "description": "Name of the shared storage account"
-      }
-    },
-    "RGStorageName": {
-      "type": "string",
-      "metadata": {
-        "description": "Name of Resource Group of the shared storage account"
-      }
-    }
+    //"sharedDataAccount": {
+    //  "type": "string",
+    //  "metadata": {
+    //    "description": "Name of the shared storage account"
+    //  }
+    //},
+    //"RGStorageName": {
+    //  "type": "string",
+    //  "metadata": {
+    //    "description": "Name of Resource Group of the shared storage account"
+    //  }
+    //}
   },
   "variables": {
     "location": "[resourceGroup().location]",
@@ -86,17 +86,17 @@
     "newStorageAccountSuffix": "[concat(variables('longNamingInfix'), 'sa')]",
     "virtualNetworkName": "grid-vnet",
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
-    "commonSettings": {
-      "DataSAName": "[parameters('sharedDataAccount')]",
-      "RGStorageName": "[parameters('RGStorageName')]"
-    },
+    //"commonSettings": {
+    //  "DataSAName": "[parameters('sharedDataAccount')]",
+    //  "RGStorageName": "[parameters('RGStorageName')]"
+    //},
     "networkSettings": {
       "virtualNetworkName": "[variables('virtualNetworkName')]",
-      "addressPrefix": "10.0.0.0/20",
-      "computeSubnetPrefix": "10.0.0.0/21",
-      "storageSubnetPrefix": "10.0.10.0/25",
-      "infraSubnetPrefix": "10.0.8.0/28",
-      "gatewaySubnetPrefix": "10.0.9.0/29",
+      "addressPrefix": "172.0.0.0/20",
+      "computeSubnetPrefix": "172.0.0.0/21",
+      "storageSubnetPrefix": "172.0.10.0/25",
+      "infraSubnetPrefix": "172.0.8.0/28",
+      "gatewaySubnetPrefix": "172.0.9.0/29",
       "infraSubnetRef": "[concat(variables('vnetID'),'/subnets/infraSubnet/')]",
       "nsgName": "nsg-master"
     },
@@ -249,9 +249,9 @@
           "artifactsBaseUrl": {
             "value": "[parameters('artifactsBaseUrl')]"
           },
-          "commonSettings": {
-            "value": "[variables('commonSettings')]"
-          },
+          //"commonSettings": {
+          //  "value": "[variables('commonSettings')]"
+          //},
           "networkSettings": {
             "value": "[variables('networkSettings')]"
           },

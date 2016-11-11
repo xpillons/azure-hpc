@@ -9,12 +9,12 @@
         "artifactsBaseUrl": ""
       }
     },
-    "commonSettings": {
-      "type": "object",
-      "metadata": {
-        "Description": "common settings object"
-      }
-    },
+    //"commonSettings": {
+    //  "type": "object",
+    //  "metadata": {
+    //    "Description": "common settings object"
+    //  }
+    //},
     "networkSettings": {
       "type": "object",
       "metadata": {
@@ -49,7 +49,7 @@
       "commandToExecute": ""
     },
     "baseUrl": "[concat(parameters('artifactsBaseUrl'),'/')]",
-    "sharedAccountId": "[resourceId(parameters('commonSettings').RGStorageName, 'Microsoft.Storage/storageAccounts', parameters('commonSettings').DataSAName)]",
+    //"sharedAccountId": "[resourceId(parameters('commonSettings').RGStorageName, 'Microsoft.Storage/storageAccounts', parameters('commonSettings').DataSAName)]",
     "sshKeyPath": "[concat('/home/',parameters('masterOSSettings').adminUserName,'/.ssh/authorized_keys')]",
     "computeApiVersion": "2016-03-30",
     "storageApiVersion": "2015-06-15"
@@ -125,7 +125,8 @@
             "autoUpgradeMinorVersion": true,
             "settings": {
               "fileUris": "[variables('vmScripts').scriptsToDownload]",
-              "commandToExecute": "[concat('bash ', concat('master-setup.sh -a ', parameters('commonSettings').DataSAName, ' -k ', listKeys(variables('sharedAccountId'), variables('storageApiVersion')).key1))]",
+              //"commandToExecute": "[concat('bash ', concat('master-setup.sh -a ', parameters('commonSettings').DataSAName, ' -k ', listKeys(variables('sharedAccountId'), variables('storageApiVersion')).key1))]",
+              "commandToExecute": "bash master-setup.sh",
               "timestamp": 4
             }
           }
