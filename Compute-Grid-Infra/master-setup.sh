@@ -115,7 +115,7 @@ install_azure_files()
 install_beegfs()
 {
 	yum -y install wget
-    wget -O install_beegfs_client.sh https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/BeeGFS/install_beegfs_mgmt.sh
+    wget -O install_beegfs_mgmt.sh https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/BeeGFS/install_beegfs_mgmt.sh
     wget -O install_beegfs_client.sh https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/BeeGFS/install_beegfs_client.sh
 
 	bash install_beegfs_mgmt.sh ${MASTER_NAME}
