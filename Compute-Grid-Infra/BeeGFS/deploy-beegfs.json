@@ -108,7 +108,7 @@
     "nbMetaDisks": {
       "type": "int",
       "defaultValue": 1,
-      "maxValue": 4,
+      "maxValue": 6,
       "metadata": {
         "description": "Number of metadate disks"
       }
@@ -123,7 +123,7 @@
         "size": 512
       },
       "P30": {
-        "size": 1024
+        "size": 1023
       }
     },
     "vmImage": "CentOS_7.2",
