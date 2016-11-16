@@ -35,9 +35,9 @@ install_pkgs()
 install_beegfs()
 {
     # Install BeeGFS repo
-    wget -O beegfs-rhel7.repo http://www.beegfs.com/release/latest-stable/dists/beegfs-rhel7.repo
+    wget -O beegfs-rhel7.repo http://www.beegfs.com/release/beegfs_2015.03/dists/beegfs-rhel7.repo
     mv beegfs-rhel7.repo /etc/yum.repos.d/beegfs.repo
-    rpm --import http://www.beegfs.com/release/latest-stable/gpg/RPM-GPG-KEY-beegfs
+    rpm --import http://www.beegfs.com/release/beegfs_2015.03/gpg/RPM-GPG-KEY-beegfs
     
     # Disable SELinux
     sed -i 's/SELINUX=.*/SELINUX=disabled/g' /etc/selinux/config
