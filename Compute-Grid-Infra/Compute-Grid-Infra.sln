@@ -17,15 +17,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		master-setup.sh = master-setup.sh
 		master-shared-resources.json = master-shared-resources.json
 		master-windows-resources.json = master-windows-resources.json
-		node-setup.ps1 = node-setup.ps1
 		nodes-linux-resources.json = nodes-linux-resources.json
 		nodes-windows-resources.json = nodes-windows-resources.json
 		nsg-master-linux.json = nsg-master-linux.json
 		nsg-master-windows.json = nsg-master-windows.json
 		README.md = README.md
-		scheduler.ps1 = scheduler.ps1
 		shared-resources.json = shared-resources.json
-		storage.ps1 = storage.ps1
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BeeGFS", "BeeGFS", "{61C5DCA9-5630-40B9-8C6E-DBB067C1AFE8}"
@@ -33,6 +30,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BeeGFS", "BeeGFS", "{61C5DC
 		BeeGFS\beegfs-node-resources.json = BeeGFS\beegfs-node-resources.json
 		BeeGFS\deploy-beegfs.json = BeeGFS\deploy-beegfs.json
 		BeeGFS\install_beegfs.sh = BeeGFS\install_beegfs.sh
+		BeeGFS\install_beegfs_client-centos6x.sh = BeeGFS\install_beegfs_client-centos6x.sh
 		BeeGFS\install_beegfs_client.sh = BeeGFS\install_beegfs_client.sh
 		BeeGFS\install_beegfs_mgmt.sh = BeeGFS\install_beegfs_mgmt.sh
 	EndProjectSection
