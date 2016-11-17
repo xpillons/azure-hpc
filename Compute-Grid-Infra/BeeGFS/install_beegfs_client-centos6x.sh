@@ -8,8 +8,8 @@ if [[ $(id -u) -ne 0 ]] ; then
     exit 1
 fi
 
-if [ $# != 1 ]; then
-    echo "Usage: $0 <ManagementHost>"
+if [ $# != 2 ]; then
+    echo "Usage: $0 <ManagementHost> <Mount>"
     exit 1
 fi
 
@@ -17,8 +17,14 @@ fi
 MGMT_HOSTNAME=$1
 
 # Shares
-SHARE_SCRATCH=/share/scratch
+SHARE_SCRATCH=$2
+SHARE_HOME=/share/home
 
+# User
+HPC_USER=hpcuser
+HPC_UID=7007
+HPC_GROUP=hpc
+HPC_GID=7007
 
 # Installs all required packages.
 #
@@ -27,8 +33,8 @@ install_pkgs()
     yum -y install epel-release
     yum -y install zlib zlib-devel bzip2 bzip2-devel bzip2-libs openssl openssl-devel openssl-libs gcc gcc-c++ nfs-utils rpcbind mdadm wget python-pip kernel kernel-devel openmpi openmpi-devel automake autoconf
 	
-	systemctl stop firewalld
-	systemctl disable firewalld	
+	#systemctl stop firewalld
+	#systemctl disable firewalld	
 }
 
 
@@ -46,12 +52,39 @@ install_beegfs()
     yum install -y beegfs-client beegfs-helperd beegfs-utils
         
     # setup client
-    sed -i 's/^sysMgmtdHost.*/sysMgmtdHost = '$MGMT_HOSTNAME'/g' /etc/beegfs/beegfs-client.conf
+    #sed -i 's/^sysMgmtdHost.*/sysMgmtdHost = '$MGMT_HOSTNAME'/g' /etc/beegfs/beegfs-client.conf
+	/opt/beegfs/sbin/beegfs-setup-client -m $MGMT_HOSTNAME
+
     echo "$SHARE_SCRATCH /etc/beegfs/beegfs-client.conf" > /etc/beegfs/beegfs-mounts.conf
 	
-    systemctl daemon-reload
-    systemctl enable beegfs-helperd.service
-    systemctl enable beegfs-client.service
+    /etc/init.d/beegfs-helperd start
+    /etc/init.d/beegfs-client start
+}
+
+setup_user()
+{
+    mkdir -p $SHARE_HOME
+    mkdir -p $SHARE_SCRATCH
+
+	echo "$MGMT_HOSTNAME:$SHARE_HOME $SHARE_HOME    nfs4    rw,auto,_netdev 0 0" >> /etc/fstab
+	mount -a
+	mount
+
+    # disable selinux
+    sed -i 's/enforcing/disabled/g' /etc/selinux/config
+    setenforce permissive
+    
+    groupadd -g $HPC_GID $HPC_GROUP
+
+    # Don't require password for HPC user sudo
+    echo "$HPC_USER ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+    
+    # Disable tty requirement for sudo
+    sed -i 's/^Defaults[ ]*requiretty/# Defaults requiretty/g' /etc/sudoers
+
+	useradd -c "HPC User" -g $HPC_GROUP -d $SHARE_HOME/$HPC_USER -s /bin/bash -u $HPC_UID $HPC_USER
+
+    chown $HPC_USER:$HPC_GROUP $SHARE_SCRATCH	
 }
 
 SETUP_MARKER=/var/tmp/install_beegfs_client.marker
