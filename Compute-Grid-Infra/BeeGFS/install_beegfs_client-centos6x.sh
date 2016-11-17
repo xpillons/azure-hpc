@@ -96,6 +96,7 @@ fi
 mkdir -p $SHARE_SCRATCH
 
 install_pkgs
+setup_user
 install_beegfs
 
 # Create marker file so we know we're configured
