@@ -34,7 +34,6 @@ install_gmond()
     setenforce 0
 		
 	#configure Ganglia monitoring
-	sed -i '0,/setuid = yes/{s/setuid = no/}'  /etc/ganglia/gmond.conf 
 	sed -i '0,/name = "unspecified"/{s/name = "unspecified"/name = "'$MGMT_HOSTNAME' cluster"/}'  /etc/ganglia/gmond.conf 
 	sed -i '0,/mcast_join = 239.2.11.71/{s/mcast_join = 239.2.11.71/host = '$MGMT_HOSTNAME'/}'  /etc/ganglia/gmond.conf
 	sed -i '0,/mcast_join = 239.2.11.71/{s/mcast_join = 239.2.11.71//}'  /etc/ganglia/gmond.conf 	
