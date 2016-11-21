@@ -16,13 +16,21 @@
         "description": "This unique prefix will be used on all the objects created as part of this template."
       }
     },
-    "nodeCount": {
+    "instanceCountPerVMSS": {
       "type": "int",
       "metadata": {
-        "description": "Number of nodes (10 or less)."
+        "description": "Number of VM instances per Scaleset (100 or less)."
       },
+      "defaultValue": 2,
+      "maxValue": 100
+    },
+    "numberOfVMSS": {
+      "type": "int",
       "defaultValue": 1,
-      "maxValue": 10
+      "maxValue": 100,
+      "metadata": {
+        "description": "Number of VMSSes to deploy (max of 100)"
+      }
     },
     "VMsku": {
       "type": "string",
@@ -61,26 +69,6 @@
         "description": "SSH rsa public key file as a string."
       }
     },
-    "dataDiskSize": {
-      "type": "string",
-      "defaultValue": "P10",
-      "allowedValues": [
-        "P10",
-        "P20",
-        "P30"
-      ],
-      "metadata": {
-        "description": "Data storage disk size used"
-      }
-    },
-    "nbDataDisks": {
-      "type": "int",
-      "defaultValue": 1,
-      "maxValue": 8,
-      "metadata": {
-        "description": "Number of storage disks"
-      }
-    },
     "imageLocation": {
       "type": "string",
       "metadata": {
@@ -96,17 +84,6 @@
   },
   "variables": {
     "uniquePrefix": "[toLower(parameters('uniquePrefix'))]",
-    "PremiumStorageMap": {
-      "P10": {
-        "size": 128
-      },
-      "P20": {
-        "size": 512
-      },
-      "P30": {
-        "size": 1024
-      }
-    },
     "vmImage": "Ubuntu_15_10",
     "baseUrl": "[concat(parameters('artifactsBaseUrl'),'/')]",
     "transfer-templateUrl": "[concat(variables('baseUrl'), 'transferVM.json')]",
@@ -147,7 +124,7 @@
       "apiVersion": "[variables('storageApiVersion')]",
       "copy": {
         "name": "storageLoop",
-        "count": "[parameters('nodeCount')]"
+        "count": "[parameters('numberOfVMSS')]"
       },
       "location": "[resourceGroup().location]",
       "properties": {
@@ -168,6 +145,9 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
+          "uniquePrefix": {
+            "value" :  "[variables('uniquePrefix')]"
+          },
           "artifactsBaseUrl": {
             "value": "[parameters('artifactsBaseUrl')]"
           },
@@ -185,7 +165,7 @@
           }
         }
       }
-    },
+    }
   ]
 }
 

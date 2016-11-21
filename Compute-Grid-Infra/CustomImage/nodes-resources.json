@@ -46,13 +46,6 @@
     "extensionApiVersion": "2015-06-15",
     "setupScript": "install_headnode.sh",
     "baseUrl": "[concat(parameters('artifactsBaseUrl'),'/')]",
-    "installationCLI": "[concat('bash ', variables('setupScript'))]",
-    "vmScripts": {
-      "scriptsToDownload": [
-        "[concat(variables('baseUrl'), variables('setupScript'))]"
-      ],
-      "commandToExecute": "[variables('installationCLI')]"
-    },
     "sshKeyPath": "[concat('/home/',parameters('nodeOSSettings').adminUserName,'/.ssh/authorized_keys')]",
     "dataDiskArray": [
       {
@@ -169,32 +162,7 @@
             }
           ]
         }
-      },
-      "resources": [
-        {
-          "name": "InstallScript",
-          "type": "extensions",
-          "location": "[variables('location')]",
-          "apiVersion": "[variables('extensionApiVersion')]",
-          "dependsOn": [
-            "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
-          ],
-          "tags": {
-            "displayName": "InstallScript"
-          },
-          "properties": {
-            "publisher": "Microsoft.Azure.Extensions",
-            "type": "CustomScript",
-            "typeHandlerVersion": "2.0",
-            "autoUpgradeMinorVersion": true,
-            "settings": {
-              "fileUris": "[variables('vmScripts').scriptsToDownload]",
-              "commandToExecute": "[variables('vmScripts').commandToExecute]",
-              "timestamp": 12
-            }
-          }
-        }
-      ]
+      }
     },
     {
       "type": "Microsoft.Storage/storageAccounts",
