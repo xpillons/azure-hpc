@@ -8,13 +8,15 @@ if [[ $(id -u) -ne 0 ]] ; then
     exit 1
 fi
 
-if [ $# != 1 ]; then
-    echo "Usage: $0 <ManagementHost>"
+if [ $# != 3 ]; then
+    echo "Usage: $0 <ManagementHost> <ClusterName> <ClusterPort>"
     exit 1
 fi
 
 # management server
 MGMT_HOSTNAME=$1
+CLUSTER_NAME=$2
+CLUSTER_PORT=$3
 
 # Installs all required packages.
 #
@@ -34,12 +36,15 @@ install_gmond()
     setenforce 0
 		
 	#configure Ganglia monitoring
-	sed -i '0,/name = "unspecified"/{s/name = "unspecified"/name = "'$MGMT_HOSTNAME' cluster"/}'  /etc/ganglia/gmond.conf 
+	sed -i '0,/name = "unspecified"/{s/name = "unspecified"/name = "'$CLUSTER_NAME'"/}'  /etc/ganglia/gmond.conf 
 	sed -i '0,/mcast_join = 239.2.11.71/{s/mcast_join = 239.2.11.71/host = '$MGMT_HOSTNAME'/}'  /etc/ganglia/gmond.conf
 	sed -i '0,/mcast_join = 239.2.11.71/{s/mcast_join = 239.2.11.71//}'  /etc/ganglia/gmond.conf 	
 	sed -i '0,/bind = 239.2.11.71/{s/bind = 239.2.11.71//}'  /etc/ganglia/gmond.conf 
 	sed -i '0,/retry_bind = true/{s/retry_bind = true//}'  /etc/ganglia/gmond.conf 
-	
+	sed -i '0,/port = 8649/{s/port = 8649/port = '$CLUSTER_PORT'/}'  /etc/ganglia/gmond.conf 
+	sed -i '0,/port = 8649/{s/port = 8649/port = '$CLUSTER_PORT'/}'  /etc/ganglia/gmond.conf 
+	sed -i '0,/port = 8649/{s/port = 8649/port = '$CLUSTER_PORT'/}'  /etc/ganglia/gmond.conf 
+
 	systemctl restart gmond
 	systemctl enable gmond
 }
