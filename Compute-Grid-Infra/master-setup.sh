@@ -35,12 +35,7 @@ setup_disks()
 {
     mkdir -p $SHARE_HOME
     mkdir -p $SHARE_SCRATCH
-    
-	echo "$SHARE_HOME    *(rw,async)" >> /etc/exports
-	systemctl enable rpcbind || echo "Already enabled"
-	systemctl enable nfs-server || echo "Already enabled"
-	systemctl start rpcbind || echo "Already enabled"
-	systemctl start nfs-server || echo "Already enabled"
+
 }
 
 setup_user()
@@ -81,6 +76,20 @@ setup_user()
 	chmod 644 $SHARE_HOME/$HPC_USER/.ssh/id_rsa.pub
 	
 	chown $HPC_USER:$HPC_GROUP $SHARE_SCRATCH    
+}
+
+mount_nfs()
+{
+	log "install NFS"
+
+	yum -y install nfs-utils nfs-utils-lib
+
+    echo "$SHARE_HOME    *(rw,async)" >> /etc/exports
+    systemctl enable rpcbind || echo "Already enabled"
+    systemctl enable nfs-server || echo "Already enabled"
+    systemctl start rpcbind || echo "Already enabled"
+    systemctl start nfs-server || echo "Already enabled"
+		
 }
 
 ######################################################################
@@ -128,7 +137,7 @@ install_ganglia()
     wget -O install_gmond.sh https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/Ganglia/install_gmond.sh
     wget -O install_gmetad.sh https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/Ganglia/install_gmetad.sh
 	bash install_gmetad.sh
-	bash install_gmond.sh ${MASTER_NAME}
+	bash install_gmond.sh ${MASTER_NAME} "Master" 8649
 }
 
 SETUP_MARKER=/var/tmp/master-setup.marker
@@ -140,6 +149,7 @@ fi
 #install_azure_cli
 #install_azure_files
 setup_disks
+mount_nfs
 setup_user
 install_ganglia
 install_beegfs
