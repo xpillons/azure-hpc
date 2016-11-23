@@ -57,7 +57,7 @@
     "extensionApiVersion": "2015-06-15",
     "setupScript": "install_beegfs.sh",
     "baseUrl": "[concat(parameters('artifactsBaseUrl'),'/')]",
-    "installationCLI": "[concat('bash ', variables('setupScript'), ' ', parameters('nodeSettings').MasterName, ' ', parameters('nodeSettings').nodeType, ' ', parameters('nodeSettings').customDomain)]",
+    "installationCLI": "[concat('bash ', variables('setupScript'), ' ', parameters('nodeSettings').MasterName, ' ', parameters('nodeSettings').nodeType, ' \"', parameters('nodeSettings').customDomain, '\"')]",
     "vmScripts": {
       "scriptsToDownload": [
         "[concat(variables('baseUrl'), variables('setupScript'))]"
