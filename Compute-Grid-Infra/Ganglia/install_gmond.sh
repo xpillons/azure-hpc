@@ -41,6 +41,7 @@ install_gmond()
 	sed -i '0,/mcast_join = 239.2.11.71/{s/mcast_join = 239.2.11.71//}'  /etc/ganglia/gmond.conf 	
 	sed -i '0,/bind = 239.2.11.71/{s/bind = 239.2.11.71//}'  /etc/ganglia/gmond.conf 
 	sed -i '0,/retry_bind = true/{s/retry_bind = true//}'  /etc/ganglia/gmond.conf 
+	sed -i '0,/send_metadata_interval = 0/{s/send_metadata_interval = 0/send_metadata_interval = 60/}'  /etc/ganglia/gmond.conf 
 	sed -i '0,/port = 8649/{s/port = 8649/port = '$CLUSTER_PORT'/}'  /etc/ganglia/gmond.conf 
 	sed -i '0,/port = 8649/{s/port = 8649/port = '$CLUSTER_PORT'/}'  /etc/ganglia/gmond.conf 
 	sed -i '0,/port = 8649/{s/port = 8649/port = '$CLUSTER_PORT'/}'  /etc/ganglia/gmond.conf 

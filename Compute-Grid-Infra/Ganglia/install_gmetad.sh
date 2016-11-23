@@ -33,9 +33,10 @@ install_ganglia_metad()
     setenforce 0
 	
 	#configure Ganglia server	
-	sed -i 's/^data_source.*/datasource "'$MGMT_HOSTNAME' cluster" '$MGMT_HOSTNAME'/g' /etc/ganglia/gmetad.conf	
-	sed -i 's/^#setuid off.*/setuid off/g' /etc/ganglia/gmetad.conf	
-	sed -i 's/^#gridname "MyGrid".*/gridname "MyGrid"/g' /etc/ganglia/gmetad.conf	
+	sed -i 's/^data_source.*/data_source "'$MGMT_HOSTNAME' cluster" '$MGMT_HOSTNAME'/g' /etc/ganglia/gmetad.conf	
+
+	sed -i 's/#setuid off.*/setuid off/g' /etc/ganglia/gmetad.conf	
+	sed -i 's/#gridname "MyGrid".*/gridname "Azure Grid"/g' /etc/ganglia/gmetad.conf	
 	
 	#TODO add authority server	
 	#sed -i 's,^#authority .*,authority "http://dnsname/ganglia/",g' /etc/ganglia/gmetad.conf	
