@@ -138,7 +138,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "[variables('deploymentApiVersion')]",
       "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachines/transfer', variables('uniquePrefix'), 'vm')]"
+        "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
       ],
       "properties": {
         "mode": "Incremental",
