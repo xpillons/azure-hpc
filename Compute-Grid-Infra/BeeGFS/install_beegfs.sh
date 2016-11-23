@@ -9,12 +9,13 @@ if [[ $(id -u) -ne 0 ]] ; then
 fi
 
 if [ $# != 2 ]; then
-    echo "Usage: $0 <ManagementHost> <Type (meta,storage,both)>"
+    echo "Usage: $0 <ManagementHost> <Type (meta,storage,both)> <customDomain>"
     exit 1
 fi
 
 MGMT_HOSTNAME=$1
 BEEGFS_NODE_TYPE="$2"
+CUSTOMDOMAIN=$3
 
 # Shares
 SHARE_HOME=/share/home
@@ -215,7 +216,7 @@ install_ganglia()
 {
 	yum -y install wget
     wget -O install_gmond.sh https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/Ganglia/install_gmond.sh
-	bash install_gmond.sh ${MGMT_HOSTNAME}
+	bash install_gmond.sh ${MGMT_HOSTNAME} "BeeGFS" 8649
 }
 
 setup_swap()
@@ -232,6 +233,11 @@ tune_tcp()
     echo "net.ipv4.neigh.default.gc_thresh1=1100" >> /etc/sysctl.conf
     echo "net.ipv4.neigh.default.gc_thresh2=2200" >> /etc/sysctl.conf
     echo "net.ipv4.neigh.default.gc_thresh3=4400" >> /etc/sysctl.conf
+}
+
+setup_domain()
+{
+	echo "supersede domain-search ""$CUSTOMDOMAIN"";" >> /etc/dhcp/dhclient.conf
 }
 
 setup_user()

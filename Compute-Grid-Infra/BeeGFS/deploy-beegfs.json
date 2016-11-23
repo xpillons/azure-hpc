@@ -112,6 +112,12 @@
       "metadata": {
         "description": "Number of metadate disks"
       }
+    },
+    "customDomain": {
+      "type": "string",
+      "metadata": {
+        "description": "custom domain name to use for name resolution"
+      }
     }
   },
   "variables": {
@@ -140,7 +146,8 @@
       "numStorageDisks": "[parameters('nbStorageDisks')]",
       "metadataDiskSize": "[variables('PremiumStorageMap')[parameters('metaDiskSize')].size]",
       "numMetadataDisks": "[parameters('nbMetaDisks')]",
-      "nodeType": "[parameters('nodeType')]"
+      "nodeType": "[parameters('nodeType')]",
+      "customDomain": "[parameters('customDomain')]"
     },
     "computeNodeImages": {
       "CentOS_7.2": {
