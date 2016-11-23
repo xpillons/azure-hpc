@@ -278,6 +278,7 @@ install_pkgs
 setup_disks
 setup_user
 tune_tcp
+setup_domain
 install_beegfs
 install_ganglia
 
