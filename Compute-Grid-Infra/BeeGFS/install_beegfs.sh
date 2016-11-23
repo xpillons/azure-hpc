@@ -237,7 +237,11 @@ tune_tcp()
 
 setup_domain()
 {
-	echo "supersede domain-search ""$CUSTOMDOMAIN"";" >> /etc/dhcp/dhclient.conf
+	# surround domain names separated by comma with " after removing extra spaces
+	QUOTEDDOMAIN=$(echo $CUSTOMDOMAIN | sed -e 's/ //g' -e 's/"//g' -e 's/^\|$/"/g' -e 's/,/","/g')
+	echo $QUOTEDDOMAIN
+
+	echo "supersede domain-search $QUOTEDDOMAIN;" >> /etc/dhcp/dhclient.conf
 }
 
 setup_user()
