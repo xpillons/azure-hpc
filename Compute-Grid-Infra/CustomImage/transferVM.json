@@ -41,10 +41,10 @@
   },
   "variables": {
     "uniquePrefix": "[toLower(parameters('uniquePrefix'))]",
-    "vmName": "[concat('transfer', variables('uniquePrefix'), 'vm')]",
+    "vmName": "[concat('xfer', variables('uniquePrefix'))]",
     "storageAccountType": "Premium_LRS",
     "location": "[resourceGroup().location]",
-    "transferSA": "[concat(uniquestring(resourceGroup().id, variables('vmName')), variables('vmName'), 'sa')]",
+    "transferSA": "[concat(uniquestring(resourceGroup().id, variables('vmName')), variables('vmName'))]",
     "osDiskName": "[concat(variables('vmName'), 'osdisk')]",
     "vnetID": "[resourceId(parameters('nodeSettings').vnetRG, 'Microsoft.Network/virtualNetworks', parameters('nodeSettings').vnetName)]",
     "subnetRef": "[concat(variables('vnetID'),'/subnets/', parameters('nodeSettings').subnetName)]",

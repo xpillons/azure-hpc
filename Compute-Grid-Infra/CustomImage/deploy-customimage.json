@@ -16,21 +16,26 @@
         "description": "This unique prefix will be used on all the objects created as part of this template."
       }
     },
-    "instanceCountPerVMSS": {
+    "computeNodeImage": {
+      "type": "string",
+      "defaultValue": "CentOS_6.7",
+      "allowedValues": [
+        "CentOS_6.7",
+        "CentOS_7.2",
+        "RHEL_7.2",
+        "W2012R2"
+      ],
+      "metadata": {
+        "description": "The VM image of the compute nodes"
+      }
+    },
+    "instanceCount": {
       "type": "int",
       "metadata": {
         "description": "Number of VM instances per Scaleset (100 or less)."
       },
       "defaultValue": 2,
       "maxValue": 100
-    },
-    "numberOfVMSS": {
-      "type": "int",
-      "defaultValue": 1,
-      "maxValue": 100,
-      "metadata": {
-        "description": "Number of VMSSes to deploy (max of 100)"
-      }
     },
     "VMsku": {
       "type": "string",
@@ -80,18 +85,25 @@
       "metadata": {
         "description": "Storage Account key for accessing the base custom image."
       }
+    },
+    "masterName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of master VM name"
+      }
     }
   },
   "variables": {
     "uniquePrefix": "[toLower(parameters('uniquePrefix'))]",
     "vmImage": "Ubuntu_15_10",
     "baseUrl": "[concat(parameters('artifactsBaseUrl'),'/')]",
+    "saCount": "[add(2, div(parameters('instanceCount'), 30))]",
     "transfer-templateUrl": "[concat(variables('baseUrl'), 'transferVM.json')]",
     "transferNodeSettings": {
       "VMsku": "[parameters('VMsku')]",
       "vnetRG": "[parameters('RGvnetName')]",
       "vnetName": "grid-vnet",
-      "subnetName": "infraSubnet"
+      "subnetName": "computeSubnet"
     },
     "computeNodeImages": {
       "CentOS_7.2": {
@@ -119,12 +131,12 @@
   "resources": [
     {
       "type": "Microsoft.Storage/storageAccounts",
-      "comments": "Create one storage account per VM",
+      "comments": "Create one storage account per VMSS",
       "name": "[concat(uniqueString(concat(resourceGroup().id, variables('uniquePrefix'), copyIndex())), variables('uniquePrefix'))]",
       "apiVersion": "[variables('storageApiVersion')]",
       "copy": {
         "name": "storageLoop",
-        "count": "[parameters('numberOfVMSS')]"
+        "count": "[variables('saCount')]"
       },
       "location": "[resourceGroup().location]",
       "properties": {
@@ -132,7 +144,7 @@
       }
     },
     {
-      "name": "[concat('transfer', variables('uniquePrefix'), 'vm')]",
+      "name": "[concat('transfer', variables('uniquePrefix'))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "[variables('deploymentApiVersion')]",
       "dependsOn": [
