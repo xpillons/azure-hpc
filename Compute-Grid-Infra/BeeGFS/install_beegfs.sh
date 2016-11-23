@@ -8,7 +8,7 @@ if [[ $(id -u) -ne 0 ]] ; then
     exit 1
 fi
 
-if [ $# != 2 ]; then
+if [ $# < 2 ]; then
     echo "Usage: $0 <ManagementHost> <Type (meta,storage,both)> <customDomain>"
     exit 1
 fi
