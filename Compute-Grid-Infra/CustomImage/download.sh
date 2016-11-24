@@ -5,21 +5,31 @@ export HOME
 
 apt-get -y update
 apt-get -y install python3-pip libssl-dev libffi-dev npm
+pip install --upgrade pip
 pip3 install blobxfer --upgrade
 blobxfer --version
 ln -s /usr/bin/nodejs /usr/bin/node
 npm install -g azure-cli
 azure config mode arm
 
+echo $1
+echo $2
+
 sa_domain=$(echo "$1" | cut -f3 -d/)
 sa_name=$(echo $sa_domain | cut -f1 -d.)
 container_name=$(echo "$1" | cut -f4 -d/)
-blob_name=$(echo "$1" | cut -f5 -d/)
+#blob_name=$(echo "$1" | cut -f5 -d/)
+# becasue blob name can contains / and ., the blobname is in fact the last part after the container name
+blob_name=$(echo ${$1#*$container_name/})
 
-echo "sa name, container name, blob name:"
-echo $sa_name
-echo $container_name
-echo $blob_name
+# file_name is the part after the last /
+d=$(echo ${blob_name%/*})
+file_name=$(echo ${blob_name#$d/*})
+
+echo "sa_name=$sa_name"
+echo "container_name=$container_name"
+echo "blob_name=$blob_name"
+echo "file_name=$file_name"
 echo "$container_name,$blob_name" > /mnt/config.txt
 
 attempts=0
