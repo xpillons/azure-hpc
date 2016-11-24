@@ -8,6 +8,12 @@
         "artifactsBaseUrl": ""
       }
     },
+    "uniquePrefix": {
+      "type": "string",
+      "metadata": {
+        "description": "This unique prefix will be used on all the objects created as part of this template."
+      }
+    },
     "nodeSettings": {
       "type": "object",
       "metadata": {
@@ -20,26 +26,34 @@
         "Description": "node OS settings object"
       }
     },
-    "vmIndex": {
+    "VMSSCount": {
+      "type": "int",
+      "defaultValue": 1,
+      "maxValue": 50,
+      "metadata": {
+        "Description": "VMSS count. 50 Max"
+      }
+    },
+    "capacity": {
+      "type": "int",
+      "defaultValue": 1,
+      "maxValue": 20,
+      "metadata": {
+        "Description": "VMSS total capacity. 20 Max for custom image with over provisioning"
+      }
+    },
+    "blobName": {
       "type": "string",
       "metadata": {
-        "description": "Index number of the VM"
-      },
-      "maxLength": 2
+        "description": "The blob name containing the base image"
+      }
     }
   },
   "variables": {
-    "vmPrefix": "HN",
-    "numDataDisks": "[parameters('nodeSettings').numDataDisks]",
     "storageAccountType": "Premium_LRS",
     "location": "[resourceGroup().location]",
-    "vmName": "[concat(toLower(variables('vmPrefix')), parameters('vmIndex'))]",
-    "dataStoreSA": "[concat(uniquestring(resourceGroup().id, variables('vmName')), variables('vmName'), 'sa')]",
-    "osDiskName": "[concat(variables('vmName'), 'osdisk')]",
     "vnetID": "[resourceId(parameters('nodeSettings').vnetRG, 'Microsoft.Network/virtualNetworks', parameters('nodeSettings').vnetName)]",
     "subnetRef": "[concat(variables('vnetID'),'/subnets/', parameters('nodeSettings').subnetName)]",
-    "nicName": "[concat(variables('vmName'), 'nic')]",
-    "ipConfigName": "[concat(variables('vmName'), 'ipconfig')]",
     "computeApiVersion": "2016-03-30",
     "networkApiVersion": "2016-03-30",
     "storageApiVersion": "2015-06-15",
@@ -47,130 +61,75 @@
     "setupScript": "install_headnode.sh",
     "baseUrl": "[concat(parameters('artifactsBaseUrl'),'/')]",
     "sshKeyPath": "[concat('/home/',parameters('nodeOSSettings').adminUserName,'/.ssh/authorized_keys')]",
-    "dataDiskArray": [
-      {
-        "name": "datadisk0",
-        "diskSizeGB": "[parameters('nodeSettings').dataDiskSize]",
-        "lun": 0,
-        "vhd": {
-          "uri": "[concat('http://',variables('dataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-datadisk0.vhd')]"
-        },
-        "caching": "None",
-        "createOption": "Empty"
-      },
-      {
-        "name": "datadisk1",
-        "diskSizeGB": "[parameters('nodeSettings').dataDiskSize]",
-        "lun": 1,
-        "vhd": {
-          "uri": "[concat('http://',variables('dataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-datadisk1.vhd')]"
-        },
-        "caching": "None",
-        "createOption": "Empty"
-      },
-      {
-        "name": "datadisk2",
-        "diskSizeGB": "[parameters('nodeSettings').dataDiskSize]",
-        "lun": 2,
-        "vhd": {
-          "uri": "[concat('http://',variables('dataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-datadisk2.vhd')]"
-        },
-        "caching": "None",
-        "createOption": "Empty"
-      },
-      {
-        "name": "datadisk3",
-        "diskSizeGB": "[parameters('nodeSettings').dataDiskSize]",
-        "lun": 3,
-        "vhd": {
-          "uri": "[concat('http://',variables('dataStoreSA'),'.blob.core.windows.net/vhds/',variables('vmName'),'-datadisk3.vhd')]"
-        },
-        "caching": "None",
-        "createOption": "Empty"
-      }
-    ]
   },
   "resources": [
     {
-      "type": "Microsoft.Network/networkInterfaces",
-      "name": "[variables('nicName')]",
+      "type": "Microsoft.Compute/virtualMachineScaleSets",
+      "apiVersion": "[variables('computeApiVersion')]",
+      "name": "[concat(parameters('uniquePrefix'), padLeft(copyindex(), 2, '0'))]",
       "location": "[variables('location')]",
-      "apiVersion": "[variables('networkApiVersion')]",
-      "dependsOn": [
-      ],
+      "copy": {
+        "name": "deploymentLoop",
+        "count": "[parameters('VMSSCount')]"
+      },
+      "sku": {
+        "name": "[parameters('nodeSettings').VMsku]",
+        "tier": "Standard",
+        "capacity": "[parameters('capacity')]"
+      },
       "properties": {
-        "ipConfigurations": [
-          {
-            "name": "[variables('ipConfigName')]",
-            "properties": {
-              "privateIPAllocationMethod": "Dynamic",
-              "subnet": {
-                "id": "[variables('subnetRef')]"
+        "overprovision": "true",
+        "upgradePolicy": {
+          "mode": "Manual"
+        },
+        "virtualMachineProfile": {
+          "storageProfile": {
+            "osDisk": {
+              "name": "vmssosdisk",
+              "caching": "ReadOnly",
+              "createOption": "FromImage",
+              "osType": "Linux",
+              "image": {
+                "uri": "[concat('https://',uniqueString(concat(resourceGroup().id, parameters('uniquePrefix'), copyIndex())), parameters('uniquePrefix'),'.blob.core.windows.net/vhds/',parameters('blobName'))]"
               }
             }
-          }
-        ]
-      }
-    },
-    {
-      "type": "Microsoft.Compute/virtualMachines",
-      "name": "[variables('vmName')]",
-      "location": "[variables('location')]",
-      "apiVersion": "[variables('computeApiVersion')]",
-      "dependsOn": [
-        "[concat('Microsoft.Storage/storageAccounts/', variables('dataStoreSA'))]",
-        "[concat('Microsoft.Network/networkInterfaces/', variables('nicName'))]"
-      ],
-      "properties": {
-        "availabilitySet": {
-          "id": "[resourceId('Microsoft.Compute/availabilitySets', parameters('nodeSettings').avsetName)]"
-        },
-        "hardwareProfile": {
-          "vmSize": "[parameters('nodeSettings').VMsku]"
-        },
-        "osProfile": {
-          "computerName": "[variables('vmName')]",
-          "adminUsername": "[parameters('nodeOSSettings').adminUserName]",
-          "linuxConfiguration": {
-            "disablePasswordAuthentication": "true",
-            "ssh": {
-              "publicKeys": [
-                {
-                  "path": "[variables('sshKeyPath')]",
-                  "keyData": "[parameters('nodeOSSettings').sshKeyData]"
-                }
-              ]
-            }
-          }
-        },
-        "storageProfile": {
-          "imageReference": "[parameters('nodeOSSettings').imageReference]",
-          "osDisk": {
-            "name": "[variables('osDiskName')]",
-            "vhd": {
-              "uri": "[concat('https://', variables('dataStoreSA'), '.blob.core.windows.net/vhds/', variables('osDiskName'), '.vhd')]"
-            },
-            "caching": "ReadOnly",
-            "createOption": "FromImage"
           },
-          "dataDisks": "[take(variables('dataDiskArray'),variables('numDataDisks'))]"
-        },
-        "networkProfile": {
-          "networkInterfaces": [
-            {
-              "id": "[resourceId('Microsoft.Network/networkInterfaces',variables('nicName'))]"
+          "osProfile": {
+            "computerNamePrefix": "[parameters('uniquePrefix')]",
+            "adminUsername": "[parameters('nodeOSSettings').adminUserName]",
+            "linuxConfiguration": {
+              "disablePasswordAuthentication": "true",
+              "ssh": {
+                "publicKeys": [
+                  {
+                    "path": "[variables('sshKeyPath')]",
+                    "keyData": "[parameters('nodeOSSettings').sshKeyData]"
+                  }
+                ]
+              }
             }
-          ]
+          },
+          "networkProfile": {
+            "networkInterfaceConfigurations": [
+              {
+                "name": "nic1",
+                "properties": {
+                  "primary": "true",
+                  "ipConfigurations": [
+                    {
+                      "name": "ip1",
+                      "properties": {
+                        "subnet": {
+                          "id": "[variables('subnetRef')]"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
         }
-      }
-    },
-    {
-      "type": "Microsoft.Storage/storageAccounts",
-      "name": "[variables('dataStoreSA')]",
-      "location": "[variables('location')]",
-      "apiVersion": "[variables('storageApiVersion')]",
-      "properties": {
-        "accountType": "[variables('storageAccountType')]"
       }
     }
   ]

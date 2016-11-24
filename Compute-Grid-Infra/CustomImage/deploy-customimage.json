@@ -16,6 +16,14 @@
         "description": "This unique prefix will be used on all the objects created as part of this template."
       }
     },
+    "VMSSCount" : {
+      "type": "int",
+      "metadata": {
+        "description": "Number of VM ScaleSets (50 Max)."
+      },
+      "defaultValue": 1,
+      "maxValue": 50
+    },
     "computeNodeImage": {
       "type": "string",
       "defaultValue": "CentOS_6.7",
@@ -32,10 +40,10 @@
     "instanceCount": {
       "type": "int",
       "metadata": {
-        "description": "Number of VM instances per Scaleset (100 or less)."
+        "description": "Number of VM instances per Scaleset (20 or less for custom images and overprovisioning)."
       },
       "defaultValue": 2,
-      "maxValue": 100
+      "maxValue": 20
     },
     "xferVMsku": {
       "type": "string",
@@ -54,6 +62,25 @@
       ],
       "metadata": {
         "description": "sku to use only premium disks VMs are allowed"
+      }
+    },
+    "computeVMsku": {
+      "type": "string",
+      "defaultValue": "Standard_D3_v2",
+      "allowedValues": [
+        "Standard_D1_v2",
+        "Standard_D2_v2",
+        "Standard_D3_v2",
+        "Standard_D4_v2",
+        "Standard_D5_v2",
+        "Standard_D11_v2",
+        "Standard_D12_v2",
+        "Standard_D13_v2",
+        "Standard_D14_v2",
+        "Standard_D15_v2"
+      ],
+      "metadata": {
+        "description": "sku to use for compute nodes"
       }
     },
     "RGvnetName": {
@@ -95,15 +122,33 @@
   },
   "variables": {
     "uniquePrefix": "[toLower(parameters('uniquePrefix'))]",
-    "vmImage": "Ubuntu_16_10",
+    "xferVMImage": "Ubuntu_16_10",
     "baseUrl": "[concat(parameters('artifactsBaseUrl'),'/')]",
-    "saCount": "[add(2, div(parameters('instanceCount'), 30))]",
+    "imagePieces": "[split(parameters('imageLocation'),'/')]",
+    "imgBlobName": "[variables('imagePieces')[sub(length(variables('imagePieces')),1)]]",
     "transfer-templateUrl": "[concat(variables('baseUrl'), 'transferVM.json')]",
+    "nodes-templateUrl": "[concat(variables('baseUrl'), 'nodes-resources.json')]",
     "transferNodeSettings": {
       "VMsku": "[parameters('xferVMsku')]",
       "vnetRG": "[parameters('RGvnetName')]",
       "vnetName": "grid-vnet",
       "subnetName": "computeSubnet"
+    },
+    "transferNodeOSSettings": {
+      "adminUserName": "[parameters('adminUserName')]",
+      "sshKeyData": "[parameters('sshKeyData')]",
+      "imageReference": "[variables('computeNodeImages')[variables('xferVMImage')]]"
+    },
+    "computeNodeSettings": {
+      "VMsku": "[parameters('computeVMsku')]",
+      "vnetRG": "[parameters('RGvnetName')]",
+      "vnetName": "grid-vnet",
+      "subnetName": "computeSubnet"
+    },
+    "computeNodeOSSettings": {
+      "adminUserName": "[parameters('adminUserName')]",
+      "sshKeyData": "[parameters('sshKeyData')]",
+      "imageReference": "[variables('computeNodeImages')[parameters('computeNodeImage')]]"
     },
     "computeNodeImages": {
       "CentOS_7.2": {
@@ -119,11 +164,6 @@
         "version": "latest"
       }
     },
-    "nodeOSSettings": {
-      "adminUserName": "[parameters('adminUserName')]",
-      "sshKeyData": "[parameters('sshKeyData')]",
-      "imageReference": "[variables('computeNodeImages')[variables('vmImage')]]"
-    },
     "deploymentApiVersion": "2015-11-01",
     "storageApiVersion": "2015-06-15",
     "storageAccountType": "Premium_LRS"
@@ -136,7 +176,7 @@
       "apiVersion": "[variables('storageApiVersion')]",
       "copy": {
         "name": "storageLoop",
-        "count": "[variables('saCount')]"
+        "count": "[parameters('VMSSCount')]"
       },
       "location": "[resourceGroup().location]",
       "properties": {
@@ -167,7 +207,7 @@
             "value": "[variables('transferNodeSettings')]"
           },
           "nodeOSSettings": {
-            "value": "[variables('nodeOSSettings')]"
+            "value": "[variables('transferNodeOSSettings')]"
           },
           "imageLocation": {
             "value": "[parameters('imageLocation')]"
@@ -176,7 +216,48 @@
             "value": "[parameters('storageAccountKey')]"
           },
           "saCount": {
-            "value": "[variables('saCount')]"
+            "value": "[parameters('VMSSCount')]"
+          }
+        }
+      }
+    },
+    {
+      "name": "[concat('vmss', variables('uniquePrefix'))]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "[variables('deploymentApiVersion')]",
+      "dependsOn": [
+        "[concat('transfer', variables('uniquePrefix'))]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('nodes-templateUrl')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "uniquePrefix": {
+            "value": "[variables('uniquePrefix')]"
+          },
+          "artifactsBaseUrl": {
+            "value": "[parameters('artifactsBaseUrl')]"
+          },
+          "nodeSettings": {
+            "value": "[variables('computeNodeSettings')]"
+          },
+          "nodeOSSettings": {
+            "value": "[variables('computeNodeOSSettings')]"
+          },
+          "imageLocation": {
+            "value": "[parameters('imageLocation')]"
+          },
+          "VMSSCount": {
+            "value": "[parameters('VMSSCount')]"
+          },
+          "capacity": {
+            "value": "[parameters('instanceCount')]"
+          },
+          "blobName": {
+            "value": "[variables('imgBlobName')]"
           }
         }
       }
