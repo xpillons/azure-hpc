@@ -39,7 +39,7 @@
       }
     },
     "saCount": {
-      "type": "string",
+      "type": "int",
       "metadata": {
         "description": "Number of SA where to upload the image"
       }
