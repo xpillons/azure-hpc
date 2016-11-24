@@ -16,13 +16,14 @@
     }
   },
   "variables": {
+    "vmName": "[concat('xfer', parameters('uniquePrefix'))]",
     "storageApiVersion": "2015-06-15",
     "extensionApiVersion": "2015-06-15"
   },
   "resources": [
     {
       "type": "Microsoft.Compute/virtualMachines/extensions",
-      "name": "[concat('transfer', parameters('uniquePrefix'), 'vm/ext')]",
+      "vmName": { "value": "[variables('vmName')]" },
       "apiVersion": "[variables('extensionApiVersion')]",
       "location": "[parameters('location')]",
       "properties": {

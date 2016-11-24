@@ -5,7 +5,7 @@
     "location": {
       "type": "string"
     },
-    "uniquePrefix": {
+    "vmName": {
       "type": "string"
     },
     "imageLocation": {
@@ -24,7 +24,7 @@
   "resources": [
     {
       "type": "Microsoft.Compute/virtualMachines/extensions",
-      "name": "[concat('transfer', parameters('uniquePrefix'), 'vm/ext')]",
+      "name": "[concat(parameters('vmName'), '/ext')]",
       "apiVersion": "[variables('extensionApiVersion')]",
       "location": "[parameters('location')]",
       "properties": {

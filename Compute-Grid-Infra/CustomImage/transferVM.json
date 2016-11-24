@@ -148,7 +148,7 @@
         },
         "parameters": {
           "location": { "value": "[resourceGroup().location]" },
-          "uniquePrefix": { "value": "[variables('uniquePrefix')]" },
+          "vmName": { "value": "[variables('vmName')]" },
           "imageLocation": { "value": "[parameters('imageLocation')]" },
           "storageAccountKey": { "value": "[parameters('storageAccountKey')]" },
           "downloadScriptURI": { "value": "[variables('downloadScriptURI')]" }

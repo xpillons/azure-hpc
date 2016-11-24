@@ -95,7 +95,7 @@
   },
   "variables": {
     "uniquePrefix": "[toLower(parameters('uniquePrefix'))]",
-    "vmImage": "Ubuntu_15_10",
+    "vmImage": "Ubuntu_16_10",
     "baseUrl": "[concat(parameters('artifactsBaseUrl'),'/')]",
     "saCount": "[add(2, div(parameters('instanceCount'), 30))]",
     "transfer-templateUrl": "[concat(variables('baseUrl'), 'transferVM.json')]",
@@ -112,10 +112,10 @@
         "sku": "7.2",
         "version": "latest"
       },
-      "Ubuntu_15_10": {
+      "Ubuntu_16_10": {
         "publisher": "Canonical",
         "offer": "UbuntuServer",
-        "sku": "15.10",
+        "sku": "16.10",
         "version": "latest"
       }
     },
