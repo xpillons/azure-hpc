@@ -5,7 +5,7 @@ export HOME
 
 apt-get -y update
 apt-get -y install python3-pip libssl-dev libffi-dev npm
-pip install --upgrade pip
+pip3 install --upgrade pip
 pip3 install blobxfer --upgrade
 blobxfer --version
 ln -s /usr/bin/nodejs /usr/bin/node
@@ -20,7 +20,7 @@ sa_name=$(echo $sa_domain | cut -f1 -d.)
 container_name=$(echo "$1" | cut -f4 -d/)
 #blob_name=$(echo "$1" | cut -f5 -d/)
 # becasue blob name can contains / and ., the blobname is in fact the last part after the container name
-blob_name=$(echo ${$1#*$container_name/})
+blob_name=$(echo ${1#*$container_name/})
 
 # file_name is the part after the last /
 d=$(echo ${blob_name%/*})
