@@ -5,6 +5,9 @@
     "location": {
       "type": "string"
     },
+    "vmName": {
+      "type": "string"
+    },
     "uniquePrefix": {
       "type": "string"
     },
@@ -16,14 +19,14 @@
     }
   },
   "variables": {
-    "vmName": "[concat('xfer', parameters('uniquePrefix'))]",
     "storageApiVersion": "2015-06-15",
-    "extensionApiVersion": "2015-06-15"
+    "extensionApiVersion": "2015-06-15",
+    "saName": "[concat(uniqueString(concat(resourceGroup().id, parameters('uniquePrefix'), parameters('index'))), parameters('uniquePrefix'))]"
   },
   "resources": [
     {
       "type": "Microsoft.Compute/virtualMachines/extensions",
-      "vmName": { "value": "[variables('vmName')]" },
+      "name": "[concat(parameters('vmName'), '/ext')]",
       "apiVersion": "[variables('extensionApiVersion')]",
       "location": "[parameters('location')]",
       "properties": {
@@ -37,7 +40,7 @@
           ]
         },
         "protectedSettings": {
-          "commandToExecute": "[concat('bash upload.sh ', concat(uniqueString(concat(resourceGroup().id, parameters('uniquePrefix'), parameters('index'))), parameters('uniquePrefix')), ' ', listKeys(concat('Microsoft.Storage/storageAccounts/', concat(uniqueString(concat(resourceGroup().id, parameters('uniquePrefix'), parameters('index'))), parameters('uniquePrefix'))), variables('storageApiVersion')).key1)]"
+          "commandToExecute": "[concat('bash upload.sh ', variables('saName'), ' ', listKeys(concat('Microsoft.Storage/storageAccounts/', variables('saName')), variables('storageApiVersion')).key1)]"
         }
       }
     }

@@ -7,6 +7,7 @@ export AZURE_STORAGE_ACCESS_KEY="$2"
 azure storage container create vhds
 
 blob_name=$(cut -f2 -d, /mnt/config.txt) 
+echo $blob_name
 attempts=0
 response=1
 while [ $response -ne 0 -a $attempts -lt 5 ]

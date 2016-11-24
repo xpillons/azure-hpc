@@ -37,7 +37,7 @@
       "defaultValue": 2,
       "maxValue": 100
     },
-    "VMsku": {
+    "xferVMsku": {
       "type": "string",
       "defaultValue": "Standard_DS3_v2",
       "allowedValues": [
@@ -100,7 +100,7 @@
     "saCount": "[add(2, div(parameters('instanceCount'), 30))]",
     "transfer-templateUrl": "[concat(variables('baseUrl'), 'transferVM.json')]",
     "transferNodeSettings": {
-      "VMsku": "[parameters('VMsku')]",
+      "VMsku": "[parameters('xferVMsku')]",
       "vnetRG": "[parameters('RGvnetName')]",
       "vnetName": "grid-vnet",
       "subnetName": "computeSubnet"
@@ -158,7 +158,7 @@
         },
         "parameters": {
           "uniquePrefix": {
-            "value" :  "[variables('uniquePrefix')]"
+            "value": "[variables('uniquePrefix')]"
           },
           "artifactsBaseUrl": {
             "value": "[parameters('artifactsBaseUrl')]"
@@ -174,6 +174,9 @@
           },
           "storageAccountKey": {
             "value": "[parameters('storageAccountKey')]"
+          },
+          "saCount": {
+            "value": "[variables('saCount')]"
           }
         }
       }

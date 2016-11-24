@@ -37,6 +37,12 @@
       "metadata": {
         "description": "Storage Account key for accessing the base custom image."
       }
+    },
+    "saCount": {
+      "type": "string",
+      "metadata": {
+        "description": "Number of SA where to upload the image"
+      }
     }
   },
   "variables": {
@@ -152,6 +158,32 @@
           "imageLocation": { "value": "[parameters('imageLocation')]" },
           "storageAccountKey": { "value": "[parameters('storageAccountKey')]" },
           "downloadScriptURI": { "value": "[variables('downloadScriptURI')]" }
+        }
+      }
+    },
+    {
+      "name": "[concat(variables('uniquePrefix'), 'script', string(add(copyIndex(), 1)))]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2015-01-01",
+      "dependsOn": [
+        "[concat('Microsoft.Resources/deployments/', variables('uniquePrefix'), 'script', copyIndex())]"
+      ],
+      "copy": {
+        "name": "uploadLoop",
+        "count": "[parameters('saCount')]"
+      },
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('uploadTemplateURI')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "location": { "value": "[variables('location')]" },
+          "vmName": { "value": "[variables('vmName')]" },
+          "uniquePrefix": { "value": "[variables('uniquePrefix')]" },
+          "index": { "value": "[copyIndex()]" },
+          "uploadScriptURI": { "value": "[variables('uploadScriptURI')]" }
         }
       }
     },
