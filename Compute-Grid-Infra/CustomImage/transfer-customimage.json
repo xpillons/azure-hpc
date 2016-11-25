@@ -2,14 +2,6 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.1",
   "parameters": {
-    "artifactsBaseUrl": {
-      "type": "string",
-      "defaultValue": "https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/CustomImage",
-      "metadata": {
-        "description": "Base URL of the solution template gallery package",
-        "artifactsBaseUrl": ""
-      }
-    },
     "uniquePrefix": {
       "type": "string",
       "metadata": {
@@ -83,8 +75,7 @@
   "variables": {
     "uniquePrefix": "[toLower(parameters('uniquePrefix'))]",
     "xferVMImage": "Ubuntu_16_10",
-    "baseUrl": "[concat(parameters('artifactsBaseUrl'),'/')]",
-    "transfer-templateUrl": "[concat(variables('baseUrl'), 'transferVM.json')]",
+    "transfer-templateUrl": "[uri(deployment().properties.templateLink.uri, 'transferVM.json')]",
     "transferNodeSettings": {
       "VMsku": "[parameters('xferVMsku')]",
       "vnetRG": "[parameters('RGvnetName')]",
@@ -145,9 +136,6 @@
         "parameters": {
           "uniquePrefix": {
             "value": "[variables('uniquePrefix')]"
-          },
-          "artifactsBaseUrl": {
-            "value": "[parameters('artifactsBaseUrl')]"
           },
           "nodeSettings": {
             "value": "[variables('transferNodeSettings')]"
