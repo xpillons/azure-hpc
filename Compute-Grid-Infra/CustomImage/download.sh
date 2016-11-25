@@ -36,7 +36,7 @@ attempts=0
 response=1
 while [ $response -ne 0 -a $attempts -lt 5 ]
 do
-  blobxfer $sa_name $container_name /mnt/ --remoteresource $blob_name --storageaccountkey $2 --download #--no-computefilemd5
+  blobxfer $sa_name $container_name /mnt/ --remoteresource $blob_name --storageaccountkey $2 --download --no-overwrite --no-computefilemd5
   response=$?
   attempts=$((attempts+1))
 done
