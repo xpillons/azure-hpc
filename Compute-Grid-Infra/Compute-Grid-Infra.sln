@@ -52,6 +52,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CustomImage", "CustomImage"
 		CustomImage\download.json = CustomImage\download.json
 		CustomImage\download.sh = CustomImage\download.sh
 		CustomImage\nodes-resources.json = CustomImage\nodes-resources.json
+		CustomImage\transfer-customimage.json = CustomImage\transfer-customimage.json
 		CustomImage\transferVM.json = CustomImage\transferVM.json
 		CustomImage\upload.json = CustomImage\upload.json
 		CustomImage\upload.sh = CustomImage\upload.sh

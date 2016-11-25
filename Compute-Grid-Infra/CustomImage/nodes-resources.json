@@ -2,12 +2,6 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "artifactsBaseUrl": {
-      "type": "string",
-      "metadata": {
-        "artifactsBaseUrl": ""
-      }
-    },
     "uniquePrefix": {
       "type": "string",
       "metadata": {
@@ -55,12 +49,15 @@
     "vnetID": "[resourceId(parameters('nodeSettings').vnetRG, 'Microsoft.Network/virtualNetworks', parameters('nodeSettings').vnetName)]",
     "subnetRef": "[concat(variables('vnetID'),'/subnets/', parameters('nodeSettings').subnetName)]",
     "computeApiVersion": "2016-03-30",
-    "networkApiVersion": "2016-03-30",
-    "storageApiVersion": "2015-06-15",
     "extensionApiVersion": "2015-06-15",
-    "setupScript": "install_headnode.sh",
-    "baseUrl": "[concat(parameters('artifactsBaseUrl'),'/')]",
     "sshKeyPath": "[concat('/home/',parameters('nodeOSSettings').adminUserName,'/.ssh/authorized_keys')]",
+
+    "vmScripts": {
+      "scriptsToDownload": [
+        "[[uri(deployment().properties.templateLink.uri, 'bootstrap.sh')]]"
+      ],
+      "commandToExecute": "[concat('bash bootstrap.sh', parameters('nodeSettings').MasterName)]"
+    }
   },
   "resources": [
     {
@@ -125,6 +122,24 @@
                       }
                     }
                   ]
+                }
+              }
+            ]
+          },
+          "extensionProfile": {
+            "extensions": [
+              {
+                "name": "specialize",
+                "properties": {
+                  "publisher": "Microsoft.Azure.Extensions",
+                  "type": "CustomScript",
+                  "typeHandlerVersion": "2.0",
+                  "autoUpgradeMinorVersion": true,
+                  "settings": {
+                    "fileUris": "[variables('vmScripts').scriptsToDownload]",
+                    "commandToExecute": "[variables('vmScripts').commandToExecute]",
+                    "timestamp": 12345
+                  }
                 }
               }
             ]

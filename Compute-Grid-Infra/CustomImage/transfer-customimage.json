@@ -2,6 +2,14 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.1",
   "parameters": {
+    "artifactsBaseUrl": {
+      "type": "string",
+      "defaultValue": "https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/CustomImage",
+      "metadata": {
+        "description": "Base URL of the solution template gallery package",
+        "artifactsBaseUrl": ""
+      }
+    },
     "uniquePrefix": {
       "type": "string",
       "metadata": {
@@ -15,27 +23,6 @@
       },
       "defaultValue": 1,
       "maxValue": 50
-    },
-    "computeNodeImage": {
-      "type": "string",
-      "defaultValue": "CentOS_6.7",
-      "allowedValues": [
-        "CentOS_6.7",
-        "CentOS_7.2",
-        "RHEL_7.2",
-        "W2012R2"
-      ],
-      "metadata": {
-        "description": "The VM image of the compute nodes"
-      }
-    },
-    "instanceCount": {
-      "type": "int",
-      "metadata": {
-        "description": "Number of VM instances per Scaleset (20 or less for custom images and overprovisioning)."
-      },
-      "defaultValue": 2,
-      "maxValue": 20
     },
     "xferVMsku": {
       "type": "string",
@@ -56,25 +43,6 @@
         "description": "sku to use only premium disks VMs are allowed"
       }
     },
-    "computeVMsku": {
-      "type": "string",
-      "defaultValue": "Standard_D3_v2",
-      "allowedValues": [
-        "Standard_D1_v2",
-        "Standard_D2_v2",
-        "Standard_D3_v2",
-        "Standard_D4_v2",
-        "Standard_D5_v2",
-        "Standard_D11_v2",
-        "Standard_D12_v2",
-        "Standard_D13_v2",
-        "Standard_D14_v2",
-        "Standard_D15_v2"
-      ],
-      "metadata": {
-        "description": "sku to use for compute nodes"
-      }
-    },
     "RGvnetName": {
       "type": "string",
       "metadata": {
@@ -93,33 +61,40 @@
         "description": "SSH rsa public key file as a string."
       }
     },
+    "imageLocation": {
+      "type": "string",
+      "metadata": {
+        "description": "URL of the base custom image, in the format of https://accountname.blob.core.windows.net/container/ "
+      }
+    },
     "imageBlobName": {
       "type": "string",
       "metadata": {
         "description": "name of the blob containing the imgage in the format of dir/subdir/image.vhd "
       }
     },
-    "masterName": {
-      "type": "string",
+    "storageAccountKey": {
+      "type": "securestring",
       "metadata": {
-        "description": "Name of master VM name"
+        "description": "Storage Account key for accessing the base custom image."
       }
     }
   },
   "variables": {
     "uniquePrefix": "[toLower(parameters('uniquePrefix'))]",
     "xferVMImage": "Ubuntu_16_10",
-    "nodes-templateUrl": "[uri(deployment().properties.templateLink.uri, 'nodes-resources.json')]",
-    "computeNodeSettings": {
-      "VMsku": "[parameters('computeVMsku')]",
+    "baseUrl": "[concat(parameters('artifactsBaseUrl'),'/')]",
+    "transfer-templateUrl": "[concat(variables('baseUrl'), 'transferVM.json')]",
+    "transferNodeSettings": {
+      "VMsku": "[parameters('xferVMsku')]",
       "vnetRG": "[parameters('RGvnetName')]",
       "vnetName": "grid-vnet",
       "subnetName": "computeSubnet"
     },
-    "computeNodeOSSettings": {
+    "transferNodeOSSettings": {
       "adminUserName": "[parameters('adminUserName')]",
       "sshKeyData": "[parameters('sshKeyData')]",
-      "imageReference": "[variables('computeNodeImages')[parameters('computeNodeImage')]]"
+      "imageReference": "[variables('computeNodeImages')[variables('xferVMImage')]]"
     },
     "computeNodeImages": {
       "CentOS_7.2": {
@@ -141,35 +116,53 @@
   },
   "resources": [
     {
-      "name": "[concat('vmss', variables('uniquePrefix'))]",
+      "type": "Microsoft.Storage/storageAccounts",
+      "comments": "Create one storage account per VMSS",
+      "name": "[concat(uniqueString(concat(resourceGroup().id, variables('uniquePrefix'), copyIndex())), variables('uniquePrefix'))]",
+      "apiVersion": "[variables('storageApiVersion')]",
+      "copy": {
+        "name": "storageLoop",
+        "count": "[parameters('VMSSCount')]"
+      },
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "accountType": "Standard_LRS"
+      }
+    },
+    {
+      "name": "[concat('transfer', variables('uniquePrefix'))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "[variables('deploymentApiVersion')]",
       "dependsOn": [
+        "storageLoop"
       ],
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[variables('nodes-templateUrl')]",
+          "uri": "[variables('transfer-templateUrl')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
           "uniquePrefix": {
             "value": "[variables('uniquePrefix')]"
           },
+          "artifactsBaseUrl": {
+            "value": "[parameters('artifactsBaseUrl')]"
+          },
           "nodeSettings": {
-            "value": "[variables('computeNodeSettings')]"
+            "value": "[variables('transferNodeSettings')]"
           },
           "nodeOSSettings": {
-            "value": "[variables('computeNodeOSSettings')]"
+            "value": "[variables('transferNodeOSSettings')]"
           },
-          "VMSSCount": {
+          "imageLocation": {
+            "value": "[concat(parameters('imageLocation'), parameters('imageBlobName'))]"
+          },
+          "storageAccountKey": {
+            "value": "[parameters('storageAccountKey')]"
+          },
+          "saCount": {
             "value": "[parameters('VMSSCount')]"
-          },
-          "capacity": {
-            "value": "[parameters('instanceCount')]"
-          },
-          "blobName": {
-            "value": "[parameters('imageBlobName')]"
           }
         }
       }

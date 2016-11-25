@@ -2,12 +2,6 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "artifactsBaseUrl": {
-      "type": "string",
-      "metadata": {
-        "artifactsBaseUrl": ""
-      }
-    },
     "uniquePrefix": {
       "type": "string",
       "metadata": {
@@ -62,11 +56,10 @@
     "extensionApiVersion": "2015-06-15",
     "deploymentApiVersion": "2015-11-01",
     "setupScript": "install_headnode.sh",
-    "baseUrl": "[concat(parameters('artifactsBaseUrl'),'/')]",
-    "downloadTemplateURI": "[concat(variables('baseUrl'), 'download.json')]",
-    "downloadScriptURI": "[concat(variables('baseUrl'), 'download.sh')]",
-    "uploadTemplateURI": "[concat(variables('baseUrl'), 'upload.json')]",
-    "uploadScriptURI": "[concat(variables('baseUrl'), 'upload.sh')]",
+    "downloadTemplateURI": "[uri(deployment().properties.templateLink.uri, 'download.json')]",
+    "downloadScriptURI": "[uri(deployment().properties.templateLink.uri, 'download.sh')]",
+    "uploadTemplateURI": "[uri(deployment().properties.templateLink.uri, 'upload.json')]",
+    "uploadScriptURI": "[uri(deployment().properties.templateLink.uri, 'upload.sh')]",
     "sshKeyPath": "[concat('/home/',parameters('nodeOSSettings').adminUserName,'/.ssh/authorized_keys')]"
   },
   "resources": [
