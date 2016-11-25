@@ -56,7 +56,7 @@
       "scriptsToDownload": [
         "[[uri(deployment().properties.templateLink.uri, 'bootstrap.sh')]]"
       ],
-      "commandToExecute": "[concat('bash bootstrap.sh', parameters('nodeSettings').MasterName)]"
+      "commandToExecute": "[concat('bash bootstrap.sh ', parameters('nodeSettings').MasterName)]"
     }
   },
   "resources": [
