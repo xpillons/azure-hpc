@@ -54,7 +54,7 @@
 
     "vmScripts": {
       "scriptsToDownload": [
-        "[[uri(deployment().properties.templateLink.uri, 'bootstrap.sh')]]"
+        "[uri(deployment().properties.templateLink.uri, 'bootstrap.sh')]"
       ],
       "commandToExecute": "[concat('bash bootstrap.sh ', parameters('nodeSettings').MasterName)]"
     }
