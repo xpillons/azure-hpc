@@ -114,7 +114,8 @@
       "VMsku": "[parameters('computeVMsku')]",
       "vnetRG": "[parameters('RGvnetName')]",
       "vnetName": "grid-vnet",
-      "subnetName": "computeSubnet"
+      "subnetName": "computeSubnet",
+      "MasterName": "[parameters('masterName')]"
     },
     "computeNodeOSSettings": {
       "adminUserName": "[parameters('adminUserName')]",
