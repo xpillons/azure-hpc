@@ -48,6 +48,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Ganglia", "Ganglia", "{4E81
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CustomImage", "CustomImage", "{5C4514E4-75B6-46FC-8F1F-786521A42C6C}"
 	ProjectSection(SolutionItems) = preProject
+		CustomImage\bootstrap.sh = CustomImage\bootstrap.sh
 		CustomImage\deploy-customimage.json = CustomImage\deploy-customimage.json
 		CustomImage\download.json = CustomImage\download.json
 		CustomImage\download.sh = CustomImage\download.sh

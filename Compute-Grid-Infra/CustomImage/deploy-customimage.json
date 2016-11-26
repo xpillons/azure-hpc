@@ -104,6 +104,18 @@
       "metadata": {
         "description": "Name of master VM name"
       }
+    },
+    "script": {
+      "type": "string",
+      "metadata": {
+        "description": "URL of the script to download as a post script install"
+      }
+    },
+    "cmdLine": {
+      "type": "string",
+      "metadata": {
+        "description": "Cmdline to run"
+      }
     }
   },
   "variables": {
@@ -115,7 +127,9 @@
       "vnetRG": "[parameters('RGvnetName')]",
       "vnetName": "grid-vnet",
       "subnetName": "computeSubnet",
-      "MasterName": "[parameters('masterName')]"
+      "MasterName": "[parameters('masterName')]",
+      "Script": "[parameters('script')]",
+      "CommandLine": "[parameters('cmdLine')]"
     },
     "computeNodeOSSettings": {
       "adminUserName": "[parameters('adminUserName')]",

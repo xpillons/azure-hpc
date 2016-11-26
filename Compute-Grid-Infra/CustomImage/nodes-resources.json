@@ -54,9 +54,9 @@
 
     "vmScripts": {
       "scriptsToDownload": [
-        "[uri(deployment().properties.templateLink.uri, 'bootstrap.sh')]"
+        "[parameters('nodeSettings').Script]"
       ],
-      "commandToExecute": "[concat('bash bootstrap.sh ', parameters('nodeSettings').MasterName)]"
+      "commandToExecute": "[parameters('nodeSettings').CommandLine]"
     }
   },
   "resources": [
