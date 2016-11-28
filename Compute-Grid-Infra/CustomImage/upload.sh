@@ -8,7 +8,7 @@ export AZURE_STORAGE_ACCESS_KEY="$2"
 blob_name=$(cut -f2 -d, /mnt/config.txt) 
 echo $blob_name
 
-BLOB_MARKER="$1/$blob_name"
+BLOB_MARKER="/mnt/$1/$blob_name"
 echo $BLOB_MARKER
 if [ -e "$BLOB_MARKER" ]; then
     echo "We're already copied, exiting..."
