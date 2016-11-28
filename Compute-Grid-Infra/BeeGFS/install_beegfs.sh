@@ -196,7 +196,7 @@ install_beegfs()
 		sed -i 's|^storeMetaDirectory.*|storeMetaDirectory = '$BEEGFS_METADATA'|g' /etc/beegfs/beegfs-meta.conf
 		sed -i 's/^sysMgmtdHost.*/sysMgmtdHost = '$MGMT_HOSTNAME'/g' /etc/beegfs/beegfs-meta.conf
 
-		tune_metad
+		tune_meta
 
 		systemctl daemon-reload
 		systemctl enable beegfs-meta.service
@@ -238,7 +238,7 @@ tune_storage()
 	sed -i 's/^tuneWorkerBufSize.*/tuneWorkerBufSize = 16m/g' /etc/beegfs/beegfs-storage.conf	
 }
 
-tune_metad()
+tune_meta()
 {
 	# See http://www.beegfs.com/wiki/MetaServerTuning#xattr
 	echo deadline > /sys/block/md20/queue/scheduler
