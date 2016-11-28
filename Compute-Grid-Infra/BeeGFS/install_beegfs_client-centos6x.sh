@@ -61,6 +61,13 @@ install_beegfs()
     /etc/init.d/beegfs-client start
 }
 
+tune_tcp()
+{
+    echo "net.ipv4.neigh.default.gc_thresh1=1100" >> /etc/sysctl.conf
+    echo "net.ipv4.neigh.default.gc_thresh2=2200" >> /etc/sysctl.conf
+    echo "net.ipv4.neigh.default.gc_thresh3=4400" >> /etc/sysctl.conf
+}
+
 setup_user()
 {
     mkdir -p $SHARE_HOME
@@ -98,6 +105,7 @@ mkdir -p $SHARE_SCRATCH
 install_pkgs
 setup_user
 install_beegfs
+tune_tcp
 
 # Create marker file so we know we're configured
 touch $SETUP_MARKER

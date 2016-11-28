@@ -56,6 +56,13 @@ install_beegfs()
     systemctl enable beegfs-client.service
 }
 
+tune_tcp()
+{
+    echo "net.ipv4.neigh.default.gc_thresh1=1100" >> /etc/sysctl.conf
+    echo "net.ipv4.neigh.default.gc_thresh2=2200" >> /etc/sysctl.conf
+    echo "net.ipv4.neigh.default.gc_thresh3=4400" >> /etc/sysctl.conf
+}
+
 SETUP_MARKER=/var/tmp/install_beegfs_client.marker
 if [ -e "$SETUP_MARKER" ]; then
     echo "We're already configured, exiting..."
@@ -66,6 +73,7 @@ mkdir -p $SHARE_SCRATCH
 
 install_pkgs
 install_beegfs
+tune_tcp
 
 # Create marker file so we know we're configured
 touch $SETUP_MARKER
