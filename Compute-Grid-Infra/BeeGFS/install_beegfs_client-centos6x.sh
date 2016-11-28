@@ -52,8 +52,8 @@ install_beegfs()
     yum install -y beegfs-client beegfs-helperd beegfs-utils
         
     # setup client
-    #sed -i 's/^sysMgmtdHost.*/sysMgmtdHost = '$MGMT_HOSTNAME'/g' /etc/beegfs/beegfs-client.conf
 	/opt/beegfs/sbin/beegfs-setup-client -m $MGMT_HOSTNAME
+    sed -i 's/^connMaxInternodeNum.*/connMaxInternodeNum = 16/g' /etc/beegfs/beegfs-client.conf
 
     echo "$SHARE_SCRATCH /etc/beegfs/beegfs-client.conf" > /etc/beegfs/beegfs-mounts.conf
 	

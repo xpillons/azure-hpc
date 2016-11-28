@@ -52,7 +52,6 @@ install_beegfs()
 
     # setup client
     sed -i 's/^sysMgmtdHost.*/sysMgmtdHost = '$MGMT_HOSTNAME'/g' /etc/beegfs/beegfs-client.conf
-    #sed -i  's/Type=oneshot.*/Type=oneshot\nRestart=always\nRestartSec=5/g' /usr/lib/systemd/system/beegfs-client.service
     echo "$SHARE_SCRATCH /etc/beegfs/beegfs-client.conf" > /etc/beegfs/beegfs-mounts.conf
 	
     systemctl daemon-reload

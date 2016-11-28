@@ -195,11 +195,12 @@ install_beegfs()
 		yum install -y beegfs-meta
 		sed -i 's|^storeMetaDirectory.*|storeMetaDirectory = '$BEEGFS_METADATA'|g' /etc/beegfs/beegfs-meta.conf
 		sed -i 's/^sysMgmtdHost.*/sysMgmtdHost = '$MGMT_HOSTNAME'/g' /etc/beegfs/beegfs-meta.conf
+
+		tune_metad
+
 		systemctl daemon-reload
 		systemctl enable beegfs-meta.service
 		
-		# See http://www.beegfs.com/wiki/MetaServerTuning#xattr
-		echo deadline > /sys/block/sdX/queue/scheduler
 	fi
 	
 	# setup storage
@@ -207,6 +208,9 @@ install_beegfs()
 		yum install -y beegfs-storage
 		sed -i 's|^storeStorageDirectory.*|storeStorageDirectory = '$BEEGFS_STORAGE'|g' /etc/beegfs/beegfs-storage.conf
 		sed -i 's/^sysMgmtdHost.*/sysMgmtdHost = '$MGMT_HOSTNAME'/g' /etc/beegfs/beegfs-storage.conf
+
+		tune_storage
+
 		systemctl daemon-reload
 		systemctl enable beegfs-storage.service
 	fi
@@ -219,13 +223,30 @@ install_ganglia()
 	bash install_gmond.sh ${MGMT_HOSTNAME} "BeeGFS" 8649
 }
 
-setup_swap()
+tune_storage()
 {
-    fallocate -l 5g /mnt/resource/swap
-	chmod 600 /mnt/resource/swap
-	mkswap /mnt/resource/swap
-	swapon /mnt/resource/swap
-	echo "/mnt/resource/swap   none  swap  sw  0 0" >> /etc/fstab
+	echo deadline > /sys/block/md10/queue/scheduler
+	echo 4096 > /sys/block/md10/queue/nr_requests
+	echo 32768 > /sys/block/md10/queue/read_ahead_kb
+
+	sed -i 's/^connMaxInternodeNum.*/connMaxInternodeNum = 800/g' /etc/beegfs/beegfs-storage.conf
+	sed -i 's/^tuneNumWorkers.*/tuneNumWorkers = 128/g' /etc/beegfs/beegfs-storage.conf
+	sed -i 's/^tuneFileReadAheadSize.*/tuneFileReadAheadSize = 32m/g' /etc/beegfs/beegfs-storage.conf
+	sed -i 's/^tuneFileReadAheadTriggerSize.*/tuneFileReadAheadTriggerSize = 2m/g' /etc/beegfs/beegfs-storage.conf
+	sed -i 's/^tuneFileReadSize.*/tuneFileReadSize = 256k/g' /etc/beegfs/beegfs-storage.conf
+	sed -i 's/^tuneFileWriteSize.*/tuneFileWriteSize = 256k/g' /etc/beegfs/beegfs-storage.conf
+	sed -i 's/^tuneWorkerBufSize.*/tuneWorkerBufSize = 16m/g' /etc/beegfs/beegfs-storage.conf	
+}
+
+tune_metad()
+{
+	# See http://www.beegfs.com/wiki/MetaServerTuning#xattr
+	echo deadline > /sys/block/md20/queue/scheduler
+	echo 128 > /sys/block/md20/queue/nr_requests
+	echo 128 > /sys/block/md20/queue/read_ahead_kb
+
+	sed -i 's/^connMaxInternodeNum.*/connMaxInternodeNum = 800/g' /etc/beegfs/beegfs-meta.conf
+	sed -i 's/^tuneNumWorkers.*/tuneNumWorkers = 128/g' /etc/beegfs/beegfs-meta.conf
 }
 
 tune_tcp()
@@ -277,7 +298,6 @@ if [ -e "$SETUP_MARKER" ]; then
     exit 0
 fi
 
-setup_swap
 install_pkgs
 setup_disks
 setup_user
