@@ -16,19 +16,6 @@
       "defaultValue": 1,
       "maxValue": 50
     },
-    "computeNodeImage": {
-      "type": "string",
-      "defaultValue": "CentOS_6.7",
-      "allowedValues": [
-        "CentOS_6.7",
-        "CentOS_7.2",
-        "RHEL_7.2",
-        "W2012R2"
-      ],
-      "metadata": {
-        "description": "The VM image of the compute nodes"
-      }
-    },
     "instanceCount": {
       "type": "int",
       "metadata": {
@@ -140,21 +127,7 @@
     "computeNodeOSSettings": {
       "adminUserName": "[parameters('adminUserName')]",
       "sshKeyData": "[parameters('sshKeyData')]",
-      "imageReference": "[variables('computeNodeImages')[parameters('computeNodeImage')]]"
-    },
-    "computeNodeImages": {
-      "CentOS_7.2": {
-        "publisher": "OpenLogic",
-        "offer": "CentOS",
-        "sku": "7.2",
-        "version": "latest"
-      },
-      "Ubuntu_16_10": {
-        "publisher": "Canonical",
-        "offer": "UbuntuServer",
-        "sku": "16.10",
-        "version": "latest"
-      }
+      "imageReference": ""
     },
     "deploymentApiVersion": "2015-11-01",
     "storageApiVersion": "2015-06-15",
