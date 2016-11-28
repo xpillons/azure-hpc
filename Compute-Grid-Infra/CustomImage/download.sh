@@ -19,7 +19,7 @@ sa_domain=$(echo "$1" | cut -f3 -d/)
 sa_name=$(echo $sa_domain | cut -f1 -d.)
 container_name=$(echo "$1" | cut -f4 -d/)
 #blob_name=$(echo "$1" | cut -f5 -d/)
-# becasue blob name can contains / and ., the blobname is in fact the last part after the container name
+# because blob name can contains / and ., the blobname is in fact the last part after the container name
 blob_name=$(echo ${1#*$container_name/})
 
 # file_name is the part after the last /
@@ -32,11 +32,18 @@ echo "blob_name=$blob_name"
 echo "file_name=$file_name"
 echo "$container_name,$blob_name" > /mnt/config.txt
 
+BLOB_MARKER="/mnt/$blob_name"
+echo $BLOB_MARKER
+if [ -e "$BLOB_MARKER" ]; then
+    echo "We're already copied, exiting..."
+    exit 0
+fi
+
 attempts=0
 response=1
 while [ $response -ne 0 -a $attempts -lt 5 ]
 do
-  blobxfer $sa_name $container_name /mnt/ --remoteresource $blob_name --storageaccountkey $2 --download --no-overwrite --no-computefilemd5
+  blobxfer $sa_name $container_name /mnt/ --remoteresource $blob_name --storageaccountkey $2 --download --no-computefilemd5
   response=$?
   attempts=$((attempts+1))
 done
