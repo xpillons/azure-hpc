@@ -41,6 +41,12 @@
       "metadata": {
         "description": "The blob name containing the base image"
       }
+    },
+    "adminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "The admin password"
+      }
     }
   },
   "variables": {
@@ -51,7 +57,6 @@
     "computeApiVersion": "2016-03-30",
     "extensionApiVersion": "2015-06-15",
     "sshKeyPath": "[concat('/home/',parameters('nodeOSSettings').adminUserName,'/.ssh/authorized_keys')]",
-
     "vmScripts": {
       "scriptsToDownload": [
         "[parameters('nodeSettings').Script]"
@@ -94,8 +99,9 @@
           "osProfile": {
             "computerNamePrefix": "[parameters('uniquePrefix')]",
             "adminUsername": "[parameters('nodeOSSettings').adminUserName]",
+            "adminPassword": "[parameters('adminPassword')]",
             "linuxConfiguration": {
-              "disablePasswordAuthentication": "true",
+              "disablePasswordAuthentication": "false",
               "ssh": {
                 "publicKeys": [
                   {

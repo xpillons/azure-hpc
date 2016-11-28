@@ -87,6 +87,12 @@
         "description": "Admin username on all VMs."
       }
     },
+    "adminPassword": {
+      "type": "securestring",
+      "metadata": {
+        "description": "Admin password on all VMs."
+      }
+    },
     "sshKeyData": {
       "type": "string",
       "metadata": {
@@ -185,6 +191,9 @@
           },
           "blobName": {
             "value": "[parameters('imageBlobName')]"
+          },
+          "adminPassword": {
+            "value": "[parameters('adminPassword')]"
           }
         }
       }
