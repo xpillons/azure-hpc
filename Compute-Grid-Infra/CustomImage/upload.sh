@@ -27,5 +27,5 @@ do
 done
  
  # Create marker file so we know we're done with this blob
-mkdir "/mnt/$1"
-touch $BLOB_MARKER
+mkdir -p "$(dirname "$BLOB_MARKER")" && touch "$BLOB_MARKER"
+
