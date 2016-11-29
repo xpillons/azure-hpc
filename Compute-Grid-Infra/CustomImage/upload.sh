@@ -9,7 +9,7 @@ blob_name=$(cut -f2 -d, /mnt/config.txt)
 echo $blob_name
 
 BLOB_MARKER="/mnt/$1/$blob_name"
-echo $BLOB_MARKER
+echo "BLOB_MARKER=$BLOB_MARKER"
 if [ -e "$BLOB_MARKER" ]; then
     echo "We're already copied, exiting..."
     exit 0
@@ -27,4 +27,5 @@ do
 done
  
  # Create marker file so we know we're done with this blob
+mkdir "/mnt/$1"
 touch $BLOB_MARKER
