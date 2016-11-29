@@ -225,9 +225,9 @@ install_ganglia()
 
 tune_storage()
 {
-	echo deadline > /sys/block/md10/queue/scheduler
-	echo 4096 > /sys/block/md10/queue/nr_requests
-	echo 32768 > /sys/block/md10/queue/read_ahead_kb
+	#echo deadline > /sys/block/md10/queue/scheduler
+	#echo 4096 > /sys/block/md10/queue/nr_requests
+	#echo 32768 > /sys/block/md10/queue/read_ahead_kb
 
 	sed -i 's/^connMaxInternodeNum.*/connMaxInternodeNum = 800/g' /etc/beegfs/beegfs-storage.conf
 	sed -i 's/^tuneNumWorkers.*/tuneNumWorkers = 128/g' /etc/beegfs/beegfs-storage.conf
@@ -241,9 +241,9 @@ tune_storage()
 tune_meta()
 {
 	# See http://www.beegfs.com/wiki/MetaServerTuning#xattr
-	echo deadline > /sys/block/md20/queue/scheduler
-	echo 128 > /sys/block/md20/queue/nr_requests
-	echo 128 > /sys/block/md20/queue/read_ahead_kb
+	#echo deadline > /sys/block/md20/queue/scheduler
+	#echo 128 > /sys/block/md20/queue/nr_requests
+	#echo 128 > /sys/block/md20/queue/read_ahead_kb
 
 	sed -i 's/^connMaxInternodeNum.*/connMaxInternodeNum = 800/g' /etc/beegfs/beegfs-meta.conf
 	sed -i 's/^tuneNumWorkers.*/tuneNumWorkers = 128/g' /etc/beegfs/beegfs-meta.conf
