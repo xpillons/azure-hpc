@@ -35,7 +35,8 @@
         "settings": {
           "fileUris": [
             "[parameters('downloadScriptURI')]"
-          ]
+          ],
+          "timestamp": 12345
         },
         "protectedSettings": {
           "commandToExecute": "[concat('bash download.sh ', parameters('imageLocation'),' ', parameters('storageAccountKey'))]"
