@@ -97,7 +97,7 @@
             }
           },
           "osProfile": {
-            "computerNamePrefix": "[parameters('uniquePrefix')]",
+            "computerNamePrefix": "[concat(parameters('uniquePrefix'), padLeft(copyindex(), 2, '0'))]",
             "adminUsername": "[parameters('nodeOSSettings').adminUserName]",
             "adminPassword": "[parameters('adminPassword')]",
             "linuxConfiguration": {
