@@ -3,14 +3,17 @@
 [[ -z "$HOME" || ! -d "$HOME" ]] && { echo 'fixing $HOME'; HOME=/root; }
 export HOME
 
-apt-get -y update
-apt-get -y install python3-pip libssl-dev libffi-dev npm
-pip3 install --upgrade pip
-pip3 install blobxfer --upgrade
-blobxfer --version
-ln -s /usr/bin/nodejs /usr/bin/node
-npm install -g azure-cli
-azure config mode arm
+install_bloxfer()
+{
+	apt-get -y update
+	apt-get -y install python3-pip libssl-dev libffi-dev npm
+	pip3 install --upgrade pip
+	pip3 install blobxfer --upgrade
+	blobxfer --version
+	ln -s /usr/bin/nodejs /usr/bin/node
+	npm install -g azure-cli
+	azure config mode arm
+}
 
 echo $1
 echo $2
@@ -18,7 +21,6 @@ echo $2
 sa_domain=$(echo "$1" | cut -f3 -d/)
 sa_name=$(echo $sa_domain | cut -f1 -d.)
 container_name=$(echo "$1" | cut -f4 -d/)
-#blob_name=$(echo "$1" | cut -f5 -d/)
 # because blob name can contains / and ., the blobname is in fact the last part after the container name
 blob_name=$(echo ${1#*$container_name/})
 
@@ -38,6 +40,8 @@ if [ -e "$BLOB_MARKER" ]; then
     echo "We're already copied, exiting..."
     exit 0
 fi
+
+install_bloxfer
 
 attempts=0
 response=1
