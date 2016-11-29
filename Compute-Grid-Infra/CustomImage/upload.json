@@ -37,7 +37,8 @@
         "settings": {
           "fileUris": [
             "[parameters('uploadScriptURI')]"
-          ]
+          ],
+          "timestamp": 12345
         },
         "protectedSettings": {
           "commandToExecute": "[concat('bash upload.sh ', variables('saName'), ' ', listKeys(concat('Microsoft.Storage/storageAccounts/', variables('saName')), variables('storageApiVersion')).key1)]"
