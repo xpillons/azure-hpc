@@ -47,7 +47,7 @@ install_gmond()
 	sed -i '0,/port = 8649/{s/port = 8649/port = '$CLUSTER_PORT'/}'  /etc/ganglia/gmond.conf 
 
 	# ovveride hostname to avoid using reverse DNS
-	sed -i 's/# override_hostname = "mywebserver.domain.com".*/override_hostname ="'`hostname`'"/g' /etc/ganglia/gmetad.conf	
+	sed -i 's/# override_hostname = "mywebserver.domain.com".*/override_hostname ="'`hostname`'"/g' /etc/ganglia/gmond.conf	
 
 	systemctl restart gmond
 	systemctl enable gmond
