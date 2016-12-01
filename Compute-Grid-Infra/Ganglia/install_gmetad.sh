@@ -34,19 +34,10 @@ install_ganglia_metad()
 	
 	#configure Ganglia server	
 	sed -i 's/^data_source.*/data_source "'$MGMT_HOSTNAME' cluster" '$MGMT_HOSTNAME'/g' /etc/ganglia/gmetad.conf	
-
-	sed -i 's/# setuid off.*/setuid off/g' /etc/ganglia/gmetad.conf	
 	sed -i 's/# gridname "MyGrid".*/gridname "Azure Grid"/g' /etc/ganglia/gmetad.conf	
 	
 	#TODO add authority server	
 	#sed -i 's,^#authority .*,authority "http://dnsname/ganglia/",g' /etc/ganglia/gmetad.conf	
-	
-	#configure Ganglia monitoring
-	sed -i '0,/name = "unspecified"/{s/name = "unspecified"/name = "'$MGMT_HOSTNAME' cluster"/}'  /etc/ganglia/gmond.conf 
-	sed -i '0,/mcast_join = 239.2.11.71/{s/mcast_join = 239.2.11.71/host = '$MGMT_HOSTNAME'/}'  /etc/ganglia/gmond.conf
-	sed -i '0,/mcast_join = 239.2.11.71/{s/mcast_join = 239.2.11.71//}'  /etc/ganglia/gmond.conf 	
-	sed -i '0,/bind = 239.2.11.71/{s/bind = 239.2.11.71//}'  /etc/ganglia/gmond.conf 
-	sed -i '0,/retry_bind = true/{s/retry_bind = true//}'  /etc/ganglia/gmond.conf 
 	
 	#configure Ganglia web server
 	sed -i '0,/Require local/{s/Require local/Require all granted/}' /etc/httpd/conf.d/ganglia.conf
@@ -55,11 +46,9 @@ install_ganglia_metad()
 	chown root:root -R /var/lib/ganglia/rrds/
 	
 	systemctl restart httpd
-	systemctl restart gmond
 	systemctl restart gmetad
 
 	systemctl enable httpd
-	systemctl enable gmond
 	systemctl enable gmetad	
 }
 

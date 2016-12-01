@@ -34,20 +34,20 @@ install_gmond()
     # Disable SELinux
     sed -i 's/SELINUX=.*/SELINUX=disabled/g' /etc/selinux/config
     setenforce 0
-		
+	GMOND_CONFIG=/etc/ganglia/gmond.conf	
 	#configure Ganglia monitoring
-	sed -i '0,/name = "unspecified"/{s/name = "unspecified"/name = "'$CLUSTER_NAME'"/}'  /etc/ganglia/gmond.conf 
-	sed -i '0,/mcast_join = 239.2.11.71/{s/mcast_join = 239.2.11.71/host = '$MGMT_HOSTNAME'/}'  /etc/ganglia/gmond.conf
-	sed -i '0,/mcast_join = 239.2.11.71/{s/mcast_join = 239.2.11.71//}'  /etc/ganglia/gmond.conf 	
-	sed -i '0,/bind = 239.2.11.71/{s/bind = 239.2.11.71//}'  /etc/ganglia/gmond.conf 
-	sed -i '0,/retry_bind = true/{s/retry_bind = true//}'  /etc/ganglia/gmond.conf 
-	sed -i '0,/send_metadata_interval = 0/{s/send_metadata_interval = 0/send_metadata_interval = 60/}'  /etc/ganglia/gmond.conf 
-	sed -i '0,/port = 8649/{s/port = 8649/port = '$CLUSTER_PORT'/}'  /etc/ganglia/gmond.conf 
-	sed -i '0,/port = 8649/{s/port = 8649/port = '$CLUSTER_PORT'/}'  /etc/ganglia/gmond.conf 
-	sed -i '0,/port = 8649/{s/port = 8649/port = '$CLUSTER_PORT'/}'  /etc/ganglia/gmond.conf 
+	sed -i '0,/name = "unspecified"/{s/name = "unspecified"/name = "'$CLUSTER_NAME'"/}'  $GMOND_CONFIG 
+	sed -i '0,/mcast_join = 239.2.11.71/{s/mcast_join = 239.2.11.71/host = '$MGMT_HOSTNAME'/}'  $GMOND_CONFIG
+	sed -i '0,/mcast_join = 239.2.11.71/{s/mcast_join = 239.2.11.71//}'  $GMOND_CONFIG
+	sed -i '0,/bind = 239.2.11.71/{s/bind = 239.2.11.71//}'  $GMOND_CONFIG
+	sed -i '0,/retry_bind = true/{s/retry_bind = true//}'  $GMOND_CONFIG
+	sed -i '0,/send_metadata_interval = 0/{s/send_metadata_interval = 0/send_metadata_interval = 60/}'  $GMOND_CONFIG
+	sed -i '0,/port = 8649/{s/port = 8649/port = '$CLUSTER_PORT'/}'  $GMOND_CONFIG
+	sed -i '0,/port = 8649/{s/port = 8649/port = '$CLUSTER_PORT'/}'  $GMOND_CONFIG
+	sed -i '0,/port = 8649/{s/port = 8649/port = '$CLUSTER_PORT'/}'  $GMOND_CONFIG
 
 	# ovveride hostname to avoid using reverse DNS
-	sed -i 's/# override_hostname = "mywebserver.domain.com".*/override_hostname ="'`hostname`'"/g' /etc/ganglia/gmond.conf	
+	sed -i 's/# override_hostname = "mywebserver.domain.com".*/override_hostname ="'`hostname`'"/g' $GMOND_CONFIG
 
 	systemctl restart gmond
 	systemctl enable gmond
