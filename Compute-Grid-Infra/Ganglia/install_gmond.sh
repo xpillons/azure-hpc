@@ -49,7 +49,8 @@ install_gmond()
 	sed -i 's/deaf = no.*/deaf = yes/g' $GMOND_CONFIG
 
 	# ovveride hostname to avoid using reverse DNS
-	sed -i 's/# override_hostname = "mywebserver.domain.com".*/override_hostname ="'`hostname`'"/g' $GMOND_CONFIG
+	name=`hostname`
+	sed -i 's/# override_hostname = "mywebserver.domain.com".*/override_hostname ="'${name,,}'"/g' $GMOND_CONFIG
 
 	systemctl restart gmond
 	systemctl enable gmond
