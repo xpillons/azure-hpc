@@ -144,7 +144,7 @@
                   "settings": {
                     "fileUris": "[variables('vmScripts').scriptsToDownload]",
                     "commandToExecute": "[variables('vmScripts').commandToExecute]",
-                    "timestamp": 12345
+                    "timestamp": 1234
                   }
                 }
               }
