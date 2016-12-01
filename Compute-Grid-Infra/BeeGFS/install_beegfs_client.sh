@@ -63,7 +63,7 @@ tune_tcp()
     echo "net.ipv4.neigh.default.gc_thresh3=4400" >> /etc/sysctl.conf
 }
 
-SETUP_MARKER=/var/tmp/install_beegfs_client.marker
+SETUP_MARKER=/var/local/install_beegfs_client.marker
 if [ -e "$SETUP_MARKER" ]; then
     echo "We're already configured, exiting..."
     exit 0

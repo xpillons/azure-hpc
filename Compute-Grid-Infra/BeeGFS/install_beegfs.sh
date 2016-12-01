@@ -292,7 +292,7 @@ setup_user()
 }
 
 
-SETUP_MARKER=/var/tmp/install_beegfs.marker
+SETUP_MARKER=/var/local/install_beegfs.marker
 if [ -e "$SETUP_MARKER" ]; then
     echo "We're already configured, exiting..."
     exit 0

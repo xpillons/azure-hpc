@@ -53,7 +53,7 @@ install_gmond()
 	systemctl enable gmond
 }
 
-SETUP_MARKER=/var/tmp/install_ganglia.marker
+SETUP_MARKER=/var/local/install_ganglia.marker
 if [ -e "$SETUP_MARKER" ]; then
     echo "We're already configured, exiting..."
     exit 0

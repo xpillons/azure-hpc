@@ -94,7 +94,7 @@ setup_user()
     chown $HPC_USER:$HPC_GROUP $SHARE_SCRATCH	
 }
 
-SETUP_MARKER=/var/tmp/install_beegfs_client.marker
+SETUP_MARKER=/var/local/install_beegfs_client.marker
 if [ -e "$SETUP_MARKER" ]; then
     echo "We're already configured, exiting..."
     exit 0
