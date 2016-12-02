@@ -8,8 +8,8 @@ if [[ $(id -u) -ne 0 ]] ; then
     exit 1
 fi
 
-if [ $# != 1 ]; then
-    echo "Usage: $0 <ManagementHost>"
+if [ $# != 2 ]; then
+    echo "Usage: $0 <ManagementHost> <Mount>"
     exit 1
 fi
 
@@ -17,7 +17,7 @@ fi
 MGMT_HOSTNAME=$1
 
 # Shares
-SHARE_SCRATCH=/share/scratch
+SHARE_SCRATCH=$2
 
 
 # Installs all required packages.
