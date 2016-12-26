@@ -93,41 +93,36 @@
             "storageUri": "[concat('http://',parameters('masterSettings').DiagSAName,'.blob.core.windows.net')]"
           }
         }
-      },
-      "resources": [
-        {
-          "name": "masterExtension",
-          "type": "extensions",
-          "location": "[variables('location')]",
-          "apiVersion": "[variables('extensionApiVersion')]",
-          "dependsOn": [
-            "[concat('Microsoft.Compute/virtualMachines/', parameters('masterSettings').Name)]"
-          ],
-          "tags": {
-            "displayName": "masterExtension"
-          },
-          "properties": {
-            "publisher": "Microsoft.Azure.Extensions",
-            "type": "CustomScript",
-            "typeHandlerVersion": "2.0",
-            "autoUpgradeMinorVersion": true,
-            "settings": {
-              "fileUris": "[variables('vmScripts').scriptsToDownload]",
-              "timestamp": 4
-            },
-            "protectedSettings": {
-              "commandToExecute": "bash master-setup.sh"
-            }
-          }
+      }
+    },
+    {
+      "name": "[concat(parameters('masterSettings').Name,'/masterExtension')]",
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "apiVersion": "[variables('extensionApiVersion')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', parameters('masterSettings').Name)]"
+      ],
+      "properties": {
+        "publisher": "Microsoft.Azure.Extensions",
+        "type": "CustomScript",
+        "typeHandlerVersion": "2.0",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "fileUris": "[variables('vmScripts').scriptsToDownload]",
+          "timestamp": 4
+        },
+        "protectedSettings": {
+          "commandToExecute": "bash master-setup.sh"
         }
-      ]
+      }
     },
     {
       "name": "ganglia",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "[variables('deploymentApiVersion')]",
       "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachines/', parameters('masterSettings').Name)]"
+        "[concat('Microsoft.Compute/virtualMachines/extensions', parameters('masterSettings').Name,'/masterExtension')]"
       ],
       "properties": {
         "mode": "Incremental",
