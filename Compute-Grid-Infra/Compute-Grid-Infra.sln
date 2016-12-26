@@ -42,6 +42,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PBSPro", "PBSPro", "{992206
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Ganglia", "Ganglia", "{4E81BC70-7F00-430C-8AA0-1B759DAE0DD9}"
 	ProjectSection(SolutionItems) = preProject
+		Ganglia\ganglia.json = Ganglia\ganglia.json
+		Ganglia\install_ganglia.sh = Ganglia\install_ganglia.sh
 		Ganglia\install_gmetad.sh = Ganglia\install_gmetad.sh
 		Ganglia\install_gmond.sh = Ganglia\install_gmond.sh
 	EndProjectSection
