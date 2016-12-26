@@ -136,8 +136,8 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
-          "vmName": { "value": "parameters('masterSettings').Name" },
-          "masterName": { "value": "parameters('masterSettings').Name" }
+          "vmName": { "value": "[parameters('masterSettings').Name]" },
+          "masterName": { "value": "[parameters('masterSettings').Name]" }
         }
       }
     }
