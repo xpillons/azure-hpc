@@ -36,7 +36,7 @@
       "commandToExecute": ""
     },
     "sshKeyPath": "[concat('/home/',parameters('masterOSSettings').adminUserName,'/.ssh/authorized_keys')]",
-    "gangliaTemplateURI": "[uri(deployment().properties.templateLink.uri, '/Ganglia/ganglia.json')]",
+    "gangliaTemplateURI": "[uri(deployment().properties.templateLink.uri, '/ganglia/ganglia.json')]",
     "computeApiVersion": "2016-03-30",
     "storageApiVersion": "2015-06-15",
     "extensionApiVersion": "2015-06-15"
