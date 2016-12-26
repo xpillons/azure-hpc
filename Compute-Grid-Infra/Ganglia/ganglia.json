@@ -30,7 +30,7 @@
           "timestamp": 12345
         },
         "protectedSettings": {
-          "commandToExecute": "[concat('bash install_ganglia.sh ', parameters('masterName'), 'Master 8649')]"
+          "commandToExecute": "[concat('bash install_ganglia.sh ', parameters('masterName'), ' Master 8649')]"
         }
       }
     }
