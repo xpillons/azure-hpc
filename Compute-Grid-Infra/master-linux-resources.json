@@ -39,7 +39,8 @@
     "gangliaTemplateURI": "[uri(deployment().properties.templateLink.uri, 'Ganglia/ganglia.json')]",
     "computeApiVersion": "2016-03-30",
     "storageApiVersion": "2015-06-15",
-    "extensionApiVersion": "2015-06-15"
+    "extensionApiVersion": "2015-06-15",
+    "deploymentApiVersion": "2016-09-01"
   },
   "resources": [
     {
@@ -124,7 +125,7 @@
     {
       "name": "ganglia",
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "[variables('extensionApiVersion')]",
+      "apiVersion": "[variables('deploymentApiVersion')]",
       "dependsOn": [
         "[concat('Microsoft.Compute/virtualMachines/', parameters('masterSettings').Name)]"
       ],
