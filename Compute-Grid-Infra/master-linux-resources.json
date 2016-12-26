@@ -96,7 +96,7 @@
       }
     },
     {
-      "name": "[concat(parameters('masterSettings').Name,'/masterExtension')]",
+      "name": "[concat('/masterExtension')]",
       "type": "Microsoft.Compute/virtualMachines/extensions",
       "apiVersion": "[variables('extensionApiVersion')]",
       "location": "[resourceGroup().location]",
@@ -122,7 +122,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "[variables('deploymentApiVersion')]",
       "dependsOn": [
-        "[concat(parameters('masterSettings').Name,'/masterExtension')]"
+        "[concat('/masterExtension')]"
       ],
       "properties": {
         "mode": "Incremental",
