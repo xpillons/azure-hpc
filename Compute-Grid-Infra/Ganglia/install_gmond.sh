@@ -46,11 +46,11 @@ install_gmond()
 	sed -i '0,/port = 8649/{s/port = 8649/port = '$CLUSTER_PORT'/}'  $GMOND_CONFIG
 	sed -i '0,/port = 8649/{s/port = 8649/port = '$CLUSTER_PORT'/}'  $GMOND_CONFIG
 	sed -i 's/#bind_hostname = yes.*/bind_hostname = yes/g' $GMOND_CONFIG
-	sed -i 's/deaf = no.*/deaf = yes/g' $GMOND_CONFIG
+	#sed -i 's/deaf = no.*/deaf = yes/g' $GMOND_CONFIG
 
 	# ovveride hostname to avoid using reverse DNS
-	name=`hostname`
-	sed -i 's/# override_hostname = "mywebserver.domain.com".*/override_hostname ="'${name,,}'"/g' $GMOND_CONFIG
+	#name=`hostname`
+	#sed -i 's/# override_hostname = "mywebserver.domain.com".*/override_hostname ="'${name,,}'"/g' $GMOND_CONFIG
 
 	systemctl restart gmond
 	systemctl enable gmond
