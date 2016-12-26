@@ -36,6 +36,7 @@
       "commandToExecute": ""
     },
     "sshKeyPath": "[concat('/home/',parameters('masterOSSettings').adminUserName,'/.ssh/authorized_keys')]",
+    "gangliaTemplateURI": "[uri(deployment().properties.templateLink.uri, '/Ganglia/ganglia.json')]",
     "computeApiVersion": "2016-03-30",
     "storageApiVersion": "2015-06-15",
     "extensionApiVersion": "2015-06-15"
@@ -119,6 +120,25 @@
           }
         }
       ]
+    },
+    {
+      "name": "ganglia",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "[variables('extensionApiVersion')]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', parameters('masterSettings').Name)]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('gangliaTemplateURI')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "vmName": { "value": "parameters('masterSettings').Name" },
+          "masterName": { "value": "parameters('masterSettings').Name" }
+        }
+      }
     }
   ]
 }

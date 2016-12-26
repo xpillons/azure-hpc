@@ -151,8 +151,8 @@ fi
 setup_disks
 mount_nfs
 setup_user
-install_ganglia
-install_beegfs
+#install_ganglia
+#install_beegfs
 
 # Create marker file so we know we're configured
 touch $SETUP_MARKER
