@@ -131,7 +131,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[variables('gangliaTemplateURI')]",
+          "uri": "[uri(deployment().properties.templateLink.uri, '/ganglia/ganglia.json')]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
