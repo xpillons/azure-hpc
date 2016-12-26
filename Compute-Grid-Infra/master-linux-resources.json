@@ -33,10 +33,11 @@
       "scriptsToDownload": [
         "[uri(deployment().properties.templateLink.uri, 'master-setup.sh')]"
       ],
-      "commandToExecute": ""
+      "commandToExecute": "bash master-setup.sh"
     },
     "sshKeyPath": "[concat('/home/',parameters('masterOSSettings').adminUserName,'/.ssh/authorized_keys')]",
     "gangliaTemplateURI": "[uri(deployment().properties.templateLink.uri, 'Ganglia/ganglia.json')]",
+    "masterScriptTemplateURI": "[uri(deployment().properties.templateLink.uri, 'master-linux-script.json')]",
     "computeApiVersion": "2016-03-30",
     "storageApiVersion": "2015-06-15",
     "extensionApiVersion": "2015-06-15",
@@ -96,24 +97,21 @@
       }
     },
     {
-      "name": "[concat(parameters('masterSettings').Name,'/masterExtension')]",
-      "type": "Microsoft.Compute/virtualMachines/extensions",
-      "apiVersion": "[variables('extensionApiVersion')]",
-      "location": "[resourceGroup().location]",
+      "name": "masterExtension",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "[variables('deploymentApiVersion')]",
       "dependsOn": [
         "[concat('Microsoft.Compute/virtualMachines/', parameters('masterSettings').Name)]"
       ],
       "properties": {
-        "publisher": "Microsoft.Azure.Extensions",
-        "type": "CustomScript",
-        "typeHandlerVersion": "2.0",
-        "autoUpgradeMinorVersion": true,
-        "settings": {
-          "fileUris": "[variables('vmScripts').scriptsToDownload]",
-          "timestamp": 4
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('masterScriptTemplateURI')]",
+          "contentVersion": "1.0.0.0"
         },
-        "protectedSettings": {
-          "commandToExecute": "bash master-setup.sh"
+        "parameters": {
+          "vmName": { "value": "[parameters('masterSettings').Name]" },
+          "vmScripts": { "value": "[variables('vmScripts')]" }
         }
       }
     },
@@ -122,7 +120,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "[variables('deploymentApiVersion')]",
       "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachines/extensions/',parameters('masterSettings').Name,'/masterExtension')]"
+        "masterExtension"
       ],
       "properties": {
         "mode": "Incremental",

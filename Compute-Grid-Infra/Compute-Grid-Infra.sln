@@ -13,6 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		deploy-nodes.json = deploy-nodes.json
 		ListNodes.ps1 = ListNodes.ps1
 		master-linux-resources.json = master-linux-resources.json
+		master-linux-script.json = master-linux-script.json
 		master-setup.ps1 = master-setup.ps1
 		master-setup.sh = master-setup.sh
 		master-shared-resources.json = master-shared-resources.json
