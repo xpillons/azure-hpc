@@ -122,7 +122,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "[variables('deploymentApiVersion')]",
       "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachines/extensions', parameters('masterSettings').Name,'/masterExtension')]"
+        "[concat('Microsoft.Compute/virtualMachines/extensions/', parameters('masterSettings').Name,'/masterExtension')]"
       ],
       "properties": {
         "mode": "Incremental",
