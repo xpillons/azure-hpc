@@ -34,7 +34,7 @@
           "timestamp": 12345
         },
         "protectedSettings": {
-          "commandToExecute": "variables('vmScripts').commandToExecute"
+          "commandToExecute": "[variables('vmScripts').commandToExecute]"
         }
       }
     }
