@@ -2,19 +2,6 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "artifactsBaseUrl": {
-      "type": "string",
-      "metadata": {
-        "description": "Base URL of the solution template gallery package",
-        "artifactsBaseUrl": ""
-      }
-    },
-    //"commonSettings": {
-    //  "type": "object",
-    //  "metadata": {
-    //    "Description": "common settings object"
-    //  }
-    //},
     "networkSettings": {
       "type": "object",
       "metadata": {
@@ -44,15 +31,14 @@
     "location": "[resourceGroup().location]",
     "vmScripts": {
       "scriptsToDownload": [
-        "[concat(variables('baseUrl'), 'master-setup.sh')]"
+        "[uri(deployment().properties.templateLink.uri, 'master-setup.sh')]"
       ],
       "commandToExecute": ""
     },
-    "baseUrl": "[concat(parameters('artifactsBaseUrl'),'/')]",
-    //"sharedAccountId": "[resourceId(parameters('commonSettings').RGStorageName, 'Microsoft.Storage/storageAccounts', parameters('commonSettings').DataSAName)]",
     "sshKeyPath": "[concat('/home/',parameters('masterOSSettings').adminUserName,'/.ssh/authorized_keys')]",
     "computeApiVersion": "2016-03-30",
-    "storageApiVersion": "2015-06-15"
+    "storageApiVersion": "2015-06-15",
+    "extensionApiVersion": "2015-06-15"
   },
   "resources": [
     {
@@ -111,7 +97,7 @@
           "name": "masterExtension",
           "type": "extensions",
           "location": "[variables('location')]",
-          "apiVersion": "[variables('storageApiVersion')]",
+          "apiVersion": "[variables('extensionApiVersion')]",
           "dependsOn": [
             "[concat('Microsoft.Compute/virtualMachines/', parameters('masterSettings').Name)]"
           ],
@@ -119,15 +105,16 @@
             "displayName": "masterExtension"
           },
           "properties": {
-            "publisher": "Microsoft.OSTCExtensions",
-            "type": "CustomScriptForLinux",
-            "typeHandlerVersion": "1.5",
+            "publisher": "Microsoft.Azure.Extensions",
+            "type": "CustomScript",
+            "typeHandlerVersion": "2.0",
             "autoUpgradeMinorVersion": true,
             "settings": {
               "fileUris": "[variables('vmScripts').scriptsToDownload]",
-              //"commandToExecute": "[concat('bash ', concat('master-setup.sh -a ', parameters('commonSettings').DataSAName, ' -k ', listKeys(variables('sharedAccountId'), variables('storageApiVersion')).key1))]",
-              "commandToExecute": "bash master-setup.sh",
               "timestamp": 4
+            },
+            "protectedSettings": {
+              "commandToExecute": "bash master-setup.sh"
             }
           }
         }

@@ -2,14 +2,6 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "artifactsBaseUrl": {
-      "type": "string",
-      "defaultValue": "https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra",
-      "metadata": {
-        "description": "Base URL of the solution template gallery package",
-        "artifactsBaseUrl": ""
-      }
-    },
     "VMsku": {
       "type": "string",
       "allowedValues": [
@@ -65,19 +57,7 @@
       "metadata": {
         "description": "SSH rsa public key file as a string."
       }
-    },
-    //"sharedDataAccount": {
-    //  "type": "string",
-    //  "metadata": {
-    //    "description": "Name of the shared storage account"
-    //  }
-    //},
-    //"RGStorageName": {
-    //  "type": "string",
-    //  "metadata": {
-    //    "description": "Name of Resource Group of the shared storage account"
-    //  }
-    //}
+    }
   },
   "variables": {
     "location": "[resourceGroup().location]",
@@ -86,10 +66,6 @@
     "newStorageAccountSuffix": "[concat(variables('longNamingInfix'), 'sa')]",
     "virtualNetworkName": "grid-vnet",
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
-    //"commonSettings": {
-    //  "DataSAName": "[parameters('sharedDataAccount')]",
-    //  "RGStorageName": "[parameters('RGStorageName')]"
-    //},
     "networkSettings": {
       "virtualNetworkName": "[variables('virtualNetworkName')]",
       "addressPrefix": "172.0.0.0/20",
@@ -166,11 +142,11 @@
     "storageApiVersion": "2015-06-15",
     "extensionApiVersion": "2015-06-15",
     "deploymentApiVersion": "2015-01-01",
-    "baseUrl": "[concat(parameters('artifactsBaseUrl'),'/')]",
-    "sharedTemplateUrl": "[concat(variables('baseUrl'), 'shared-resources.json')]",
-    "master-sharedTemplateUrl": "[concat(variables('baseUrl'), 'master-shared-resources.json')]",
-    "master-OSTemplateUrl": "[concat(variables('baseUrl'), 'master-', variables('masterOSSettings').osType.os, '-resources.json')]",
-    "master-NSGTemplateUrl": "[concat(variables('baseUrl'), 'nsg-master-', variables('masterOSSettings').osType.os, '.json')]"
+
+    "sharedTemplateUrl": "[uri(deployment().properties.templateLink.uri, 'shared-resources.json')]",
+    "master-sharedTemplateUrl": "[uri(deployment().properties.templateLink.uri, 'master-shared-resources.json')]",
+    "master-OSTemplateUrl": "[uri(deployment().properties.templateLink.uri, concat('master-', variables('masterOSSettings').osType.os, '-resources.json'))]",
+    "master-NSGTemplateUrl": "[uri(deployment().properties.templateLink.uri, concat('nsg-master-', variables('masterOSSettings').osType.os, '.json'))]",
   },
   "resources": [
     {
@@ -246,12 +222,6 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
-          "artifactsBaseUrl": {
-            "value": "[parameters('artifactsBaseUrl')]"
-          },
-          //"commonSettings": {
-          //  "value": "[variables('commonSettings')]"
-          //},
           "networkSettings": {
             "value": "[variables('networkSettings')]"
           },
