@@ -7,15 +7,15 @@
       "metadata": {
         "Description": "vmName to apply the script"
       }
-    },
-    "vmScripts": {
-      "type": "object",
-      "metadata": {
-        "Description": "vmScripts to download and command to execute"
-      }
     }
   },
   "variables": {
+    "vmScripts": {
+      "scriptsToDownload": [
+        "[uri(deployment().properties.templateLink.uri, 'master-setup.sh')]"
+      ],
+      "commandToExecute": "bash master-setup.sh"
+    },
     "extensionApiVersion": "2015-06-15"
   },
   "resources": [
@@ -30,11 +30,11 @@
         "typeHandlerVersion": "2.0",
         "autoUpgradeMinorVersion": true,
         "settings": {
-          "fileUris": "[parameters('vmScripts').scriptsToDownload]",
+          "fileUris": "[variables('vmScripts').scriptsToDownload]",
           "timestamp": 12345
         },
         "protectedSettings": {
-          "commandToExecute": "parameters('vmScripts').commandToExecute"
+          "commandToExecute": "variables('vmScripts').commandToExecute"
         }
       }
     }
