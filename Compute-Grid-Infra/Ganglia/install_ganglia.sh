@@ -18,6 +18,14 @@ MGMT_HOSTNAME=$1
 CLUSTER_NAME=$2
 CLUSTER_PORT=$3
 
+# Returns 0 if this node is the management node.
+#
+is_mgmt()
+{
+    hostname | grep "$MGMT_HOSTNAME"
+    return $?
+}
+
 install_ganglia_gmetad()
 {
 	echo "Installing Ganglia gmetad"
@@ -100,7 +108,7 @@ setenforce 0
 systemctl stop firewalld
 systemctl disable firewalld
 
-if [ "$MGMT_HOSTNAME" -eq `hostname` ]; then
+if is_mgmt; then
 	install_ganglia_gmetad
 fi
 
