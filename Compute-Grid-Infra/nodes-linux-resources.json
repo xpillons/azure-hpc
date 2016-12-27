@@ -70,10 +70,10 @@
     "cnSetupScript": "cn-setup.sh",
     "vmScripts": {
       "scriptsToDownload": [
-        "[uri(deployment().properties.templateLink.uri, '/cn-setup.sh')]",
-        "[uri(deployment().properties.templateLink.uri, '/BeeGFS/install_beegfs.sh')]",
-        "[uri(deployment().properties.templateLink.uri, '/PBSPro/install_pbspro.sh')]",
-        "[uri(deployment().properties.templateLink.uri, '/Ganglia/install_gmond.sh')]"
+        "[uri(deployment().properties.templateLink.uri, 'cn-setup.sh')]",
+        "[uri(deployment().properties.templateLink.uri, 'BeeGFS/install_beegfs.sh')]",
+        "[uri(deployment().properties.templateLink.uri, 'PBSPro/install_pbspro.sh')]",
+        "[uri(deployment().properties.templateLink.uri, 'Ganglia/install_ganglia.sh')]"
       ],
       "commandToExecute": "[concat('bash ', variables('cnSetupScript'), ' -m ', parameters('nodeSettings').MasterName)]"
     },
