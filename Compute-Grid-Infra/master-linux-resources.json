@@ -30,6 +30,7 @@
   "variables": {
     "location": "[resourceGroup().location]",
     "sshKeyPath": "[concat('/home/',parameters('masterOSSettings').adminUserName,'/.ssh/authorized_keys')]",
+    "beeGFSScriptTemplateURI": "[uri(deployment().properties.templateLink.uri, 'BeeGFS/beegfs-script.json')]",
     "gangliaTemplateURI": "[uri(deployment().properties.templateLink.uri, 'Ganglia/ganglia.json')]",
     "masterScriptTemplateURI": "[uri(deployment().properties.templateLink.uri, 'master-linux-script.json')]",
     "computeApiVersion": "2016-03-30",
@@ -122,6 +123,25 @@
         "parameters": {
           "vmName": { "value": "[parameters('masterSettings').Name]" },
           "masterName": { "value": "[parameters('masterSettings').Name]" }
+        }
+      }
+    },
+    {
+      "name": "beegfs",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "[variables('deploymentApiVersion')]",
+      "dependsOn": [
+        "ganglia"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('beeGFSScriptTemplateURI')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "vmName": { "value": "[parameters('masterSettings').Name]" },
+          "params": { "value": "[concat(parameters('masterSettings').Name, ' client')]" }
         }
       }
     }

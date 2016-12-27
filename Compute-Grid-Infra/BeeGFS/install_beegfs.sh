@@ -9,17 +9,21 @@ if [[ $(id -u) -ne 0 ]] ; then
 fi
 
 if [ $# < 2 ]; then
-    echo "Usage: $0 <ManagementHost> <Type (meta,storage,both)> <customDomain>"
+    echo "Usage: $0 <ManagementHost> <Type (meta,storage,both,client)> <Mount> <customDomain>"
     exit 1
 fi
 
 MGMT_HOSTNAME=$1
 BEEGFS_NODE_TYPE="$2"
-CUSTOMDOMAIN=$3
+CUSTOMDOMAIN=$4
 
 # Shares
 SHARE_HOME=/share/home
 SHARE_SCRATCH=/share/scratch
+if [ -n "$3" ]; then
+	SHARE_SCRATCH=$3
+fi
+
 BEEGFS_METADATA=/data/beegfs/meta
 BEEGFS_STORAGE=/data/beegfs/storage
 
@@ -28,6 +32,14 @@ HPC_USER=hpcuser
 HPC_UID=7007
 HPC_GROUP=hpc
 HPC_GID=7007
+
+# Returns 0 if this node is the management node.
+#
+is_management()
+{
+    hostname | grep "$MGMT_HOSTNAME"
+    return $?
+}
 
 is_metadatanode()
 {
@@ -48,6 +60,14 @@ is_storagenode()
 is_convergednode()
 {
 	if [ "$BEEGFS_NODE_TYPE" == "both" ]; then 
+		return 0
+	fi
+	return 1
+}
+
+is_client()
+{
+	if [ "$BEEGFS_NODE_TYPE" == "client" ] || is_management ; then 
 		return 0
 	fi
 	return 1
@@ -176,20 +196,18 @@ setup_disks()
     mount -a
 }
 
-install_beegfs()
+install_beegfs_repo()
 {
-    systemctl stop firewalld
-    systemctl disable firewalld
-	
     # Install BeeGFS repo
     wget -O beegfs-rhel7.repo http://www.beegfs.com/release/beegfs_2015.03/dists/beegfs-rhel7.repo
     mv beegfs-rhel7.repo /etc/yum.repos.d/beegfs.repo
     rpm --import http://www.beegfs.com/release/beegfs_2015.03/gpg/RPM-GPG-KEY-beegfs
-    
-    # Disable SELinux
-    sed -i 's/SELINUX=.*/SELINUX=disabled/g' /etc/selinux/config
-    setenforce 0
-    
+
+}
+
+install_beegfs()
+{
+       
 	# setup metata data
     if is_metadatanode; then
 		yum install -y beegfs-meta
@@ -214,13 +232,30 @@ install_beegfs()
 		systemctl daemon-reload
 		systemctl enable beegfs-storage.service
 	fi
-}
 
-install_ganglia()
-{
-	yum -y install wget
-    wget -O install_gmond.sh https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/Ganglia/install_gmond.sh
-	bash install_gmond.sh ${MGMT_HOSTNAME} "BeeGFS" 8649
+	# setup management
+	if is_management; then
+		yum install -y beegfs-mgmtd beegfs-helperd beegfs-utils beegfs-admon
+        
+		# Install management server and client
+		mkdir -p /data/beegfs/mgmtd
+		sed -i 's|^storeMgmtdDirectory.*|storeMgmtdDirectory = /data/beegfs/mgmt|g' /etc/beegfs/beegfs-mgmtd.conf
+		sed -i 's/^sysMgmtdHost.*/sysMgmtdHost = '$MGMT_HOSTNAME'/g' /etc/beegfs/beegfs-admon.conf
+		systemctl daemon-reload
+		systemctl enable beegfs-mgmtd.service
+		systemctl enable beegfs-admon.service
+	fi
+
+	if is_client; then
+		yum install -y beegfs-client beegfs-helperd beegfs-utils
+		# setup client
+		sed -i 's/^sysMgmtdHost.*/sysMgmtdHost = '$MGMT_HOSTNAME'/g' /etc/beegfs/beegfs-client.conf
+		echo "$SHARE_SCRATCH /etc/beegfs/beegfs-client.conf" > /etc/beegfs/beegfs-mounts.conf
+	
+		systemctl daemon-reload
+		systemctl enable beegfs-helperd.service
+		systemctl enable beegfs-client.service
+	fi
 }
 
 tune_storage()
@@ -276,11 +311,7 @@ setup_user()
 	echo "$MGMT_HOSTNAME:$SHARE_HOME $SHARE_HOME    nfs4    rw,auto,_netdev 0 0" >> /etc/fstab
 	mount -a
 	mount
-
-    # disable selinux
-    sed -i 's/enforcing/disabled/g' /etc/selinux/config
-    setenforce permissive
-    
+   
     groupadd -g $HPC_GID $HPC_GROUP
 
     # Don't require password for HPC user sudo
@@ -301,13 +332,20 @@ if [ -e "$SETUP_MARKER" ]; then
     exit 0
 fi
 
+systemctl stop firewalld
+systemctl disable firewalld
+
+# Disable SELinux
+sed -i 's/SELINUX=.*/SELINUX=disabled/g' /etc/selinux/config
+setenforce 0
+
 install_pkgs
 setup_disks
 setup_user
 tune_tcp
 setup_domain
+install_beegfs_repo
 install_beegfs
-#install_ganglia
 
 # Create marker file so we know we're configured
 touch $SETUP_MARKER
