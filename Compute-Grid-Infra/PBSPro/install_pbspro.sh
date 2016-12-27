@@ -47,8 +47,8 @@ install_pbspro()
     cd CentOS_7
     rpm -ivh --nodeps pbspro-server-14.1.0-13.1.x86_64.rpm
     
-    echo 'export PATH=/opt/pbs/default/bin:$PATH' >> /etc/profile.d/pbs.sh
-    echo 'export PATH=/opt/pbs/default/sbin:$PATH' >> /etc/profile.d/pbs.sh
+    echo 'export PATH=/opt/pbs/bin:$PATH' >> /etc/profile.d/pbs.sh
+    echo 'export PATH=/opt/pbs/sbin:$PATH' >> /etc/profile.d/pbs.sh
     
     if is_master; then
         cat > /etc/pbs.conf << EOF

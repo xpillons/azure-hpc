@@ -32,6 +32,7 @@
     "sshKeyPath": "[concat('/home/',parameters('masterOSSettings').adminUserName,'/.ssh/authorized_keys')]",
     "beeGFSScriptTemplateURI": "[uri(deployment().properties.templateLink.uri, 'BeeGFS/beegfs-script.json')]",
     "gangliaTemplateURI": "[uri(deployment().properties.templateLink.uri, 'Ganglia/ganglia.json')]",
+    "schedulerTemplateURI": "[uri(deployment().properties.templateLink.uri, 'PBSPro/pbspro.json')]",
     "masterScriptTemplateURI": "[uri(deployment().properties.templateLink.uri, 'master-linux-script.json')]",
     "computeApiVersion": "2016-03-30",
     "deploymentApiVersion": "2016-09-01"
@@ -127,11 +128,30 @@
       }
     },
     {
-      "name": "beegfs",
+      "name": "scheduler",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "[variables('deploymentApiVersion')]",
       "dependsOn": [
         "ganglia"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('schedulerTemplateURI')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "vmName": { "value": "[parameters('masterSettings').Name]" },
+          "masterName": { "value": "[parameters('masterSettings').Name]" }
+        }
+      }
+    },
+    {
+      "name": "beegfs",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "[variables('deploymentApiVersion')]",
+      "dependsOn": [
+        "scheduler"
       ],
       "properties": {
         "mode": "Incremental",

@@ -40,6 +40,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PBSPro", "PBSPro", "{992206B4-5289-43B8-8E4B-529FCCEDA380}"
 	ProjectSection(SolutionItems) = preProject
 		PBSPro\install_pbspro.sh = PBSPro\install_pbspro.sh
+		PBSPro\pbspro.json = PBSPro\pbspro.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Ganglia", "Ganglia", "{4E81BC70-7F00-430C-8AA0-1B759DAE0DD9}"
