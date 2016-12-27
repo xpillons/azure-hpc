@@ -91,14 +91,19 @@ install_beegfs_client()
 {
 	#yum -y install wget
     #wget -O install_beegfs_client.sh https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/BeeGFS/install_beegfs_client.sh
-	bash install_beegfs_client.sh ${MASTER_NAME}
+	bash install_beegfs.sh ${MASTER_NAME} "client"
 }
 
 install_ganglia()
 {
 	#yum -y install wget
     #wget -O install_gmond.sh https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/Ganglia/install_gmond.sh
-	bash install_gmond.sh ${MASTER_NAME}
+	bash install_gmond.sh ${MASTER_NAME} "Cluster" 8649
+}
+
+install_pbspro()
+{
+	bash install_pbspro.sh ${MASTER_NAME}
 }
 
 setup_user()
@@ -111,11 +116,7 @@ setup_user()
 	echo "$MASTER_NAME:$SHARE_HOME $SHARE_HOME    nfs4    rw,auto,_netdev 0 0" >> /etc/fstab
 	mount -a
 	mount
-
-    # disable selinux
-    sed -i 's/enforcing/disabled/g' /etc/selinux/config
-    setenforce permissive
-    
+   
     groupadd -g $HPC_GID $HPC_GROUP
 
     # Don't require password for HPC user sudo
@@ -129,21 +130,27 @@ setup_user()
     chown $HPC_USER:$HPC_GROUP $SHARE_SCRATCH	
 }
 
-install_applications
+#install_applications
 
-SETUP_MARKER=/var/tmp/cn-setup.marker
+SETUP_MARKER=/var/local/cn-setup.marker
 if [ -e "$SETUP_MARKER" ]; then
     echo "We're already configured, exiting..."
     exit 0
 fi
 
+# disable selinux
+sed -i 's/enforcing/disabled/g' /etc/selinux/config
+setenforce permissive
+
 #install_azure_cli
 #install_azure_files
-mount_nfs
-install_lsf
-install_applications
-#setup_user
-#install_beegfs_client
+#mount_nfs
+#install_lsf
+#install_applications
+setup_user
+install_ganglia
+install_pbspro
+install_beegfs_client
 
 # Create marker file so we know we're configured
 touch $SETUP_MARKER
