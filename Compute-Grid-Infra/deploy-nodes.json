@@ -4,6 +4,7 @@
   "parameters": {
     "VMsku": {
       "type": "string",
+      "defaultValue": "Standard_D3_v2",
       "allowedValues": [
         "Standard_D1_v2",
         "Standard_D2_v2",
@@ -32,7 +33,7 @@
     },
     "computeNodeImage": {
       "type": "string",
-      "defaultValue": "CentOS_6.7",
+      "defaultValue": "CentOS_7.2",
       "allowedValues": [
         "CentOS_6.7",
         "CentOS_7.2",
