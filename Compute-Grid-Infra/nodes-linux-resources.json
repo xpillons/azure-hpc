@@ -68,13 +68,12 @@
     "networkApiVersion": "2016-03-30",
     "storageApiVersion": "2015-06-15",
     "cnSetupScript": "cn-setup.sh",
-    "scriptUrl": "[uri(deployment().properties.templateLink.uri, '/')]",
     "vmScripts": {
       "scriptsToDownload": [
-        "[concat(variables('scriptUrl'), 'cn-setup.sh')]",
-        "[concat(variables('scriptUrl'), 'BeeGFS/install_beegfs.sh')]",
-        "[concat(variables('scriptUrl'), 'PBSPro/install_pbspro.sh')]",
-        "[concat(variables('scriptUrl'), 'Ganglia/install_gmond.sh')]"
+        "[uri(deployment().properties.templateLink.uri, '/cn-setup.sh')]",
+        "[uri(deployment().properties.templateLink.uri, '/BeeGFS/install_beegfs.sh')]",
+        "[uri(deployment().properties.templateLink.uri, '/PBSPro/install_pbspro.sh')]",
+        "[uri(deployment().properties.templateLink.uri, '/Ganglia/install_gmond.sh')]"
       ],
       "commandToExecute": "[concat('bash ', variables('cnSetupScript'), ' -m ', parameters('nodeSettings').MasterName)]"
     },

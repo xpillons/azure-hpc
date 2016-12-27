@@ -68,10 +68,9 @@
     "networkApiVersion": "2016-03-30",
     "storageApiVersion": "2015-06-15",
     "cnSetupScript": "cn-setup.ps1",
-    "scriptUrl": "[uri(deployment().properties.templateLink.uri, '/')]",
     "vmScripts": {
       "scriptsToDownload": [
-        "[concat(variables('scriptUrl'), 'cn-setup.ps1')]"
+        "[uri(deployment().properties.templateLink.uri, '/cn-setup.ps1')]"
       ],
       "commandToExecute": "[concat('powershell -ExecutionPolicy Unrestricted -File cn-setup.ps1 ', parameters('nodeSettings').MasterName, ' ', parameters('nodeOSSettings').adminUserName, ' ', parameters('adminPassword'))]"
     }
