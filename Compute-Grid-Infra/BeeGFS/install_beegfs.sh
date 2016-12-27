@@ -258,11 +258,14 @@ tune_tcp()
 
 setup_domain()
 {
-	# surround domain names separated by comma with " after removing extra spaces
-	QUOTEDDOMAIN=$(echo $CUSTOMDOMAIN | sed -e 's/ //g' -e 's/"//g' -e 's/^\|$/"/g' -e 's/,/","/g')
-	echo $QUOTEDDOMAIN
+    if [ -n "$CUSTOMDOMAIN" ]; then
 
-	echo "supersede domain-search $QUOTEDDOMAIN;" >> /etc/dhcp/dhclient.conf
+		# surround domain names separated by comma with " after removing extra spaces
+		QUOTEDDOMAIN=$(echo $CUSTOMDOMAIN | sed -e 's/ //g' -e 's/"//g' -e 's/^\|$/"/g' -e 's/,/","/g')
+		echo $QUOTEDDOMAIN
+
+		echo "supersede domain-search $QUOTEDDOMAIN;" >> /etc/dhcp/dhclient.conf
+	fi
 }
 
 setup_user()
@@ -304,7 +307,7 @@ setup_user
 tune_tcp
 setup_domain
 install_beegfs
-install_ganglia
+#install_ganglia
 
 # Create marker file so we know we're configured
 touch $SETUP_MARKER

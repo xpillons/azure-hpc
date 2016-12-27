@@ -2,12 +2,6 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "artifactsBaseUrl": {
-      "type": "string",
-      "metadata": {
-        "artifactsBaseUrl": ""
-      }
-    },
     "nodeSettings": {
       "type": "object",
       "metadata": {
@@ -55,15 +49,10 @@
     "networkApiVersion": "2016-03-30",
     "storageApiVersion": "2015-06-15",
     "extensionApiVersion": "2015-06-15",
-    "setupScript": "install_beegfs.sh",
-    "baseUrl": "[concat(parameters('artifactsBaseUrl'),'/')]",
-    "installationCLI": "[concat('bash ', variables('setupScript'), ' ', parameters('nodeSettings').MasterName, ' ', parameters('nodeSettings').nodeType, ' \"', parameters('nodeSettings').customDomain, '\"')]",
-    "vmScripts": {
-      "scriptsToDownload": [
-        "[concat(variables('baseUrl'), variables('setupScript'))]"
-      ],
-      "commandToExecute": "[variables('installationCLI')]"
-    },
+    "deploymentApiVersion": "2016-09-01",
+    "beeGFSScriptTemplateURI": "[uri(deployment().properties.templateLink.uri, 'beegfs-script.json')]",
+    "gangliaTemplateURI": "[uri(deployment().properties.templateLink.uri, '../Ganglia/ganglia.json')]",
+    "installParams": "[concat(parameters('nodeSettings').MasterName, ' ', parameters('nodeSettings').nodeType, ' \"', parameters('nodeSettings').customDomain, '\"')]",
     "sshKeyPath": "[concat('/home/',parameters('nodeOSSettings').adminUserName,'/.ssh/authorized_keys')]",
     "storageDiskArray": [
       {
@@ -262,32 +251,45 @@
             }
           ]
         }
-      },
-      "resources": [
-        {
-          "name": "InstallScript",
-          "type": "extensions",
-          "location": "[variables('location')]",
-          "apiVersion": "[variables('extensionApiVersion')]",
-          "dependsOn": [
-            "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
-          ],
-          "tags": {
-            "displayName": "InstallScript"
-          },
-          "properties": {
-            "publisher": "Microsoft.Azure.Extensions",
-            "type": "CustomScript",
-            "typeHandlerVersion": "2.0",
-            "autoUpgradeMinorVersion": true,
-            "settings": {
-              "fileUris": "[variables('vmScripts').scriptsToDownload]",
-              "commandToExecute": "[variables('vmScripts').commandToExecute]",
-              "timestamp": 12
-            }
-          }
+      }
+    },
+    {
+      "name": "beegfs",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "[variables('deploymentApiVersion')]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', variables('vmName'))]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('beeGFSScriptTemplateURI')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "vmName": { "value": "[variables('vmName')]" },
+          "params": { "value": "[variables('installParams')]" }
         }
-      ]
+      }
+    },
+    {
+      "name": "ganglia",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "[variables('deploymentApiVersion')]",
+      "dependsOn": [
+        "beegfs"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('gangliaTemplateURI')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "vmName": { "value": "[variables('vmName')]" },
+          "masterName": { "value": "[parameters('nodeSettings').MasterName]" }
+        }
+      }
     },
     {
       "type": "Microsoft.Storage/storageAccounts",

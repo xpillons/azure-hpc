@@ -2,14 +2,6 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.1",
   "parameters": {
-    "artifactsBaseUrl": {
-      "type": "string",
-      "defaultValue": "https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/BeeGFS",
-      "metadata": {
-        "description": "Base URL of the solution template gallery package",
-        "artifactsBaseUrl": ""
-      }
-    },
     "nodeType": {
       "type": "string",
       "defaultValue": "both",
@@ -134,7 +126,6 @@
     },
     "vmImage": "CentOS_7.2",
     "deploymentApiVersion": "2015-11-01",
-    "baseUrl": "[concat(parameters('artifactsBaseUrl'),'/')]",
     "beeGFSNodeSettings": {
       "VMsku": "[parameters('VMsku')]",
       "vnetRG": "[parameters('RGvnetName')]",
@@ -168,7 +159,7 @@
       "sshKeyData": "[parameters('sshKeyData')]",
       "imageReference": "[variables('computeNodeImages')[variables('vmImage')]]"
     },
-    "beeGFSNode-templateUrl": "[concat(variables('baseUrl'), 'beegfs-node-resources.json')]",
+    "beeGFSNode-templateUrl": "[uri(deployment().properties.templateLink.uri, 'beegfs-node-resources.json')]",
     "avApiVersion": "2015-06-15"
   },
   "resources": [
@@ -197,9 +188,6 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
-          "artifactsBaseUrl": {
-            "value": "[parameters('artifactsBaseUrl')]"
-          },
           "nodeSettings": {
             "value": "[variables('beeGFSNodeSettings')]"
           },
@@ -212,7 +200,6 @@
         }
       }
     }
-
   ]
 }
 
