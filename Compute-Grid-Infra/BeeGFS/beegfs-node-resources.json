@@ -254,7 +254,7 @@
       }
     },
     {
-      "name": "beegfs",
+      "name": "[concat('beegfs-', variables('vmName'))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "[variables('deploymentApiVersion')]",
       "dependsOn": [
@@ -273,11 +273,11 @@
       }
     },
     {
-      "name": "ganglia",
+      "name": "[concat('ganglia-', variables('vmName'))]",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "[variables('deploymentApiVersion')]",
       "dependsOn": [
-        "beegfs"
+        "[concat('beegfs-', variables('vmName'))]"
       ],
       "properties": {
         "mode": "Incremental",
