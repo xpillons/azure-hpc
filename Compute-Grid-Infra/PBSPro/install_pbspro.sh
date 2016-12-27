@@ -42,6 +42,8 @@ install_pbspro()
     # Required on 7.2 as the libical lib changed
     ln -s /usr/lib64/libical.so.1 /usr/lib64/libical.so.0
     
+	cd /mnt
+
     wget http://wpc.23a7.iotacdn.net/8023A7/origin2/rl/PBS-Open/CentOS_7.zip
     unzip CentOS_7.zip
     cd CentOS_7
