@@ -2,12 +2,6 @@
   "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "commonSettings": {
-      "type": "object",
-      "metadata": {
-        "Description": "common settings object"
-      }
-    },
     "nodeSettings": {
       "type": "object",
       "metadata": {
@@ -74,8 +68,7 @@
     "networkApiVersion": "2016-03-30",
     "storageApiVersion": "2015-06-15",
     "cnSetupScript": "cn-setup.ps1",
-    "scriptUrl": "https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/",
-    "sharedAccountId": "[resourceId(parameters('commonSettings').RGStorageName, 'Microsoft.Storage/storageAccounts', parameters('commonSettings').DataSAName)]",
+    "scriptUrl": "uri(deployment().properties.templateLink.uri, '/')",
     "vmScripts": {
       "scriptsToDownload": [
         "[concat(variables('scriptUrl'), 'cn-setup.ps1')]"
