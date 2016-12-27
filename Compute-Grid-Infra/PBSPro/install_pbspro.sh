@@ -37,12 +37,7 @@ install_pkgs()
 #
 install_pbspro()
 {
-    yum install -y gcc make rpm-build libtool hwloc-devel \
-      libX11-devel libXt-devel libedit-devel libical-devel \
-      ncurses-devel perl postgresql-devel python-devel tcl-devel \
-      tk-devel swig expat-devel openssl-devel libXext libXft \
-      autoconf automake expat libedit postgresql-server python \
-      sendmail tcl tk libical perl-Env perl-Switch
+    yum install -y gcc make rpm-build libtool hwloc-devel libX11-devel libXt-devel libedit-devel libical-devel ncurses-devel perl postgresql-devel python-devel tcl-devel tk-devel swig expat-devel openssl-devel libXext libXft autoconf automake expat libedit postgresql-server python sendmail tcl tk libical perl-Env perl-Switch
     
     # Required on 7.2 as the libical lib changed
     ln -s /usr/lib64/libical.so.1 /usr/lib64/libical.so.0
@@ -92,7 +87,15 @@ EOF
     cd ..
 }
 
+SETUP_MARKER=/var/local/install_pbspro.marker
+if [ -e "$SETUP_MARKER" ]; then
+    echo "We're already configured, exiting..."
+    exit 0
+fi
+
 
 install_pkgs
 install_pbspro
 
+# Create marker file so we know we're configured
+touch $SETUP_MARKER
