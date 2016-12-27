@@ -98,7 +98,7 @@ install_ganglia()
 {
 	#yum -y install wget
     #wget -O install_gmond.sh https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/Ganglia/install_gmond.sh
-	bash install_gmond.sh ${MASTER_NAME} "Cluster" 8649
+	bash install_ganglia.sh ${MASTER_NAME} "Cluster" 8649
 }
 
 install_pbspro()
