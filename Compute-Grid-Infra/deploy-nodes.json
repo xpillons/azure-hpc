@@ -122,7 +122,8 @@
       "vnetName": "grid-vnet",
       "subnetName": "computeSubnet",
       "MasterName": "[parameters('masterName')]",
-      "storageAccountType": "Standard_LRS"
+      "storageAccountType": "Standard_LRS",
+      "sharedStorage": "[parameters('sharedStorage')]"
     },
     "osTypes": {
       "CentOS_6.7": {

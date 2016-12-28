@@ -67,15 +67,29 @@
     "computeApiVersion": "2016-03-30",
     "networkApiVersion": "2016-03-30",
     "storageApiVersion": "2015-06-15",
+    "ScriptsOptions": {
+      "none": {
+        "params": ""
+      },
+      "beegfs": {
+        "params": " -S beegfs"
+      },
+      "pbspro": {
+        "params": " -s pbspro"
+      },
+      "master": {
+        "params": "[concat(' -m ', parameters('nodeSettings').MasterName)]"
+      }
+    },
     "cnSetupScript": "cn-setup.sh",
     "vmScripts": {
       "scriptsToDownload": [
-        "[uri(deployment().properties.templateLink.uri, 'cn-setup.sh')]",
+        "[uri(deployment().properties.templateLink.uri, variables('cnSetupScript'))]",
         "[uri(deployment().properties.templateLink.uri, 'BeeGFS/install_beegfs.sh')]",
         "[uri(deployment().properties.templateLink.uri, 'PBSPro/install_pbspro.sh')]",
         "[uri(deployment().properties.templateLink.uri, 'Ganglia/install_ganglia.sh')]"
       ],
-      "commandToExecute": "[concat('bash ', variables('cnSetupScript'), ' -m ', parameters('nodeSettings').MasterName)]"
+      "commandToExecute": "[concat('bash ', variables('cnSetupScript'), variables('ScriptsOptions')['master'].params, variables('ScriptsOptions')['pbspro'].params), variables('ScriptsOptions')[parameters('nodeSettings').sharedStorage].params]"
     },
     "sshKeyPath": "[concat('/home/',parameters('nodeOSSettings').adminUserName,'/.ssh/authorized_keys')]"
   },

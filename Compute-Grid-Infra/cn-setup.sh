@@ -17,7 +17,9 @@ log()
 	echo "$1"
 }
 
-while getopts :a:k:m: optname; do
+usage() { echo "Usage: $0 [-a <azure storage account>] [-k <azure storage key>] [-m <masterName>] [-s <pbspro>] [-S <beegfs>]" 1>&2; exit 1; }
+
+while getopts :a:k:m:S:s: optname; do
   log "Option $optname set with value ${OPTARG}"
   
   case $optname in
@@ -29,6 +31,15 @@ while getopts :a:k:m: optname; do
 		;;
     m)  # master name
 		export MASTER_NAME=${OPTARG}
+		;;
+    S)  # Shared Storage (beegfs)
+		export SHARED_STORAGE=${OPTARG}
+		;;
+    s)  # Scheduler (pbspro)
+		export SCHEDULER=${OPTARG}
+		;;
+	*)
+		usage
 		;;
   esac
 done
@@ -89,15 +100,11 @@ mount_nfs()
 
 install_beegfs_client()
 {
-	#yum -y install wget
-    #wget -O install_beegfs_client.sh https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/BeeGFS/install_beegfs_client.sh
 	bash install_beegfs.sh ${MASTER_NAME} "client"
 }
 
 install_ganglia()
 {
-	#yum -y install wget
-    #wget -O install_gmond.sh https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/Ganglia/install_gmond.sh
 	bash install_ganglia.sh ${MASTER_NAME} "Cluster" 8649
 }
 
@@ -149,8 +156,14 @@ setenforce permissive
 #install_applications
 setup_user
 install_ganglia
-install_pbspro
-install_beegfs_client
+
+if [ "$SCHEDULER" -eq "pbspro" ]; then
+	install_pbspro
+fi
+
+if [ "$SHARED_STORAGE" -eq "beegfs" ]; then
+	install_beegfs_client
+fi
 
 # Create marker file so we know we're configured
 touch $SETUP_MARKER
