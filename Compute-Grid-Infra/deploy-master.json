@@ -33,6 +33,17 @@
         "description": "The VM image of the compute nodes"
       }
     },
+    "sharedStorage": {
+      "type": "string",
+      "defaultValue": "none",
+      "allowedValues": [
+        "none",
+        "beegfs"
+      ],
+      "metadata": {
+        "description": "specify the shared storage to be used"
+      }
+    },
     "vmPrefix": {
       "type": "string",
       "metadata": {
@@ -88,7 +99,8 @@
       "NicName": "[concat(variables('masterBoxName'), 'nic')]",
       "VMsku": "[parameters('VMsku')]",
       "publicIPAddressName": "[concat(variables('masterBoxName'), 'pip')]",
-      "publicIPDomainName": "[variables('namingInfix')]"
+      "publicIPDomainName": "[variables('namingInfix')]",
+      "sharedStorage": "[parameters('sharedStorage')]"
     },
     "masterOSSettings": {
       "osType": "[variables('osTypes')[parameters('masterImage')]]",
@@ -137,10 +149,6 @@
         "version": "latest"
       }
     },
-    "computeApiVersion": "2016-03-30",
-    "networkApiVersion": "2016-03-30",
-    "storageApiVersion": "2015-06-15",
-    "extensionApiVersion": "2015-06-15",
     "deploymentApiVersion": "2015-01-01",
 
     "sharedTemplateUrl": "[uri(deployment().properties.templateLink.uri, 'shared-resources.json')]",

@@ -30,7 +30,16 @@
   "variables": {
     "location": "[resourceGroup().location]",
     "sshKeyPath": "[concat('/home/',parameters('masterOSSettings').adminUserName,'/.ssh/authorized_keys')]",
-    "beeGFSScriptTemplateURI": "[uri(deployment().properties.templateLink.uri, 'BeeGFS/beegfs-script.json')]",
+    "StorageTemplateURIChoice": {
+      "none": {
+        "uri": "[uri(deployment().properties.templateLink.uri, 'storage-none.json')]",
+        "params": ""
+      },
+      "beegfs": {
+        "uri": "[uri(deployment().properties.templateLink.uri, 'BeeGFS/beegfs-script.json')]",
+        "params": "[concat(parameters('masterSettings').Name, ' client')]"
+      }
+    },
     "gangliaTemplateURI": "[uri(deployment().properties.templateLink.uri, 'Ganglia/ganglia.json')]",
     "schedulerTemplateURI": "[uri(deployment().properties.templateLink.uri, 'PBSPro/pbspro.json')]",
     "masterScriptTemplateURI": "[uri(deployment().properties.templateLink.uri, 'master-linux-script.json')]",
@@ -147,7 +156,7 @@
       }
     },
     {
-      "name": "beegfs",
+      "name": "storage",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "[variables('deploymentApiVersion')]",
       "dependsOn": [
@@ -156,12 +165,12 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[variables('beeGFSScriptTemplateURI')]",
+          "uri": "[variables('StorageTemplateURIChoice')[parameters('masterOSSettings').sharedStorage].uri]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
           "vmName": { "value": "[parameters('masterSettings').Name]" },
-          "params": { "value": "[concat(parameters('masterSettings').Name, ' client')]" }
+          "params": { "value": "[variables('StorageTemplateURIChoice')[parameters('masterOSSettings').sharedStorage].params]" }
         }
       }
     }
