@@ -157,11 +157,11 @@ setenforce permissive
 setup_user
 install_ganglia
 
-if [ "$SCHEDULER" -eq "pbspro" ]; then
+if [ "$SCHEDULER" == "pbspro" ]; then
 	install_pbspro
 fi
 
-if [ "$SHARED_STORAGE" -eq "beegfs" ]; then
+if [ "$SHARED_STORAGE" == "beegfs" ]; then
 	install_beegfs_client
 fi
 
