@@ -47,12 +47,10 @@ install_pbspro()
     wget http://wpc.23a7.iotacdn.net/8023A7/origin2/rl/PBS-Open/CentOS_7.zip
     unzip CentOS_7.zip
     cd CentOS_7
-    rpm -ivh --nodeps pbspro-server-14.1.0-13.1.x86_64.rpm
-    
-    echo 'export PATH=/opt/pbs/bin:$PATH' >> /etc/profile.d/pbs.sh
-    echo 'export PATH=/opt/pbs/sbin:$PATH' >> /etc/profile.d/pbs.sh
-    
+       
     if is_master; then
+	    rpm -ivh --nodeps pbspro-server-14.1.0-13.1.x86_64.rpm
+
         cat > /etc/pbs.conf << EOF
 PBS_SERVER=$MASTER_HOSTNAME
 PBS_START_SERVER=1
@@ -71,6 +69,8 @@ EOF
         /opt/pbs/bin/qmgr -c "s s job_history_enable = true"
         /opt/pbs/bin/qmgr -c "s s job_history_duration = 336:0:0"
     else
+	    rpm -ivh --nodeps pbspro-execution-14.1.0-13.1.x86_64.rpm
+
         cat > /etc/pbs.conf << EOF
 PBS_SERVER=$MASTER_HOSTNAME
 PBS_START_SERVER=0
@@ -85,6 +85,9 @@ EOF
 
         /etc/init.d/pbs start
     fi
+
+    echo 'export PATH=/opt/pbs/bin:$PATH' >> /etc/profile.d/pbs.sh
+    echo 'export PATH=/opt/pbs/sbin:$PATH' >> /etc/profile.d/pbs.sh
 
     cd ..
 }
