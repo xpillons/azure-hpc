@@ -165,12 +165,12 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[variables('StorageTemplateURIChoice')[parameters('masterOSSettings').sharedStorage].uri]",
+          "uri": "[variables('StorageTemplateURIChoice')[parameters('masterSettings').sharedStorage].uri]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
           "vmName": { "value": "[parameters('masterSettings').Name]" },
-          "params": { "value": "[variables('StorageTemplateURIChoice')[parameters('masterOSSettings').sharedStorage].params]" }
+          "params": { "value": "[variables('StorageTemplateURIChoice')[parameters('masterSettings').sharedStorage].params]" }
         }
       }
     }
