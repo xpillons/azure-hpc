@@ -40,8 +40,15 @@
         "params": "[concat(parameters('masterSettings').Name, ' client')]"
       }
     },
+    "SchedulerTemplateURIChoice": {
+      "none": {
+        "uri": "[uri(deployment().properties.templateLink.uri, 'scheduler-none.json')]",
+      },
+      "pbspro": {
+        "uri": "[uri(deployment().properties.templateLink.uri, 'PBSPro/pbspro.json')]",
+      }
+    },
     "gangliaTemplateURI": "[uri(deployment().properties.templateLink.uri, 'Ganglia/ganglia.json')]",
-    "schedulerTemplateURI": "[uri(deployment().properties.templateLink.uri, 'PBSPro/pbspro.json')]",
     "masterScriptTemplateURI": "[uri(deployment().properties.templateLink.uri, 'master-linux-script.json')]",
     "computeApiVersion": "2016-03-30",
     "deploymentApiVersion": "2016-09-01"
@@ -146,7 +153,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[variables('schedulerTemplateURI')]",
+          "uri": "[variables('SchedulerTemplateURIChoice')[parameters('masterSettings').scheduler].uri]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
