@@ -89,7 +89,7 @@ EOF
         /etc/init.d/pbs start
 
 		# setup the self register script
-		cp pbs_selfregister.sh /etc/init.d
+		cp pbs_selfregister.sh /etc/init.d/pbs_selfregister
 		chmod +x /etc/init.d/pbs_selfregister
 		chown root /etc/init.d/pbs_selfregister
 		chkconfig --add pbs_selfregister
