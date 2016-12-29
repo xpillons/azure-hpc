@@ -42,6 +42,17 @@
         "description": "specify the shared storage to be used"
       }
     },
+    "scheduler": {
+      "type": "string",
+      "defaultValue": "none",
+      "allowedValues": [
+        "none",
+        "pbspro"
+      ],
+      "metadata": {
+        "description": "specify the job scheduler to be used"
+      }
+    },
     "computeNodeImage": {
       "type": "string",
       "defaultValue": "CentOS_7.2",
@@ -115,7 +126,6 @@
     "longNamingInfix": "[toLower(parameters('vmSSPrefix'))]",
     "newStorageAccountSuffix": "[concat(variables('longNamingInfix'), 'sa')]",
     "deploymentApiVersion": "2015-11-01",
-    "baseTemplateUri": "https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/",
     "nodeSettings": {
       "VMsku": "[parameters('VMsku')]",
       "vnetRG": "[parameters('RGvnetName')]",
@@ -123,7 +133,8 @@
       "subnetName": "computeSubnet",
       "MasterName": "[parameters('masterName')]",
       "storageAccountType": "Standard_LRS",
-      "sharedStorage": "[parameters('sharedStorage')]"
+      "sharedStorage": "[parameters('sharedStorage')]",
+      "scheduler": "[parameters('scheduler')]"
     },
     "osTypes": {
       "CentOS_6.7": {

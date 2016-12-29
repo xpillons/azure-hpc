@@ -52,7 +52,7 @@
         "pbspro"
       ],
       "metadata": {
-        "description": "specify the shared storage to be used"
+        "description": "specify the job scheduler to be used"
       }
     },
     "vmPrefix": {
