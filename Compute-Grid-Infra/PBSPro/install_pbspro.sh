@@ -83,6 +83,7 @@ PBS_CORE_LIMIT=unlimited
 PBS_SCP=/bin/scp
 EOF
 
+		echo '$clienthost $MASTER_HOSTNAME' > /var/spool/pbs/mom_priv/config
         /etc/init.d/pbs start
     fi
 
