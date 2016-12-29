@@ -43,14 +43,11 @@ install_pbspro()
     # Required on 7.2 as the libical lib changed
     ln -s /usr/lib64/libical.so.1 /usr/lib64/libical.so.0
     
-	cd /mnt
-
-    wget http://wpc.23a7.iotacdn.net/8023A7/origin2/rl/PBS-Open/CentOS_7.zip
-    unzip CentOS_7.zip
-    cd CentOS_7
+    wget -O /mnt/CentOS_7.zip  http://wpc.23a7.iotacdn.net/8023A7/origin2/rl/PBS-Open/CentOS_7.zip
+    unzip /mnt/CentOS_7.zip -d /mnt
        
     if is_master; then
-	    rpm -ivh --nodeps pbspro-server-14.1.0-13.1.x86_64.rpm
+	    rpm -ivh --nodeps /mnt/CentOS_7/pbspro-server-14.1.0-13.1.x86_64.rpm
 
         cat > /etc/pbs.conf << EOF
 PBS_SERVER=$MASTER_HOSTNAME
@@ -74,7 +71,7 @@ EOF
         /opt/pbs/bin/qmgr -c "s s managers = $PBS_MANAGER@*"
 
     else
-	    rpm -ivh --nodeps pbspro-execution-14.1.0-13.1.x86_64.rpm
+	    rpm -ivh --nodeps /mnt/CentOS_7/pbspro-execution-14.1.0-13.1.x86_64.rpm
 
         cat > /etc/pbs.conf << EOF
 PBS_SERVER=$MASTER_HOSTNAME
@@ -91,9 +88,15 @@ EOF
 		echo '$clienthost '$MASTER_HOSTNAME > /var/spool/pbs/mom_priv/config
         /etc/init.d/pbs start
 
-		#self register node
-		nodename=`hostname`
-		sudo -u $PBS_MANAGER /opt/pbs/bin/qmgr -c "create node $nodename"
+		# setup the self register script
+		cp pbs_selfregister.sh /etc/init.d
+		chmod +x /etc/init.d/pbs_selfregister
+		chown root /etc/init.d/pbs_selfregister
+		chkconfig --add pbs_selfregister
+
+		# register node
+		/etc/init.d/pbs_selfregister start
+
     fi
 
     echo 'export PATH=/opt/pbs/bin:$PATH' >> /etc/profile.d/pbs.sh
