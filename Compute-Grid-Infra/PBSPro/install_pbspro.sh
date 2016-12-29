@@ -14,6 +14,7 @@ fi
 
 # Set user args
 MASTER_HOSTNAME=$1
+PBS_MANAGER=hpcuser
 
 # Returns 0 if this node is the master node.
 #
@@ -68,6 +69,10 @@ EOF
         # Enable job history
         /opt/pbs/bin/qmgr -c "s s job_history_enable = true"
         /opt/pbs/bin/qmgr -c "s s job_history_duration = 336:0:0"
+
+		# add hpcuser as manager
+        /opt/pbs/bin/qmgr -c "s s managers = $PBS_MANAGER@*"
+
     else
 	    rpm -ivh --nodeps pbspro-execution-14.1.0-13.1.x86_64.rpm
 
@@ -85,6 +90,10 @@ EOF
 
 		echo '$clienthost '$MASTER_HOSTNAME > /var/spool/pbs/mom_priv/config
         /etc/init.d/pbs start
+
+		#self register node
+		nodename=`hostname`
+		sudo -u $PBS_MANAGER /opt/pbs/bin/qmgr -c "create node $nodename"
     fi
 
     echo 'export PATH=/opt/pbs/bin:$PATH' >> /etc/profile.d/pbs.sh
