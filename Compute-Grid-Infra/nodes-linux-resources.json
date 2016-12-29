@@ -87,6 +87,7 @@
         "[uri(deployment().properties.templateLink.uri, variables('cnSetupScript'))]",
         "[uri(deployment().properties.templateLink.uri, 'BeeGFS/install_beegfs.sh')]",
         "[uri(deployment().properties.templateLink.uri, 'PBSPro/install_pbspro.sh')]",
+        "[uri(deployment().properties.templateLink.uri, 'PBSPro/pbs_selfregister.sh')]",
         "[uri(deployment().properties.templateLink.uri, 'Ganglia/install_ganglia.sh')]"
       ],
       "commandToExecute": "[concat('bash ', variables('cnSetupScript'), variables('ScriptsOptions')['master'].params, variables('ScriptsOptions')['pbspro'].params, variables('ScriptsOptions')[parameters('nodeSettings').sharedStorage].params)]"
