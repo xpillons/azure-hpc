@@ -5,4 +5,4 @@ These templates will build a compute grid made by a single master VMs running th
 # VM infrastructure
 The following diagram shows the overall Compute, Storage and Network infrastructure which is going to be provisioning within Azure to support running HPC applications.
 
-![Grid Infrastructure](/doc/Infra.PNG)
+![Grid Infrastructure](doc/Infra.PNG)
