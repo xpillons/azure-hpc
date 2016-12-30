@@ -1,4 +1,8 @@
-# Compute grid infrastructure
+# Compute grid infrastructure in Azure
 
-This template will build a compute grid made by a single jumpbox VMs and multiple VM Scaleset. The jumpbox have its own subnet and all scalesets are inside a global subnet. Accessing the jumpbox can be done thru SSH and its public address.
-This is still work in progress, the goal being to add BeeGFS storage, Ganglia Monitoring, PBS Pro OSS as a job scheduler.
+These templates will build a compute grid made by a single master VMs running the management services, multiple VM Scaleset for deploying compute nodes, and optionally a set of nodes to run [BeeGFS](http://www.beegfs.com/) as a parallel shared file system. Ganglia is always setup by default on all VMs, and [PBS Pro](http://www.pbspro.org/) can optionally be setup for job scheduling.
+
+# VM infrastructure
+The following diagram shows the overall Compute, Storage and Network infrastructure which is going to be provisioning within Azure to support running HPC applications.
+
+![Grid Infrastructure](/doc/Infra.PNG)
