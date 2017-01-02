@@ -20,7 +20,7 @@
     "networkApiVersion": "2016-03-30",
     "storageApiVersion": "2015-06-15"
   },
-  "resources": [    
+  "resources": [
     {
       "type": "Microsoft.Storage/storageAccounts",
       "name": "[parameters('masterSettings').SAName]",
@@ -79,5 +79,11 @@
         }
       }
     }
-  ]
+  ],
+  "outputs": {
+    "GangliaURI": {
+        "value": "[uri(reference(parameters('masterSettings').publicIPAddressName.properties.dnsSettings.fqdn),'ganglia')]",
+        "type": "string"
+      }
+    }
 }
