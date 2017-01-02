@@ -260,7 +260,7 @@
   ],
   "outputs": {
     "GangliaURI": {
-      "value": "[reference('master-shared-resources').outputs.GangliaURI.value]",
+      "value": "[uri(concat('http://',reference('master-shared-resources').outputs.masterFQDN.value),'ganglia')]",
       "type": "string"
     },
     "masterFQDN": {
