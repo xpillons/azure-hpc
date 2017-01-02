@@ -59,6 +59,8 @@ You have to provide these parameters to the template :
     <img src="http://azuredeploy.net/deploybutton.png"/>
 </a>
 
+Once the deployment succeed, use the output **masterFQDN** to retrieve the master name. The output **GangliaURI** contains the URI of the Ganglia monitoring page.
+
 ## Optionally deploy the BeeGFS nodes
 
 ## Provision the compute nodes
