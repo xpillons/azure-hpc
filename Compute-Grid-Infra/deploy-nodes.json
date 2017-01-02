@@ -103,6 +103,7 @@
     },
     "adminPassword": {
       "type": "securestring",
+      "defaultValue": "",
       "metadata": {
         "description": "Admin password on all VMs."
       }
