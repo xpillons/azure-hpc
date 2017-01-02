@@ -82,7 +82,7 @@
   ],
   "outputs": {
     "GangliaURI": {
-        "value": "[uri(reference(parameters('masterSettings').publicIPAddressName.properties.dnsSettings.fqdn),'ganglia')]",
+        "value": "[uri(reference(parameters('masterSettings').publicIPAddressName).properties.dnsSettings.fqdn,'ganglia')]",
         "type": "string"
       }
     }
