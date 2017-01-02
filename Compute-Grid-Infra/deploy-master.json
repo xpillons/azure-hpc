@@ -260,11 +260,11 @@
   ],
   "outputs": {
     "GangliaURI": {
-      "value": "[reference('master-shared-resources').outputs.GangliaURI.value]",
+      "value": "[reference('master-shared-resources').outputs.GangliaURI]",
       "type": "string"
     },
     "masterFQDN": {
-      "value": "[reference('master-shared-resources').outputs.masterFQDN.value]",
+      "value": "[reference('master-shared-resources').outputs.masterFQDN]",
       "type": "string"
     }
   }
