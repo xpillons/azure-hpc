@@ -79,7 +79,8 @@
     },
     "nbStorageDisks": {
       "type": "int",
-      "defaultValue": 1,
+      "defaultValue": 2,
+      "minValue": 2,
       "maxValue": 8,
       "metadata": {
         "description": "Number of storage disks"
@@ -99,7 +100,8 @@
     },
     "nbMetaDisks": {
       "type": "int",
-      "defaultValue": 1,
+      "defaultValue": 2,
+      "minValue": 2,
       "maxValue": 6,
       "metadata": {
         "description": "Number of metadate disks"
@@ -107,6 +109,7 @@
     },
     "customDomain": {
       "type": "string",
+      "defaultValue": "",
       "metadata": {
         "description": "custom domain name to use for name resolution"
       }
