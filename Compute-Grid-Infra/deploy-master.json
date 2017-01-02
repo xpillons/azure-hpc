@@ -259,9 +259,13 @@
     }
   ],
   "outputs": {
-    "GangliaURI": {      
-        "value": "[reference('master-shared-resources').outputs.GangliaURI.value]",
-        "type": "string"
-      }
+    "GangliaURI": {
+      "value": "[reference('master-shared-resources').outputs.GangliaURI.value]",
+      "type": "string"
+    },
+    "masterFQDN": {
+      "value": "[reference('master-shared-resources').outputs.masterFQDN.value]",
+      "type": "string"
     }
+  }
 }

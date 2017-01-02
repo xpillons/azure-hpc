@@ -82,8 +82,12 @@
   ],
   "outputs": {
     "GangliaURI": {
-        "value": "[uri(reference(parameters('masterSettings').publicIPAddressName).properties.dnsSettings.fqdn,'ganglia')]",
-        "type": "string"
-      }
+      "value": "[uri(reference(parameters('masterSettings').publicIPAddressName).properties.dnsSettings.fqdn,'ganglia')]",
+      "type": "string"
+    },
+    "masterFQDN": {
+      "value": "[reference(parameters('masterSettings').publicIPAddressName).properties.dnsSettings.fqdn]",
+      "type": "string"
     }
+  }
 }
