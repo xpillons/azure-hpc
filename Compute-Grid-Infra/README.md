@@ -63,4 +63,35 @@ Once the deployment succeed, use the output **masterFQDN** to retrieve the maste
 
 ## Optionally deploy the BeeGFS nodes
 
+If your compute cluster require a scalable shared file storage, you can deploy BeeGFS nodes to create a unique namespace. Prior doing your deployment you will have to decide how much storage nodes you will require and for each how much data disks you will provide for the storage and metadata services.
+Data disks are based on Premium Storage and can have three different sizes :
+* P10 : 128 GB
+* P20 : 512 GB
+* P30 : 1023 GB
+
+The storage nodes will be included in the VNET created in the previous step, and all inside the *storage-subnet* .
+
+The template __BeeGFS/deploy-beegfs.json__ will provision the storage nodes with CentOS 7.2 and BeeGFS version 2015.3.
+
+You have to provide these parameters to the template :
+* _nodeType_ : Default value is **both** and should be kept as is. Other values *meta* and *storage* are allowed for advanced scenarios in which meta data services and storage services are deployed on dedicated nodes.
+* _nodeCount_ : Total number of storage nodes to deploy. Maximum is 100.
+* _VMsku_ : The VM instance type to be used in the Standard_DSx_v2 series. Default is Standard_DS3_v2.
+* _RGvnetName_ : The name of the Resource Group used to deploy the Master VM and the VNET.
+* _adminUsername_ : This is the name of the administrator account to create on the VM. It is recommended to use the same than for the Master VM.
+* _sshKeyData_ : The public SSH key to associate to the administrator user
+* _masterName_ : The short name of the Master VM, on which the BeeGFS management service is installed
+* _storageDiskSize_ : Size of the Data Disk to be used for the storage service (P10, P20, P30). Default is P10.
+* _nbStorageDisks_ : Number of data disks to be attached to a single VM. Min is 2, Max is 8, Default is 2.
+* _metaDiskSize_ :  Size of the Data Disk to be used for the metadata service (P10, P20, P30). Default is P10.
+* _nbMetaDisks_ : Number of data disks to be attached to a single VM. Min is 2, Max is 8, Default is 2.
+* _customDomain_ : If the VNET is configure to use a custom domain, specify the name of this custom domain to be used
+
+Storage nodes will be named _beegfs00 ... beegfs99_ .
+
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fxpillons%2Fazure-hpc%2Fmaster%2FCompute-Grid-Infra%2FBeeGFS%2Fdeploy-beegfs.json" target="_blank">
+    <img src="http://azuredeploy.net/deploybutton.png"/>
+</a>
+
+
 ## Provision the compute nodes
