@@ -75,6 +75,7 @@
       "allowedValues": [
         "CentOS_6.7",
         "CentOS_7.2",
+        "CentOS-HPC_7.1",
         "RHEL_7.2",
         "W2012R2"
       ],
@@ -160,6 +161,9 @@
       "CentOS_7.2": {
         "os": "linux"
       },
+      "CentOS-HPC_7.1": {
+        "os": "linux"
+      },
       "RHEL_7.2": {
         "os": "linux"
       },
@@ -172,6 +176,12 @@
         "publisher": "OpenLogic",
         "offer": "CentOS",
         "sku": "6.7",
+        "version": "latest"
+      },
+      "CentOS-HPC_7.1": {
+        "publisher": "OpenLogic",
+        "offer": "CentOS-HPC",
+        "sku": "7.1",
         "version": "latest"
       },
       "CentOS_7.2": {
