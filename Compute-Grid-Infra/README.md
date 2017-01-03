@@ -51,15 +51,18 @@ You have to provide these parameters to the template :
 * _VMSku_ : This is to specify the instance size of the master VM. For example Standard_DS3_v2
 * _adminUsername_ : This is the name of the administrator account to create on the VM
 * _adminPassword_ : Password to associate to the administrator account. It is highly encourage to use SSH authentication and passwordless instead.
-* _sshKeyData_ : The public SSH key to associate to the administrator user
-
-
+* _sshKeyData_ : The public SSH key to associate with the administrator user
 
 <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fxpillons%2Fazure-hpc%2Fmaster%2FCompute-Grid-Infra%2Fdeploy-master.json" target="_blank">
     <img src="http://azuredeploy.net/deploybutton.png"/>
 </a>
 
-Once the deployment succeed, use the output **masterFQDN** to retrieve the master name. The output **GangliaURI** contains the URI of the Ganglia monitoring page.
+### Check your deployment
+Once the deployment succeed, use the output **masterFQDN** to retrieve the master name and SSH on it. The output **GangliaURI** contains the URI of the Ganglia monitoring page, which should display after few minutes graphs of the current load.
+
+To check if PBSPro is installed, run the command **pbsnodes -a** this should return no available nodes, but the command should run successfully.
+
+BeeGFS will be checked later once the storage nodes will be deployed.
 
 ## Optionally deploy the BeeGFS nodes
 
@@ -76,22 +79,58 @@ The template __BeeGFS/deploy-beegfs.json__ will provision the storage nodes with
 You have to provide these parameters to the template :
 * _nodeType_ : Default value is **both** and should be kept as is. Other values *meta* and *storage* are allowed for advanced scenarios in which meta data services and storage services are deployed on dedicated nodes.
 * _nodeCount_ : Total number of storage nodes to deploy. Maximum is 100.
-* _VMsku_ : The VM instance type to be used in the Standard_DSx_v2 series. Default is Standard_DS3_v2.
+* _VMsku_ : The VM instance type to be used in the Standard_DSx_v2 series. Default is **Standard_DS3_v2**.
 * _RGvnetName_ : The name of the Resource Group used to deploy the Master VM and the VNET.
 * _adminUsername_ : This is the name of the administrator account to create on the VM. It is recommended to use the same than for the Master VM.
-* _sshKeyData_ : The public SSH key to associate to the administrator user
+* _sshKeyData_ : The public SSH key to associate with the administrator user
 * _masterName_ : The short name of the Master VM, on which the BeeGFS management service is installed
-* _storageDiskSize_ : Size of the Data Disk to be used for the storage service (P10, P20, P30). Default is P10.
-* _nbStorageDisks_ : Number of data disks to be attached to a single VM. Min is 2, Max is 8, Default is 2.
-* _metaDiskSize_ :  Size of the Data Disk to be used for the metadata service (P10, P20, P30). Default is P10.
-* _nbMetaDisks_ : Number of data disks to be attached to a single VM. Min is 2, Max is 8, Default is 2.
+* _storageDiskSize_ : Size of the Data Disk to be used for the storage service (P10, P20, P30). Default is **P10**.
+* _nbStorageDisks_ : Number of data disks to be attached to a single VM. Min is 2, Max is 8, Default is **2**.
+* _metaDiskSize_ :  Size of the Data Disk to be used for the metadata service (P10, P20, P30). Default is **P10**.
+* _nbMetaDisks_ : Number of data disks to be attached to a single VM. Min is 2, Max is 8, Default is **2**.
 * _customDomain_ : If the VNET is configure to use a custom domain, specify the name of this custom domain to be used
-
-Storage nodes will be named _beegfs00 ... beegfs99_ .
 
 <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fxpillons%2Fazure-hpc%2Fmaster%2FCompute-Grid-Infra%2FBeeGFS%2Fdeploy-beegfs.json" target="_blank">
     <img src="http://azuredeploy.net/deploybutton.png"/>
 </a>
 
+### Check your deployment
+Storage nodes will be named _beegfs00 ... beegfs99_ .
+After few minutes, they should appear in the Ganglia monitoring web page.
+
+To check that the nodes are well registered into the BeeGFS management service, SSH on the master VM and then run these commands :
+* to list the storage nodes : *beegfs-ctl --listnodes --nodetype=storage*
+* to list the metadata nodes : *beegfs-ctl --listnodes --nodetype=metadata*
+* to display the BeeGFS file system : *beegfs-df*
+* to display the BeeGFS network : *beegfs-net*
+
+The mount point to use is **/share/scratch** , and it should already be mounted on the master VM.
 
 ## Provision the compute nodes
+Compute nodes are provisioned using VM Scalesets, each set can have up to 100 VMs. You will have to provide the number of VM per scalesets and how many sets you want to create. All scalesets will contains the same VM instances.
+
+You have to provide these parameters to the template :
+* _VMsku_ : Instance type to provision. Default is **Standard_D3_v2**
+* _sharedStorage_ : default is **none**. Allowed values are (beegfs, none)
+* _scheduler_ : default is **none**. Allowed values are (pbspro, none)
+* _computeNodeImage_ : OS to use for compute nodes. Default and recommended value is **CentOS_7.2**
+* _vmSSPrefix_ : 8 characters prefix to use to name the compute nodes. The naming pattern will be **prefixAABBBBBB** where _AA_ is two digit number of the scaleset and _BBBBBB_ is the 8 hexadecimal value inside the Scaleset
+* _instanceCountPerVMSS_ : number of VMs instance inside a single scaleset. Default is 2, maximum is 100
+* _numberOfVMSS_ : number of VM scaleset to create. Default is 1, maximum is 100
+* _RGvnetName_ : The name of the Resource Group used to deploy the Master VM and the VNET.
+* _adminUsername_ : This is the name of the administrator account to create on the VM. It is recommended to use the same than for the Master VM.
+* _adminPassword_ : Password to associate to the administrator account. It is highly encourage to use SSH authentication and passwordless instead.
+* _sshKeyData_ : The public SSH key to associate with the administrator user
+* _masterName_ : The short name of the Master VM
+
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fxpillons%2Fazure-hpc%2Fmaster%2FCompute-Grid-Infra%2Fdeploy-nodes.json" target="_blank">
+    <img src="http://azuredeploy.net/deploybutton.png"/>
+</a>
+
+### Check your deployment
+After few minutes, once the provision succeed, you should see the new hosts added on the Ganglia monitoring page.
+
+If PBS Pro is used, SSH on the master and run the **pbsnodes -a** command to list all the registered nodes.
+
+**Your cluster is now ready to host applications and run jobs**
+____
