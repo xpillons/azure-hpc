@@ -25,25 +25,6 @@
       "defaultValue": 2,
       "maxValue": 20
     },
-    "xferVMsku": {
-      "type": "string",
-      "defaultValue": "Standard_DS3_v2",
-      "allowedValues": [
-        "Standard_DS1_v2",
-        "Standard_DS2_v2",
-        "Standard_DS3_v2",
-        "Standard_DS4_v2",
-        "Standard_DS5_v2",
-        "Standard_DS11_v2",
-        "Standard_DS12_v2",
-        "Standard_DS13_v2",
-        "Standard_DS14_v2",
-        "Standard_DS15_v2"
-      ],
-      "metadata": {
-        "description": "sku to use only premium disks VMs are allowed"
-      }
-    },
     "computeVMsku": {
       "type": "string",
       "defaultValue": "Standard_D3_v2",
@@ -124,7 +105,6 @@
   },
   "variables": {
     "uniquePrefix": "[toLower(parameters('uniquePrefix'))]",
-    "xferVMImage": "Ubuntu_16_10",
     "nodes-templateUrl": "[uri(deployment().properties.templateLink.uri, 'nodes-resources.json')]",
     "computeNodeSettings": {
       "VMsku": "[parameters('computeVMsku')]",
@@ -139,9 +119,7 @@
       "sshKeyData": "[parameters('sshKeyData')]",
       "imageReference": ""
     },
-    "deploymentApiVersion": "2015-11-01",
-    "storageApiVersion": "2015-06-15",
-    "storageAccountType": "Premium_LRS"
+    "deploymentApiVersion": "2015-11-01"
   },
   "resources": [
     {
