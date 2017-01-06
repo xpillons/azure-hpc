@@ -4,6 +4,7 @@
   "parameters": {
     "uniquePrefix": {
       "type": "string",
+      "maxLength": 8,
       "metadata": {
         "description": "This unique prefix will be used on all the objects created as part of this template."
       }
