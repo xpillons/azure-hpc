@@ -106,20 +106,16 @@
         "description": "name of the blob containing the imgage in the format of dir/subdir/image.vhd "
       }
     },
-    "masterName": {
-      "type": "string",
-      "metadata": {
-        "description": "Name of master VM name"
-      }
-    },
     "script": {
       "type": "string",
+      "defaultValue": "",
       "metadata": {
         "description": "URL of the script to download as a post script install"
       }
     },
     "cmdLine": {
       "type": "string",
+      "defaultValue": "",
       "metadata": {
         "description": "Cmdline to run"
       }
@@ -134,7 +130,6 @@
       "vnetRG": "[parameters('RGvnetName')]",
       "vnetName": "[parameters('vnetName')]",
       "subnetName": "[parameters('subnetName')]",
-      "MasterName": "[parameters('masterName')]",
       "Script": "[parameters('script')]",
       "CommandLine": "[parameters('cmdLine')]"
     },
