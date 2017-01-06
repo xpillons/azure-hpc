@@ -68,6 +68,20 @@
         "description": "Name of the RG of the virtual network to use."
       }
     },
+    "vnetName": {
+      "type": "string",
+      "defaultValue": "grid-vnet",
+      "metadata": {
+        "description": "Name of the virtual network to use for the VMSS"
+      }
+    },
+    "subnetName": {
+      "type": "string",
+      "defaultValue": "computeSubnet",
+      "metadata": {
+        "description": "Name of the subnet in the virtual network to use for the VMSS"
+      }
+    },
     "adminUsername": {
       "type": "string",
       "metadata": {
@@ -118,8 +132,8 @@
     "computeNodeSettings": {
       "VMsku": "[parameters('computeVMsku')]",
       "vnetRG": "[parameters('RGvnetName')]",
-      "vnetName": "grid-vnet",
-      "subnetName": "computeSubnet",
+      "vnetName": "[parameters('vnetName')]",
+      "subnetName": "[parameters('subnetName')]",
       "MasterName": "[parameters('masterName')]",
       "Script": "[parameters('script')]",
       "CommandLine": "[parameters('cmdLine')]"

@@ -41,6 +41,20 @@
         "description": "Name of the RG of the virtual network to use."
       }
     },
+    "vnetName": {
+      "type": "string",
+      "defaultValue": "grid-vnet",
+      "metadata": {
+        "description": "Name of the virtual network to use for the transfer VM"
+      }
+    },
+    "subnetName": {
+      "type": "string",
+      "defaultValue": "computeSubnet",
+      "metadata": {
+        "description": "Name of the subnet in the virtual network to use for the transfer VM"
+      }
+    },
     "adminUsername": {
       "type": "string",
       "metadata": {
@@ -79,8 +93,8 @@
     "transferNodeSettings": {
       "VMsku": "[parameters('xferVMsku')]",
       "vnetRG": "[parameters('RGvnetName')]",
-      "vnetName": "grid-vnet",
-      "subnetName": "computeSubnet"
+      "vnetName": "[parameters('vnetName')]",
+      "subnetName": "[parameters('subnetName')]"
     },
     "transferNodeOSSettings": {
       "adminUserName": "[parameters('adminUserName')]",
