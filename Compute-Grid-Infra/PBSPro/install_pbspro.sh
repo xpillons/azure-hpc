@@ -24,6 +24,13 @@ is_master()
     return $?
 }
 
+enable_kernel_update()
+{
+	# enable kernel update
+	sed -i.bak -e '28d' /etc/yum.conf 
+	sed -i '28i#exclude=kernel*' /etc/yum.conf 
+
+}
 # Installs all required packages.
 #
 install_pkgs()
@@ -112,10 +119,7 @@ if [ -e "$SETUP_MARKER" ]; then
 fi
 
 
-# enable kernel update
-cd /etc && sed -i.bak -e '28d' yum.conf 
-cd /etc && sed -i '28i#exclude=kernel*' yum.conf 
-
+enable_kernel_update
 install_pkgs
 install_pbspro
 
