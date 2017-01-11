@@ -38,6 +38,11 @@ install_pkgs()
 #
 install_pbspro()
 {
+	# enable kernel update
+ 	cd /etc && sed -i.bak -e '28d' yum.conf 
+	cd /etc && sed -i '28i#exclude=kernel*' yum.conf 
+
+
     yum install -y gcc make rpm-build libtool hwloc-devel libX11-devel libXt-devel libedit-devel libical-devel ncurses-devel perl postgresql-devel python-devel tcl-devel tk-devel swig expat-devel openssl-devel libXext libXft autoconf automake expat libedit postgresql-server python sendmail tcl tk libical perl-Env perl-Switch
     
     # Required on 7.2 as the libical lib changed
