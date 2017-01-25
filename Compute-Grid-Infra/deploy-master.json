@@ -30,7 +30,7 @@
         "W2012R2"
       ],
       "metadata": {
-        "description": "The VM image of the compute nodes"
+        "description": "The VM image of the master nodes"
       }
     },
     "sharedStorage": {

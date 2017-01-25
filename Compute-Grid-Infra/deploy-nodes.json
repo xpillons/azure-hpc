@@ -140,7 +140,6 @@
   },
   "variables": {
     "location": "[resourceGroup().location]",
-    "namingInfix": "[toLower(substring(concat(parameters('vmSSPrefix'), uniqueString(resourceGroup().id)), 0, 9))]",
     "longNamingInfix": "[toLower(parameters('vmSSPrefix'))]",
     "newStorageAccountSuffix": "[concat(variables('longNamingInfix'), 'sa')]",
     "deploymentApiVersion": "2015-11-01",

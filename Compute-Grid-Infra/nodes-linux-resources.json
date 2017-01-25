@@ -41,20 +41,20 @@
   },
   "variables": {
     "location": "[resourceGroup().location]",
-    "namingInfix": "[toLower(substring(concat(parameters('vmssName'), uniqueString(resourceGroup().id)), 0, 9))]",
+    "namingInfix": "[toLower(take(concat(parameters('vmssName'), uniqueString(resourceGroup().id)), 9))]",
     "uniqueStringArray": [
-      "[concat(uniqueString(concat(resourceGroup().id, parameters('newStorageAccountSuffix'), '0')))]",
-      "[concat(uniqueString(concat(resourceGroup().id, parameters('newStorageAccountSuffix'), '1')))]",
-      "[concat(uniqueString(concat(resourceGroup().id, parameters('newStorageAccountSuffix'), '2')))]",
-      "[concat(uniqueString(concat(resourceGroup().id, parameters('newStorageAccountSuffix'), '3')))]",
-      "[concat(uniqueString(concat(resourceGroup().id, parameters('newStorageAccountSuffix'), '4')))]"
+      "[concat(take(uniqueString(concat(resourceGroup().id, parameters('newStorageAccountSuffix'), '0')), 9), parameters('newStorageAccountSuffix'))]",
+      "[concat(take(uniqueString(concat(resourceGroup().id, parameters('newStorageAccountSuffix'), '1')), 9), parameters('newStorageAccountSuffix'))]",
+      "[concat(take(uniqueString(concat(resourceGroup().id, parameters('newStorageAccountSuffix'), '2')), 9), parameters('newStorageAccountSuffix'))]",
+      "[concat(take(uniqueString(concat(resourceGroup().id, parameters('newStorageAccountSuffix'), '3')), 9), parameters('newStorageAccountSuffix'))]",
+      "[concat(take(uniqueString(concat(resourceGroup().id, parameters('newStorageAccountSuffix'), '4')), 9), parameters('newStorageAccountSuffix'))]"
     ],
     "vhdContainers": [
-      "[concat('https://', variables('uniqueStringArray')[0], parameters('newStorageAccountSuffix'), '.blob.core.windows.net/', variables('vhdContainerName'))]",
-      "[concat('https://', variables('uniqueStringArray')[1], parameters('newStorageAccountSuffix'), '.blob.core.windows.net/', variables('vhdContainerName'))]",
-      "[concat('https://', variables('uniqueStringArray')[2], parameters('newStorageAccountSuffix'), '.blob.core.windows.net/', variables('vhdContainerName'))]",
-      "[concat('https://', variables('uniqueStringArray')[3], parameters('newStorageAccountSuffix'), '.blob.core.windows.net/', variables('vhdContainerName'))]",
-      "[concat('https://', variables('uniqueStringArray')[4], parameters('newStorageAccountSuffix'), '.blob.core.windows.net/', variables('vhdContainerName'))]"
+      "[concat('https://', variables('uniqueStringArray')[0], '.blob.core.windows.net/', variables('vhdContainerName'))]",
+      "[concat('https://', variables('uniqueStringArray')[1], '.blob.core.windows.net/', variables('vhdContainerName'))]",
+      "[concat('https://', variables('uniqueStringArray')[2], '.blob.core.windows.net/', variables('vhdContainerName'))]",
+      "[concat('https://', variables('uniqueStringArray')[3], '.blob.core.windows.net/', variables('vhdContainerName'))]",
+      "[concat('https://', variables('uniqueStringArray')[4], '.blob.core.windows.net/', variables('vhdContainerName'))]"
     ],
     // total storage account used for OSDisks in the VMSS is 2 + instance/30, for a max of 5 SA with 100 VMs.
     "saCount": "[add(2, div(parameters('instanceCount'), 30))]",
@@ -97,7 +97,7 @@
   "resources": [
     {
       "type": "Microsoft.Storage/storageAccounts",
-      "name": "[concat(variables('uniqueStringArray')[copyIndex()], parameters('newStorageAccountSuffix'))]",
+      "name": "[variables('uniqueStringArray')[copyIndex()]]",
       "location": "[variables('location')]",
       "apiVersion": "[variables('storageApiVersion')]",
       "copy": {
