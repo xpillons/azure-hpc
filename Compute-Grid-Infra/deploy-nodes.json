@@ -140,8 +140,7 @@
   },
   "variables": {
     "location": "[resourceGroup().location]",
-    "longNamingInfix": "[toLower(parameters('vmSSPrefix'))]",
-    "newStorageAccountSuffix": "[concat(variables('longNamingInfix'), 'sa')]",
+    "newStorageAccountSuffix": "[toLower(parameters('vmSSPrefix'))]",
     "deploymentApiVersion": "2015-11-01",
     "nodeSettings": {
       "VMsku": "[parameters('VMsku')]",
