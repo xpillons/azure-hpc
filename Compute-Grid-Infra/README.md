@@ -6,6 +6,15 @@ Table of Contents
 =================
 
 * [VM Infrastructure](#vm-infrastructure)
+  * [Network](#network)
+  * [Compute](#compute)
+  * [Storage](#storage)
+  * [Management](#management)
+* [Deployment steps](#deployment-steps)
+  * [Create the networking infrastructure and the jumpbox](#Create-the-networking-infrastructure-and-the-jumpbox)
+  * [Optionally deploy the BeeGFS nodes](#Optionally-deploy-the-BeeGFS-nodes)
+  * [Provision the compute nodes](#Provision-the-compute-nodes)
+
 
 # VM Infrastructure
 The following diagram shows the overall Compute, Storage and Network infrastructure which is going to be provisioning within Azure to support running HPC applications.
