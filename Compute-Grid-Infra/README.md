@@ -2,6 +2,11 @@
 
 These templates will build a compute grid made by a single master VMs running the management services, multiple VM Scaleset for deploying compute nodes, and optionally a set of nodes to run [BeeGFS](http://www.beegfs.com/) as a parallel shared file system. Ganglia is always setup by default on all VMs, and [PBS Pro](http://www.pbspro.org/) can optionally be setup for job scheduling.
 
+Table of Contents
+=================
+
+* [VM Infrastructure](#vm-infrastructure)
+
 # VM Infrastructure
 The following diagram shows the overall Compute, Storage and Network infrastructure which is going to be provisioning within Azure to support running HPC applications.
 
@@ -27,7 +32,7 @@ Compute nodes are deployed thru VM Scale sets, made each by up to 100 VMs instan
 Depending on the workload to run on the cluster, there is a need to build a scalable file system. BeeGFS is proposed as an option, each storage node will host the storage and metadata services. Several Premium Disks are configured in RAID0 to store the metadata in addition to the real store.
 
 ### Management
-A dedicated VM (the master node) is used as a jumbbox, exposing an SSH endpoint, and hosting these services :
+A dedicated VM (the master node) is used as a jumpbox, exposing an SSH endpoint, and hosting these services :
 * __Ganglia__ metadata service and monitoring web site
 * __PBS Pro__ job scheduler
 * __BeeGFS__ management services
