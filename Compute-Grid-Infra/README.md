@@ -13,7 +13,7 @@ Table of Contents
   * [Provision the compute nodes](#provision-the-compute-nodes)
 * [Running Applications](#running-applications)
   * [Validating MPI](#validating-mpi)
-
+  * [Running a Pallas job with PBS Pro](#running-a-pallas-job-with-pbs-pro)
 
 # Compute grid in Azure
 
@@ -242,6 +242,34 @@ You should expect an output as the one below
 
 
     # All processes entering MPI_Finalize
+
+## Running a Pallas job with PBS Pro
+
+ssh on the master node and switch to the **hpcuser** user. Then change directory to home
+
+    sudo su hpcuser
+    cd
+
+create a shell script named **pingpong.sh** with the content listed below
+
+    #!/bin/bash
+
+    # set the number of nodes and processes per node
+    #PBS -l nodes=2:ppn=1
+
+    # set name of job
+    #PBS -N mpi-pingpong
+    source /opt/intel/impi/5.1.3.181/bin64/mpivars.sh
+
+    mpirun -env I_MPI_FABRICS=dapl -env I_MPI_DAPL_PROVIDER=ofa-v2-ib0 -env I_MPI_DYNAMIC_CONNECTION=0 IMB-MPI1 pingpong
+
+Then submit a job
+
+    qsub pingpong.sh
+
+The job output will be written in the current directory in files named **mpi-pingpong.e*** and **mpi-pingpong.o***
+
+The **mpi-pingpong.o*** file should contains the MPI pingpong output as shown above when doing the manual test.
 
 
 ____
