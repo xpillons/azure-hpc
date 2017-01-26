@@ -7,9 +7,9 @@ Table of Contents
   * [Storage](#storage)
   * [Management](#management)
 * [Deployment steps](#deployment-steps)
-  * [Create the networking infrastructure and the jumpbox](#Create-the-networking-infrastructure-and-the-jumpbox)
-  * [Optionally deploy the BeeGFS nodes](#Optionally-deploy-the-BeeGFS-nodes)
-  * [Provision the compute nodes](#Provision-the-compute-nodes)
+  * [Create the networking infrastructure and the jumpbox](#create-the-networking-infrastructure-and-the-jumpbox)
+  * [Optionally deploy the BeeGFS nodes](#optionally-deploy-the-beegfs-nodes)
+  * [Provision the compute nodes](#provision-the-compute-nodes)
 
 
 # Compute grid in Azure
