@@ -7,6 +7,7 @@ Table of Contents
   * [Storage](#storage)
   * [Management](#management)
 * [Deployment steps](#deployment-steps)
+  * [Deploy using Azure CLI](#deploy-using-azure-cli)
   * [Create the networking infrastructure and the jumpbox](#create-the-networking-infrastructure-and-the-jumpbox)
   * [Optionally deploy the BeeGFS nodes](#optionally-deploy-the-beegfs-nodes)
   * [Provision the compute nodes](#provision-the-compute-nodes)
@@ -54,6 +55,18 @@ To build the compute grid, three main steps need to be executed :
 3. Provision the compute nodes
 
 _The OS for this solution is CentOS 7.2. All scripts have been tested only for that version._
+
+## Deploy using Azure CLI
+Azure CLI 2.0 preview setup instruction can be found [here](https://docs.microsoft.com/en-us/cli/azure/install-az-cli2)
+
+Below is an example on how to provision the templates. First you have to login with your credentials. If you have several subscriptions, make sure to make the one you want to deploy in the default. Then create a resource group providing the region and a name for it, and finally invoke the template passing your local parameter file. In the template URI make sure to use the RAW URI https://raw.githubusercontent.com/xpillons/azure-hpc/master/*** and not the github HTML link.
+
+    az login
+    account set --subscription [subscriptionId]
+    az group create -l "West Europe" -n rg-master
+    az group deployment create -g rg-master --template-uri https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/deploy-master.json --parameters @myparams.json
+
+
 
 ## Create the networking infrastructure and the jumpbox
 The template __deploy-master.json__ will provision the networking infrastructure as well as a master VM exposing an SSH endpoint for remote connection.   
