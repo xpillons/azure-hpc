@@ -162,9 +162,9 @@ If PBS Pro is used, SSH on the master and run the **pbsnodes -a** command to lis
 # Running applications
 
 ## Validating MPI
-Intel MPI and Infiniband are only available for A8/A9 and H16r instances. A default user named **azureuser** has been created on the compute nodes and on the master node with passwordless access so it can be immediately used to run MPI across nodes.
+Intel MPI and Infiniband are only available for A8/A9 and H16r instances. A default user named **hpcuser** has been created on the compute nodes and on the master node with passwordless access so it can be immediately used to run MPI across nodes.
 
-To begin, you need first to ssh on the master and then switch to the **azureuser** user. From there, ssh one one of the compute nodes, and configure MPI by following the instructions from [here](https://docs.microsoft.com/en-us/azure/virtual-machines/virtual-machines-linux-classic-rdma-cluster#configure-intel-mpi)
+To begin, you need first to ssh on the master and then switch to the **hpcuser** user. From there, ssh one one of the compute nodes, and configure MPI by following the instructions from [here](https://docs.microsoft.com/en-us/azure/virtual-machines/virtual-machines-linux-classic-rdma-cluster#configure-intel-mpi)
 
 To run the 2 node pingpong test, execute the following command
 
