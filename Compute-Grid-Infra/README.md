@@ -11,6 +11,8 @@ Table of Contents
   * [Create the networking infrastructure and the jumpbox](#create-the-networking-infrastructure-and-the-jumpbox)
   * [Optionally deploy the BeeGFS nodes](#optionally-deploy-the-beegfs-nodes)
   * [Provision the compute nodes](#provision-the-compute-nodes)
+* [Running Applications](#running-applications)
+  * [Validating MPI](#validating-mpi)
 
 
 # Compute grid in Azure
@@ -156,6 +158,92 @@ After few minutes, once the provision succeed, you should see the new hosts adde
 If PBS Pro is used, SSH on the master and run the **pbsnodes -a** command to list all the registered nodes.
 
 **Your cluster is now ready to host applications and run jobs**
+
+# Running applications
+
+## Validating MPI
+Intel MPI and Infiniband are only available for A8/A9 and H16r instances. A default user named **azureuser** has been created on the compute nodes and on the master node with passwordless access so it can be immediately used to run MPI across nodes.
+
+To begin, you need first to ssh on the master and then switch to the **azureuser** user. From there, ssh one one of the compute nodes, and configure MPI by following the instructions from [here](https://docs.microsoft.com/en-us/azure/virtual-machines/virtual-machines-linux-classic-rdma-cluster#configure-intel-mpi)
+
+To run the 2 node pingpong test, execute the following command
+
+    mpirun -hosts <host1>,<host2> -ppn 1 -n 2 -env I_MPI_FABRICS=dapl -env I_MPI_DAPL_PROVIDER=ofa-v2-ib0 -env I_MPI_DYNAMIC_CONNECTION=0 IMB-MPI1 pingpong
+
+You should expect an output as the one below
+
+    #------------------------------------------------------------
+    #    Intel (R) MPI Benchmarks 4.1 Update 1, MPI-1 part
+    #------------------------------------------------------------
+    # Date                  : Thu Jan 26 02:16:14 2017
+    # Machine               : x86_64
+    # System                : Linux
+    # Release               : 3.10.0-229.20.1.el7.x86_64
+    # Version               : #1 SMP Tue Nov 3 19:10:07 UTC 2015
+    # MPI Version           : 3.0
+    # MPI Thread Environment:
+
+    # New default behavior from Version 3.2 on:
+
+    # the number of iterations per message size is cut down
+    # dynamically when a certain run time (per message size sample)
+    # is expected to be exceeded. Time limit is defined by variable
+    # "SECS_PER_SAMPLE" (=> IMB_settings.h)
+    # or through the flag => -time
+
+
+
+    # Calling sequence was:
+
+    # IMB-MPI1 pingpong
+
+    # Minimum message length in bytes:   0
+    # Maximum message length in bytes:   4194304
+    #
+    # MPI_Datatype                   :   MPI_BYTE
+    # MPI_Datatype for reductions    :   MPI_FLOAT
+    # MPI_Op                         :   MPI_SUM
+    #
+    #
+
+    # List of Benchmarks to run:
+
+    # PingPong
+
+    #---------------------------------------------------
+    # Benchmarking PingPong
+    # #processes = 2
+    #---------------------------------------------------
+           #bytes #repetitions      t[usec]   Mbytes/sec
+                0         1000         3.37         0.00
+                1         1000         3.40         0.28
+                2         1000         3.69         0.52
+                4         1000         3.39         1.13
+                8         1000         3.41         2.24
+               16         1000         3.38         4.51
+               32         1000         2.78        10.99
+               64         1000         2.79        21.90
+              128         1000         3.12        39.09
+              256         1000         3.34        73.13
+              512         1000         3.79       128.87
+             1024         1000         4.85       201.48
+             2048         1000         5.74       340.21
+             4096         1000         7.06       552.98
+             8192         1000         8.51       917.87
+            16384         1000        10.86      1438.11
+            32768         1000        16.55      1888.21
+            65536          640        28.15      2220.37
+           131072          320        53.47      2337.75
+           262144          160        84.07      2973.66
+           524288           80       148.77      3360.92
+          1048576           40       284.91      3509.84
+          2097152           20       546.43      3660.15
+          4194304           10      1077.75      3711.45
+
+
+    # All processes entering MPI_Finalize
+
+
 ____
 
 ### Reporting bugs
