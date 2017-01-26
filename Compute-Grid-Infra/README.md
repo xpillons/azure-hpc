@@ -1,10 +1,6 @@
-# Compute grid in Azure
-
-These templates will build a compute grid made by a single master VMs running the management services, multiple VM Scaleset for deploying compute nodes, and optionally a set of nodes to run [BeeGFS](http://www.beegfs.com/) as a parallel shared file system. Ganglia is always setup by default on all VMs, and [PBS Pro](http://www.pbspro.org/) can optionally be setup for job scheduling.
-
 Table of Contents
 =================
-
+* [Compute grid in Azure](#compute-grid-in-azure)
 * [VM Infrastructure](#vm-infrastructure)
   * [Network](#network)
   * [Compute](#compute)
@@ -14,6 +10,11 @@ Table of Contents
   * [Create the networking infrastructure and the jumpbox](#Create-the-networking-infrastructure-and-the-jumpbox)
   * [Optionally deploy the BeeGFS nodes](#Optionally-deploy-the-BeeGFS-nodes)
   * [Provision the compute nodes](#Provision-the-compute-nodes)
+
+
+# Compute grid in Azure
+
+These templates will build a compute grid made by a single master VMs running the management services, multiple VM Scaleset for deploying compute nodes, and optionally a set of nodes to run [BeeGFS](http://www.beegfs.com/) as a parallel shared file system. Ganglia is always setup by default on all VMs, and [PBS Pro](http://www.pbspro.org/) can optionally be setup for job scheduling.
 
 
 # VM Infrastructure
@@ -143,3 +144,14 @@ If PBS Pro is used, SSH on the master and run the **pbsnodes -a** command to lis
 
 **Your cluster is now ready to host applications and run jobs**
 ____
+
+### Reporting bugs
+
+Please report bugs by opening an issue in the [GitHub Issue Tracker](https://github.com/xpillons/azure-hpc/issues)
+
+This project has adopted the [Microsoft Open Source Code of
+Conduct](https://opensource.microsoft.com/codeofconduct/). For more information
+see the [Code of Conduct
+FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact
+[opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional
+questions or comments.
