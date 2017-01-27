@@ -64,7 +64,7 @@ Azure CLI 2.0 preview setup instruction can be found [here](https://docs.microso
 Below is an example on how to provision the templates. First you have to login with your credentials. If you have several subscriptions, make sure to make the one you want to deploy in the default. Then create a resource group providing the region and a name for it, and finally invoke the template passing your local parameter file. In the template URI make sure to use the RAW URI https://raw.githubusercontent.com/xpillons/azure-hpc/master/*** and not the github HTML link.
 
     az login
-    account set --subscription [subscriptionId]
+    az account set --subscription [subscriptionId]
     az group create -l "West Europe" -n rg-master
     az group deployment create -g rg-master --template-uri https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/deploy-master.json --parameters @myparams.json
 
