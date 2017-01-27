@@ -74,6 +74,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "doc", "doc", "{A264E811-010
 		doc\Infra.PNG = doc\Infra.PNG
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{39C4279A-A9CF-4D1F-9916-B68AFBC534FD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "4nodes-centos71-pbs-IB", "4nodes-centos71-pbs-IB", "{DF994C48-E6A9-41C0-9C46-1E1D7982B0BB}"
+	ProjectSection(SolutionItems) = preProject
+		Samples\4nodes-centos71-pbs-IB\master.param.json = Samples\4nodes-centos71-pbs-IB\master.param.json
+		Samples\4nodes-centos71-pbs-IB\nodes.param.json = Samples\4nodes-centos71-pbs-IB\nodes.param.json
+		Samples\4nodes-centos71-pbs-IB\README.md = Samples\4nodes-centos71-pbs-IB\README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -84,5 +93,7 @@ Global
 		{4E81BC70-7F00-430C-8AA0-1B759DAE0DD9} = {E3BE2F83-EF47-465C-8066-915F86E2D5C6}
 		{5C4514E4-75B6-46FC-8F1F-786521A42C6C} = {E3BE2F83-EF47-465C-8066-915F86E2D5C6}
 		{A264E811-0100-4D91-8A2C-580B393FAA3C} = {E3BE2F83-EF47-465C-8066-915F86E2D5C6}
+		{39C4279A-A9CF-4D1F-9916-B68AFBC534FD} = {E3BE2F83-EF47-465C-8066-915F86E2D5C6}
+		{DF994C48-E6A9-41C0-9C46-1E1D7982B0BB} = {39C4279A-A9CF-4D1F-9916-B68AFBC534FD}
 	EndGlobalSection
 EndGlobal

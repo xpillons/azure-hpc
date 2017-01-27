@@ -1,0 +1,14 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vmPrefix": { "value": "PINTA" },
+    "sharedStorage": { "value": "none" },
+    "scheduler": { "value": "pbspro" },
+    "masterImage": { "value": "CentOS_7.2" },
+    "VMsku": { "value": "Standard_DS3_v2" },
+    "adminUsername": { "value": "azureadmin" },
+    "adminPassword": { "value": "" },
+    "sshKeyData": { "value": "<ADD YOUR SSH KEY HERE>" }
+  }
+}

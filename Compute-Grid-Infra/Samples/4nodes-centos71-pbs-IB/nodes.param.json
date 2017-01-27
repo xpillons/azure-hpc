@@ -1,0 +1,18 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "VMsku": { "value": "Standard_A9" },
+    "vmSSPrefix": { "value": "PINTA" },
+    "computeNodeImage": { "value": "CentOS-HPC_7.1" },
+    "numberOfVMSS": { "value": 1 },
+    "instanceCountPerVMSS": { "value": 4 },
+    "RGvnetName": { "value": "hpc-master" },
+    "adminUsername": { "value": "azureadmin" },
+    "adminPassword": { "value": "" },
+    "sshKeyData": { "value": "<ADD YOUR SSH KEY HERE>"},
+    "masterName": { "value": "pintamaster" },
+    "sharedStorage": { "value": "none" },
+    "scheduler": { "value": "pbspro" }
+  }
+}
