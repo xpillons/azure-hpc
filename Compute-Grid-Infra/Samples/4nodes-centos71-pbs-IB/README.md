@@ -1,5 +1,7 @@
 # 4 nodes PBS Pro Infiniband Cluster
 
+_This sample needs 68 cores_
+
 The current sample will build a 4 nodes Infiniband cluster with a master node running PBS Pro and Ganglia.
 In order to proceed, download locally the **master.param.json** and **nodes.param.json** files, and update them with **your own SSH key**.
 
