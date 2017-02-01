@@ -28,14 +28,20 @@ install_pkgs()
     yum -y install zlib zlib-devel bzip2 bzip2-devel bzip2-libs openssl openssl-devel openssl-libs gcc gcc-c++ nfs-utils rpcbind mdadm wget python-pip kernel kernel-devel openmpi openmpi-devel automake autoconf
 }
 
-
-install_beegfs()
+install_beegfs_repo()
 {
     # Install BeeGFS repo
-    wget -O beegfs-rhel7.repo http://www.beegfs.com/release/beegfs_2015.03/dists/beegfs-rhel7.repo
+    #wget -O beegfs-rhel7.repo http://www.beegfs.com/release/beegfs_2015.03/dists/beegfs-rhel7.repo
+    wget -O beegfs-rhel7.repo http://www.beegfs.com/release/beegfs_6/dists/beegfs-rhel7.repo
+
     mv beegfs-rhel7.repo /etc/yum.repos.d/beegfs.repo
-    rpm --import http://www.beegfs.com/release/beegfs_2015.03/gpg/RPM-GPG-KEY-beegfs
-    
+    #rpm --import http://www.beegfs.com/release/beegfs_2015.03/gpg/RPM-GPG-KEY-beegfs
+    rpm --import http://www.beegfs.com/release/beegfs_6/gpg/RPM-GPG-KEY-beegfs
+
+}
+
+install_beegfs()
+{    
     # Disable SELinux
     sed -i 's/SELINUX=.*/SELINUX=disabled/g' /etc/selinux/config
     setenforce 0
@@ -68,6 +74,7 @@ fi
 mkdir -p $SHARE_SCRATCH
 
 install_pkgs
+install_beegfs_repo
 install_beegfs
 
 # Create marker file so we know we're configured
