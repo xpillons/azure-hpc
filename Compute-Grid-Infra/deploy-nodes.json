@@ -207,7 +207,7 @@
       "sshKeyData": "[parameters('sshKeyData')]",
       "imageReference": "[variables('computeNodeImages')[parameters('computeNodeImage')]]"
     },
-    "node-OSTemplateUrl": "[uri(deployment().properties.templateLink.uri, concat('nodes-', variables('nodeOSSettings').osType.os,'-resources.json'))]"
+    "node-OSTemplateUrl": "[uri(deployment().properties.templateLink.uri, concat('nodes-', variables('nodeOSSettings').osType.os,'-resources-md.json'))]"
   },
   "resources": [
     {
