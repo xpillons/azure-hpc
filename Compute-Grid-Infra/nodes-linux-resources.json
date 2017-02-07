@@ -182,7 +182,7 @@
                   "autoUpgradeMinorVersion": true,
                   "settings": {
                     "fileUris": "[variables('vmScripts').scriptsToDownload]",
-                    "commandToExecute": "[variables('vmScripts').commandToExecute]",
+                    "commandToExecute": "",
                     "timestamp": 12345
                   }
                 }
