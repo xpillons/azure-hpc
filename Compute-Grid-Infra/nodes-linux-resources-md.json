@@ -131,7 +131,7 @@
             "imageReference": "[parameters('nodeOSSettings').imageReference]",
             "osDisk": {
               "createOption": "FromImage",
-              "diskSizeGB": "30"
+              "caching": "ReadOnly"
             },
             "dataDisks": []
           },
