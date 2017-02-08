@@ -298,7 +298,7 @@
               "createOption": "FromImage",
               "caching": "ReadOnly"
             },
-            "dataDisks": "[concat(take(variables('storageDiskArray'),variables('beeGFSNodeSettings').numStorageDisks), take(variables('metadataDiskArray'), variables('beeGFSNodeSettings').numMetaDisks))]"
+            "dataDisks": "[concat(take(variables('storageDiskArray'),variables('beeGFSNodeSettings').numStorageDisks), take(variables('metadataDiskArray'), variables('beeGFSNodeSettings').numMetadataDisks))]"
           },
           "extensionProfile": {
             "extensions": [
