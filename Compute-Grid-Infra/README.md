@@ -39,7 +39,7 @@ Infiniband is automatically provided when HPC Azure nodes are provisioned.
 For DNS, the Azure DNS is used for name resolution on the private IPs.
 
 ### Compute
-Compute nodes are deployed thru VM Scale sets, made each by up to 100 VMs instances. They are all inside the compute-subnet. For each VM scale set, there can be up to 5 storage accounts to store the OS disks. The number 5 is chosen to not have more than 20 VMs stored into the same account to balance performance and resiliency.
+Compute nodes are deployed thru VM Scale sets and Managed Disks, made each by up to 100 VMs instances. They are all inside the compute-subnet.
 
 ### Storage
 Depending on the workload to run on the cluster, there is a need to build a scalable file system. BeeGFS is proposed as an option, each storage node will host the storage and metadata services. Several Premium Disks are configured in RAID0 to store the metadata in addition to the real store.
@@ -57,6 +57,9 @@ To build the compute grid, three main steps need to be executed :
 3. Provision the compute nodes
 
 _The OS for this solution is CentOS 7.2. All scripts have been tested only for that version._
+
+> Starting on February 8, 2017 Compute nodes and BeeGFS nodes are all provisioned using Managed Disks.
+
 
 ## Deploying using Azure CLI
 Azure CLI 2.0 preview setup instruction can be found [here](https://docs.microsoft.com/en-us/cli/azure/install-az-cli2)
@@ -102,7 +105,7 @@ Data disks are based on Premium Storage and can have three different sizes :
 
 The storage nodes will be included in the VNET created in the previous step, and all inside the *storage-subnet* .
 
-The template __BeeGFS/deploy-beegfs.json__ will provision the storage nodes with CentOS 7.2 and BeeGFS version 2015.3.
+The template __BeeGFS/deploy-beegfs-vmss.json__ will provision the storage nodes with CentOS 7.2 and BeeGFS version 6.
 
 You have to provide these parameters to the template :
 * _nodeType_ : Default value is **both** and should be kept as is. Other values *meta* and *storage* are allowed for advanced scenarios in which meta data services and storage services are deployed on dedicated nodes.
@@ -118,7 +121,7 @@ You have to provide these parameters to the template :
 * _nbMetaDisks_ : Number of data disks to be attached to a single VM. Min is 2, Max is 8, Default is **2**.
 * _customDomain_ : If the VNET is configure to use a custom domain, specify the name of this custom domain to be used
 
-[![Click to deploy template on Azure](http://azuredeploy.net/deploybutton.png "Click to deploy template on Azure")](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fxpillons%2Fazure-hpc%2Fmaster%2FCompute-Grid-Infra%2FBeeGFS%2Fdeploy-beegfs.json)  
+[![Click to deploy template on Azure](http://azuredeploy.net/deploybutton.png "Click to deploy template on Azure")](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fxpillons%2Fazure-hpc%2Fmaster%2FCompute-Grid-Infra%2FBeeGFS%2Fdeploy-beegfs-vmss.json)  
 
 ### Check your deployment
 Storage nodes will be named _beegfs00 ... beegfs99_ .
