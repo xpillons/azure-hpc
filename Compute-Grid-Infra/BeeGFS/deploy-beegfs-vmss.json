@@ -1,0 +1,326 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.1",
+  "parameters": {
+    "nodeType": {
+      "type": "string",
+      "defaultValue": "both",
+      "allowedValues": [
+        "both",
+        "meta",
+        "storage"
+      ],
+      "metadata": {
+        "description": "type of beegfs node to deploy"
+      }
+    },
+    "nodeCount": {
+      "type": "int",
+      "metadata": {
+        "description": "Number of BeeGFS nodes (100 or less)."
+      },
+      "defaultValue": 1,
+      "maxValue": 100
+    },
+    "VMsku": {
+      "type": "string",
+      "defaultValue": "Standard_DS3_v2",
+      "allowedValues": [
+        "Standard_DS1_v2",
+        "Standard_DS2_v2",
+        "Standard_DS3_v2",
+        "Standard_DS4_v2",
+        "Standard_DS5_v2",
+        "Standard_DS11_v2",
+        "Standard_DS12_v2",
+        "Standard_DS13_v2",
+        "Standard_DS14_v2",
+        "Standard_DS15_v2"
+      ],
+      "metadata": {
+        "description": "sku to use for the storage nodes - only premium disks VMs are allowed"
+      }
+    },
+    "RGvnetName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the RG of the virtual network to use."
+      }
+    },
+    "adminUsername": {
+      "type": "string",
+      "metadata": {
+        "description": "Admin username on all VMs."
+      }
+    },
+    "sshKeyData": {
+      "type": "string",
+      "metadata": {
+        "description": "SSH rsa public key file as a string."
+      }
+    },
+    "masterName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of master VM name"
+      }
+    },
+    "storageDiskSize": {
+      "type": "string",
+      "defaultValue": "P10",
+      "allowedValues": [
+        "P10",
+        "P20",
+        "P30"
+      ],
+      "metadata": {
+        "description": "Premium storage disk size used for the storage services"
+      }
+    },
+    "nbStorageDisks": {
+      "type": "int",
+      "defaultValue": 2,
+      "minValue": 2,
+      "maxValue": 8,
+      "metadata": {
+        "description": "Number of storage disks"
+      }
+    },
+    "metaDiskSize": {
+      "type": "string",
+      "defaultValue": "P10",
+      "allowedValues": [
+        "P10",
+        "P20",
+        "P30"
+      ],
+      "metadata": {
+        "description": "Premium storage disk size used for the metadata services"
+      }
+    },
+    "nbMetaDisks": {
+      "type": "int",
+      "defaultValue": 2,
+      "minValue": 2,
+      "maxValue": 6,
+      "metadata": {
+        "description": "Number of metadate disks"
+      }
+    },
+    "customDomain": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "custom domain name to use for name resolution"
+      }
+    }
+  },
+  "variables": {
+    "location": "[resourceGroup().location]",
+    "PremiumStorageMap": {
+      "P10": {
+        "size": 128
+      },
+      "P20": {
+        "size": 512
+      },
+      "P30": {
+        "size": 1023
+      }
+    },
+    "vmImage": "CentOS_7.2",
+    "deploymentApiVersion": "2015-11-01",
+    "beeGFSNodeSettings": {
+      "VMsku": "[parameters('VMsku')]",
+      "vnetRG": "[parameters('RGvnetName')]",
+      "vnetName": "grid-vnet",
+      "subnetName": "storageSubnet",
+      "MasterName": "[parameters('masterName')]",
+      "storageDiskSize": "[variables('PremiumStorageMap')[parameters('storageDiskSize')].size]",
+      "numStorageDisks": "[parameters('nbStorageDisks')]",
+      "metadataDiskSize": "[variables('PremiumStorageMap')[parameters('metaDiskSize')].size]",
+      "numMetadataDisks": "[parameters('nbMetaDisks')]",
+      "nodeType": "[parameters('nodeType')]",
+      "customDomain": "[parameters('customDomain')]"
+    },
+    "computeNodeImages": {
+      "CentOS_7.2": {
+        "publisher": "OpenLogic",
+        "offer": "CentOS",
+        "sku": "7.2",
+        "version": "latest"
+      },
+      "RHEL_7.2": {
+        "publisher": "RedHat",
+        "offer": "RHEL",
+        "sku": "7.2",
+        "version": "latest"
+      }
+    },
+    "nodeOSSettings": {
+      "adminUserName": "[parameters('adminUserName')]",
+      "sshKeyData": "[parameters('sshKeyData')]",
+      "imageReference": "[variables('computeNodeImages')[variables('vmImage')]]"
+    },
+    "computeApiVersion": "2016-04-30-preview",
+    "vnetID": "[resourceId(variables('beeGFSNodeSettings').vnetRG, 'Microsoft.Network/virtualNetworks', variables('beeGFSNodeSettings').vnetName)]",
+    "subnetRef": "[concat(variables('vnetID'),'/subnets/', variables('beeGFSNodeSettings').subnetName)]",
+    "sshKeyPath": "[concat('/home/',variables('nodeOSSettings').adminUserName,'/.ssh/authorized_keys')]",
+    "installParams": "[concat(variables('beeGFSNodeSettings').MasterName, ' ', variables('beeGFSNodeSettings').nodeType, ' \"', variables('beeGFSNodeSettings').customDomain, '\"')]",
+    "gangliaInstall": "[concat('bash install_ganglia.sh ', variables('beeGFSNodeSettings').MasterName, ' Master 8649')]",
+    "vmScripts": {
+      "scriptsToDownload": [
+        "[uri(deployment().properties.templateLink.uri, 'install_beegfs.sh')]",
+        "[uri(deployment().properties.templateLink.uri, 'Ganglia/install_ganglia.sh')]"
+      ],
+      "commandToExecute": "[concat('bash install_beegfs.sh ', variables('installParams'), ';', variables('gangliaInstall'))]"
+    },
+    "metadataDiskArray": [
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').metadataDiskSize]",
+        "lun": "0",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').metadataDiskSize]",
+        "lun": "1",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').metadataDiskSize]",
+        "lun": "2",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').metadataDiskSize]",
+        "lun": "3",
+        "createOption": "Empty"
+      }
+    ],
+    "storageDiskArray": [
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetaDisks, 0)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetaDisks, 1)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetaDisks, 2)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetaDisks, 3)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetaDisks, 4)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetaDisks, 5)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetaDisks, 6)]",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetaDisks, 7)]",
+        "createOption": "Empty"
+      }
+    ]
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Compute/virtualMachineScaleSets",
+      "name": "BeeGFS",
+      "location": "[variables('location')]",
+      "apiVersion": "[variables('computeApiVersion')]",
+      "sku": {
+        "name": "[variables('beeGFSNodeSettings').VMsku]",
+        "tier": "Standard",
+        "capacity": "[parameters('nodeCount')]"
+      },
+      "properties": {
+        "overprovision": "true",
+        "upgradePolicy": {
+          "mode": "Manual"
+        },
+        "virtualMachineProfile": {
+          "networkProfile": {
+            "networkInterfaceConfigurations": [
+              {
+                "name": "nic",
+                "properties": {
+                  "primary": "true",
+                  "ipConfigurations": [
+                    {
+                      "name": "ipconfig",
+                      "properties": {
+                        "subnet": {
+                          "id": "[variables('subnetRef')]"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "osProfile": {
+            "computerNamePrefix": "beegfs",
+            "adminUsername": "[variables('nodeOSSettings').adminUserName]",
+            "linuxConfiguration": {
+              "disablePasswordAuthentication": "true",
+              "ssh": {
+                "publicKeys": [
+                  {
+                    "path": "[variables('sshKeyPath')]",
+                    "keyData": "[variables('nodeOSSettings').sshKeyData]"
+                  }
+                ]
+              }
+            }
+          },
+          "storageProfile": {
+            "imageReference": "[variables('nodeOSSettings').imageReference]",
+            "osDisk": {
+              "createOption": "FromImage",
+              "caching": "ReadOnly"
+            },
+            "dataDisks": "[concat(take(variables('storageDiskArray'),variables('beeGFSNodeSettings').numStorageDisks), take(variables('metadataDiskArray'), variables('beeGFSNodeSettings').numMetaDisks))]"
+          },
+          "extensionProfile": {
+            "extensions": [
+              {
+                "name": "installBeeGFS",
+                "properties": {
+                  "publisher": "Microsoft.Azure.Extensions",
+                  "type": "CustomScript",
+                  "typeHandlerVersion": "2.0",
+                  "autoUpgradeMinorVersion": true,
+                  "settings": {
+                    "fileUris": "[variables('vmScripts').scriptsToDownload]",
+                    "commandToExecute": "[variables('vmScripts').commandToExecute]",
+                    "timestamp": 1
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}
+

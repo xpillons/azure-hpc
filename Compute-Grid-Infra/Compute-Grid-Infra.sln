@@ -33,6 +33,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BeeGFS", "BeeGFS", "{61C5DC
 	ProjectSection(SolutionItems) = preProject
 		BeeGFS\beegfs-node-resources.json = BeeGFS\beegfs-node-resources.json
 		BeeGFS\beegfs-script.json = BeeGFS\beegfs-script.json
+		BeeGFS\deploy-beegfs-vmss.json = BeeGFS\deploy-beegfs-vmss.json
 		BeeGFS\deploy-beegfs.json = BeeGFS\deploy-beegfs.json
 		BeeGFS\install_beegfs.sh = BeeGFS\install_beegfs.sh
 		BeeGFS\install_beegfs_client-centos6x.sh = BeeGFS\install_beegfs_client-centos6x.sh
