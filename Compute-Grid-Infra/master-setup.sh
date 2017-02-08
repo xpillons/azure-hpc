@@ -22,6 +22,7 @@ done
 # Shares
 SHARE_HOME=/share/home
 SHARE_SCRATCH=/share/scratch
+SHARE_APPS=/share/apps
 
 # User
 HPC_USER=hpcuser
@@ -35,7 +36,9 @@ setup_disks()
 {
     mkdir -p $SHARE_HOME
     mkdir -p $SHARE_SCRATCH
+	mkdir -p $SHARE_APPS
 
+	chown $HPC_USER:$HPC_GROUP $SHARE_APPS
 }
 
 setup_user()
@@ -75,7 +78,7 @@ setup_user()
 	chmod 600 $SHARE_HOME/$HPC_USER/.ssh/id_rsa
 	chmod 644 $SHARE_HOME/$HPC_USER/.ssh/id_rsa.pub
 	
-	chown $HPC_USER:$HPC_GROUP $SHARE_SCRATCH    
+	chown $HPC_USER:$HPC_GROUP $SHARE_SCRATCH
 }
 
 mount_nfs()
