@@ -200,42 +200,42 @@
     "storageDiskArray": [
       {
         "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
-        "lun": "[add(variables('beeGFSNodeSettings').numMetaDisks, 0)]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 0)]",
         "createOption": "Empty"
       },
       {
         "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
-        "lun": "[add(variables('beeGFSNodeSettings').numMetaDisks, 1)]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 1)]",
         "createOption": "Empty"
       },
       {
         "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
-        "lun": "[add(variables('beeGFSNodeSettings').numMetaDisks, 2)]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 2)]",
         "createOption": "Empty"
       },
       {
         "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
-        "lun": "[add(variables('beeGFSNodeSettings').numMetaDisks, 3)]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 3)]",
         "createOption": "Empty"
       },
       {
         "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
-        "lun": "[add(variables('beeGFSNodeSettings').numMetaDisks, 4)]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 4)]",
         "createOption": "Empty"
       },
       {
         "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
-        "lun": "[add(variables('beeGFSNodeSettings').numMetaDisks, 5)]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 5)]",
         "createOption": "Empty"
       },
       {
         "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
-        "lun": "[add(variables('beeGFSNodeSettings').numMetaDisks, 6)]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 6)]",
         "createOption": "Empty"
       },
       {
         "diskSizeGB": "[variables('beeGFSNodeSettings').storageDiskSize]",
-        "lun": "[add(variables('beeGFSNodeSettings').numMetaDisks, 7)]",
+        "lun": "[add(variables('beeGFSNodeSettings').numMetadataDisks, 7)]",
         "createOption": "Empty"
       }
     ]
