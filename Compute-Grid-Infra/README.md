@@ -124,7 +124,7 @@ You have to provide these parameters to the template :
 [![Click to deploy template on Azure](http://azuredeploy.net/deploybutton.png "Click to deploy template on Azure")](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fxpillons%2Fazure-hpc%2Fmaster%2FCompute-Grid-Infra%2FBeeGFS%2Fdeploy-beegfs-vmss.json)  
 
 ### Check your deployment
-Storage nodes will be named _beegfs00 ... beegfs99_ .
+Storage nodes will be named _beegfs000000 beegfs000001 ..._ .
 After few minutes, they should appear in the Ganglia monitoring web page.
 
 To check that the nodes are well registered into the BeeGFS management service, SSH on the master VM and then run these commands :
