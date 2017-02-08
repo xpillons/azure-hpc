@@ -171,7 +171,7 @@
     "vmScripts": {
       "scriptsToDownload": [
         "[uri(deployment().properties.templateLink.uri, 'install_beegfs.sh')]",
-        "[uri(deployment().properties.templateLink.uri, 'Ganglia/install_ganglia.sh')]"
+        "[uri(deployment().properties.templateLink.uri, '../Ganglia/install_ganglia.sh')]"
       ],
       "commandToExecute": "[concat('bash install_beegfs.sh ', variables('installParams'), ';', variables('gangliaInstall'))]"
     },
@@ -252,7 +252,7 @@
         "capacity": "[parameters('nodeCount')]"
       },
       "properties": {
-        "overprovision": "true",
+        "overprovision": "false",
         "upgradePolicy": {
           "mode": "Manual"
         },
