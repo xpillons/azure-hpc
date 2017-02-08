@@ -129,7 +129,6 @@
       }
     },
     "vmImage": "CentOS_7.2",
-    "deploymentApiVersion": "2015-11-01",
     "beeGFSNodeSettings": {
       "VMsku": "[parameters('VMsku')]",
       "vnetRG": "[parameters('RGvnetName')]",
