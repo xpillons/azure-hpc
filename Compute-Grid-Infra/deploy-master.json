@@ -80,6 +80,38 @@
       "metadata": {
         "description": "SSH rsa public key file as a string."
       }
+    },
+    "VNetStatus": {
+        "type": "string",
+        "defaultValue": "new",
+        "allowedValues": [
+            "new",
+            "existing"
+        ],
+        "metadata": {
+            "description": "Selection between an existing Virtual Network or a brand new one"
+        }
+    },
+    "existingVNetName": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "name of existing Virtual Network"
+      }
+    },
+    "existingVNetREsourceGroup": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "name of Resource Group for existing Virtual Network"
+      }
+    },
+    "existingSubnetName": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "name of existing Virtual Network"
+      }
     }
   },
   "variables": {
@@ -87,8 +119,22 @@
     "namingInfix": "[toLower(substring(concat(parameters('vmPrefix'), uniqueString(resourceGroup().id)), 0, 9))]",
     "longNamingInfix": "[toLower(parameters('vmPrefix'))]",
     "newStorageAccountSuffix": "[concat(variables('longNamingInfix'), 'sa')]",
-    "virtualNetworkName": "grid-vnet",
-    "vnetID": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
+    "networkStatus": {
+        "existing": {
+            "virtualNetworkName": "[parameters('existingVNetName')]",
+            "vnetID": "[resourceId(parameters('existingVNetREsourceGroup'), 'Microsoft.Network/virtualNetworks', parameters('existingVNetName'))]",
+            "infraSubnetRef": "[concat(variables('vnetID'),'/subnets/', parameters('existingSubnetName'))]"
+        },
+        "new": {
+            "virtualNetworkName": "grid-vnet",
+            "vnetID": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
+            "infraSubnetRef": "[concat(variables('vnetID'),'/subnets/infraSubnet/')]"
+        }
+    },
+    "currentnetworkStatus": "[variables('networkStatus')[parameters('VNetStatus')]]",
+    "virtualNetworkName": "[variables('currentnetworkStatus').virtualNetworkName]",
+    "vnetID": "[variables('currentnetworkStatus').vnetID]",
+    "infraSubnetRef": "[variables('currentnetworkStatus').infraSubnetRef]",
     "networkSettings": {
       "virtualNetworkName": "[variables('virtualNetworkName')]",
       "addressPrefix": "172.0.0.0/20",
@@ -96,7 +142,7 @@
       "storageSubnetPrefix": "172.0.10.0/25",
       "infraSubnetPrefix": "172.0.8.0/28",
       "gatewaySubnetPrefix": "172.0.9.0/29",
-      "infraSubnetRef": "[concat(variables('vnetID'),'/subnets/infraSubnet/')]",
+      "infraSubnetRef": "[variables('infraSubnetRef')]",
       "nsgName": "nsg-master"
     },
     "masterBoxName": "[concat(variables('longNamingInfix'), 'master')]",
@@ -164,10 +210,10 @@
     },
     "deploymentApiVersion": "2015-01-01",
 
-    "sharedTemplateUrl": "[uri(deployment().properties.templateLink.uri, 'shared-resources.json')]",
+    "sharedTemplateUrl": "[uri(deployment().properties.templateLink.uri, concat('shared-resources-', parameters('VNetStatus'), '.json'))]",
     "master-sharedTemplateUrl": "[uri(deployment().properties.templateLink.uri, 'master-shared-resources.json')]",
     "master-OSTemplateUrl": "[uri(deployment().properties.templateLink.uri, concat('master-', variables('masterOSSettings').osType.os, '-resources.json'))]",
-    "master-NSGTemplateUrl": "[uri(deployment().properties.templateLink.uri, concat('nsg-master-', variables('masterOSSettings').osType.os, '.json'))]"
+    "master-NSGTemplateUrl": "[uri(deployment().properties.templateLink.uri, concat('nsg-master-', variables('masterOSSettings').osType.os, parameters('VNetStatus'), '.json'))]"
   },
   "resources": [
     {
