@@ -31,7 +31,7 @@
     "location": "[resourceGroup().location]",
     "PremiumStorageMap": {
       "none": {
-        "size":  0
+        "size": 0
       },
       "P10": {
         "size": 128
@@ -68,7 +68,7 @@
     },
     "gangliaTemplateURI": "[uri(deployment().properties.templateLink.uri, 'Ganglia/ganglia.json')]",
     "masterScriptTemplateURI": "[uri(deployment().properties.templateLink.uri, 'master-linux-script.json')]",
-    "computeApiVersion": "2016-03-30",
+    "computeApiVersion": "2016-04-30-preview",
     "deploymentApiVersion": "2016-09-01"
   },
   "resources": [
