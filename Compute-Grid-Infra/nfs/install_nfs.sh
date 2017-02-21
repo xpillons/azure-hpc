@@ -52,7 +52,7 @@ EOF
     sleep 10
 
 	mkfs -t $filesystem $createdPartitions
-	echo "$createdPartitions $mountPoint $filesystem rw,noatime,attr2,inode64,nobarrier,sunit=1024,swidth=4096,nofail 0 2" >> /etc/fstab
+	echo "$createdPartitions $mountPoint $filesystem defaults,nofail 0 2" >> /etc/fstab
 	
 	mount $createdPartitions
 }
