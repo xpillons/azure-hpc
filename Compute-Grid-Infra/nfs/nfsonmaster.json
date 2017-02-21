@@ -1,0 +1,38 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vmName": {
+      "type": "string"
+    },
+    "params": {
+      "type": "securestring"
+    }
+  },
+  "variables": {
+    "extensionApiVersion": "2015-06-15"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(parameters('vmName'), '/ext')]",
+      "apiVersion": "[variables('extensionApiVersion')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "publisher": "Microsoft.Azure.Extensions",
+        "type": "CustomScript",
+        "typeHandlerVersion": "2.0",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "fileUris": [
+            "[uri(deployment().properties.templateLink.uri, 'install_nfs.sh')]"
+          ],
+          "timestamp": 12345
+        },
+        "protectedSettings": {
+          "commandToExecute": "[concat('bash install_nfs.sh ', parameters('params'))]"
+        }
+      }
+    }
+  ]
+}

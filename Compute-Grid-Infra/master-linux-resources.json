@@ -29,6 +29,20 @@
   },
   "variables": {
     "location": "[resourceGroup().location]",
+    "PremiumStorageMap": {
+      "none": {
+        "size":  0
+      },
+      "P10": {
+        "size": 128
+      },
+      "P20": {
+        "size": 512
+      },
+      "P30": {
+        "size": 1023
+      }
+    },
     "sshKeyPath": "[concat('/home/',parameters('masterOSSettings').adminUserName,'/.ssh/authorized_keys')]",
     "StorageTemplateURIChoice": {
       "none": {
@@ -38,14 +52,18 @@
       "beegfs": {
         "uri": "[uri(deployment().properties.templateLink.uri, 'BeeGFS/beegfs-script.json')]",
         "params": "[concat(parameters('masterSettings').Name, ' client')]"
+      },
+      "nfsonmaster": {
+        "uri": "[uri(deployment().properties.templateLink.uri, 'nfs/nfsonmaster.json')]",
+        "params": "[concat(parameters('masterSettings').Name, ' ')]"
       }
     },
     "SchedulerTemplateURIChoice": {
       "none": {
-        "uri": "[uri(deployment().properties.templateLink.uri, 'scheduler-none.json')]",
+        "uri": "[uri(deployment().properties.templateLink.uri, 'scheduler-none.json')]"
       },
       "pbspro": {
-        "uri": "[uri(deployment().properties.templateLink.uri, 'PBSPro/pbspro.json')]",
+        "uri": "[uri(deployment().properties.templateLink.uri, 'PBSPro/pbspro.json')]"
       }
     },
     "gangliaTemplateURI": "[uri(deployment().properties.templateLink.uri, 'Ganglia/ganglia.json')]",
@@ -83,13 +101,16 @@
         "storageProfile": {
           "imageReference": "[parameters('masterOSSettings').imageReference]",
           "osDisk": {
-            "name": "[parameters('masterSettings').OSDiskName]",
-            "vhd": {
-              "uri": "[concat('http://',parameters('masterSettings').SAName,'.blob.core.windows.net/',parameters('masterSettings').VHDContainerName,'/',parameters('masterSettings').OSDiskName,'.vhd')]"
-            },
             "caching": "ReadOnly",
             "createOption": "FromImage"
-          }
+          },
+          "dataDisks": [
+            {
+              "diskSizeGB": "[variables('PremiumStorageMap')[parameters('masterSettings').dataDiskSize].size]",
+              "lun": "0",
+              "createOption": "Empty"
+            }
+          ]
         },
         "networkProfile": {
           "networkInterfaces": [
