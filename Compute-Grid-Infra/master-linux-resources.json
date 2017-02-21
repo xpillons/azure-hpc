@@ -83,7 +83,7 @@
       },
       "nfsonmaster": {
         "uri": "[uri(deployment().properties.templateLink.uri, 'nfs/nfsonmaster.json')]",
-        "params": "[concat(parameters('masterSettings').Name, ' ')]"
+        "params": ""
       }
     },
     "SchedulerTemplateURIChoice": {

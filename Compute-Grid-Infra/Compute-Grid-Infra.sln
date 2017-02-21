@@ -87,6 +87,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "4nodes-centos71-pbs-IB", "4
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NFS", "NFS", "{7088833E-68FB-4F71-A856-D4B17BD603AC}"
 	ProjectSection(SolutionItems) = preProject
+		nfs\install_nfs.sh = nfs\install_nfs.sh
 		nfs\nfsonmaster.json = nfs\nfsonmaster.json
 	EndProjectSection
 EndProject
