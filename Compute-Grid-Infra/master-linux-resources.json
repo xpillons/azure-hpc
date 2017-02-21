@@ -31,18 +31,46 @@
     "location": "[resourceGroup().location]",
     "PremiumStorageMap": {
       "none": {
-        "size": 0
+        "size": 0,
+        "nbDisk": 0
       },
       "P10": {
-        "size": 128
+        "size": 128,
+        "nbDisk": 1
       },
       "P20": {
-        "size": 512
+        "size": 512,
+        "nbDisk": 1
       },
       "P30": {
-        "size": 1023
+        "size": 1023,
+        "nbDisk": 1
       }
     },
+    "nbDataDisks": "[variables('PremiumStorageMap')[parameters('masterSettings').dataDiskSize].nbDisk]",
+    "diskSize": "[variables('PremiumStorageMap')[parameters('masterSettings').dataDiskSize].size]",
+    "dataDiskArray": [
+      {
+        "diskSizeGB": "[variables('diskSize')]",
+        "lun": "0",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('diskSize')]",
+        "lun": "1",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('diskSize')]",
+        "lun": "2",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('diskSize')]",
+        "lun": "3",
+        "createOption": "Empty"
+      }
+    ],
     "sshKeyPath": "[concat('/home/',parameters('masterOSSettings').adminUserName,'/.ssh/authorized_keys')]",
     "StorageTemplateURIChoice": {
       "none": {
@@ -104,13 +132,7 @@
             "caching": "ReadOnly",
             "createOption": "FromImage"
           },
-          "dataDisks": [
-            {
-              "diskSizeGB": "[variables('PremiumStorageMap')[parameters('masterSettings').dataDiskSize].size]",
-              "lun": "0",
-              "createOption": "Empty"
-            }
-          ]
+          "dataDisks": "[take(variables('dataDiskArray'),variables('nbDataDisks'))]"
         },
         "networkProfile": {
           "networkInterfaces": [

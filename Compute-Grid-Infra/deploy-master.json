@@ -116,11 +116,7 @@
     "masterBoxName": "[concat(variables('longNamingInfix'), 'master')]",
     "masterSettings": {
       "Name": "[variables('masterBoxName')]",
-      "SAType": "Premium_LRS",
-      "SAName": "[concat(uniqueString(concat(resourceGroup().id, variables('newStorageAccountSuffix'), 'masterboxsa')), 'master')]",
       "DiagSAName": "[concat(uniqueString(concat(resourceGroup().id, variables('newStorageAccountSuffix'), 'masterboxsadiag')), 'diag')]",
-      "OSDiskName": "[concat(variables('masterBoxName'), 'osdisk')]",
-      "VHDContainerName": "[concat(variables('masterBoxName'), 'vhd')]",
       "IPConfigName": "[concat(variables('masterBoxName'), 'ipconfig')]",
       "NicName": "[concat(variables('masterBoxName'), 'nic')]",
       "VMsku": "[parameters('VMsku')]",
