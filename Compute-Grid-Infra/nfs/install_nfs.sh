@@ -43,8 +43,7 @@ p
 1
 
 
-t
-fd
+p
 w
 EOF
         createdPartitions="$createdPartitions /dev/${disk}1"
