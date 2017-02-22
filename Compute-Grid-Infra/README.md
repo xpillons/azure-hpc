@@ -42,7 +42,8 @@ For DNS, the Azure DNS is used for name resolution on the private IPs.
 Compute nodes are deployed thru VM Scale sets and Managed Disks, made each by up to 100 VMs instances. They are all inside the compute-subnet.
 
 ### Storage
-Depending on the workload to run on the cluster, there is a need to build a scalable file system. BeeGFS is proposed as an option, each storage node will host the storage and metadata services. Several Premium Disks are configured in RAID0 to store the metadata in addition to the real store.
+Depending on the workload to run on the cluster, there may be a need to build a scalable file system. BeeGFS is proposed as an option, each storage node will host the storage and metadata services. Several Premium Disks are configured in RAID0 to store the metadata in addition to the real store.
+For a small size cluster, there is an option to use the master machine as an NFS server with an attached data disk.
 
 ### Management
 A dedicated VM (the master node) is used as a jumpbox, exposing an SSH endpoint, and hosting these services :
@@ -58,7 +59,7 @@ To build the compute grid, three main steps need to be executed :
 
 _The OS for this solution is CentOS 7.2. All scripts have been tested only for that version._
 
-> Starting on February 8, 2017 Compute nodes and BeeGFS nodes are all provisioned using Managed Disks.
+> Starting on February 22, 2017 Master, Compute nodes and BeeGFS nodes are all provisioned using Managed Disks.
 
 
 ## Deploying using Azure CLI
@@ -78,9 +79,10 @@ The template __deploy-master.json__ will provision the networking infrastructure
 
 You have to provide these parameters to the template :
 * _vmPrefix_ : a 8 characters prefix to be used to name your objects. The master VM will be named as **\[prefix\]master**
-* _sharedStorage_ : to specify the shared storage to use. Allowed values are : none, beegfs.
+* _sharedStorage_ : to specify the shared storage to use. Allowed values are : none, beegfs, nfsonmaster.
 * _scheduler_ : the job scheduler to be setup. Allowed values are : none, pbspro
 * _masterImage_ : the OS to be used. Should be CentOS_7.2
+* _dataDiskSize_ :  the size of the data disk to attached. Allowed values are : none, P10 (128GB), P20 (512GB), P30 (1023GB)
 * _VMSku_ : This is to specify the instance size of the master VM. For example Standard_DS3_v2
 * _adminUsername_ : This is the name of the administrator account to create on the VM
 * _adminPassword_ : Password to associate to the administrator account. It is highly encourage to use SSH authentication and passwordless instead.
@@ -92,6 +94,8 @@ You have to provide these parameters to the template :
 Once the deployment succeed, use the output **masterFQDN** to retrieve the master name and SSH on it. The output **GangliaURI** contains the URI of the Ganglia monitoring page, which should display after few minutes graphs of the current load.
 
 To check if PBSPro is installed, run the command **pbsnodes -a** this should return no available nodes, but the command should run successfully.
+
+If **nfsonmaster** is choosen, an NFS mount point named **/data** will be created.
 
 BeeGFS will be checked later once the storage nodes will be deployed.
 
@@ -140,7 +144,7 @@ Compute nodes are provisioned using VM Scalesets, each set can have up to 100 VM
 
 You have to provide these parameters to the template :
 * _VMsku_ : Instance type to provision. Default is **Standard_D3_v2**
-* _sharedStorage_ : default is **none**. Allowed values are (beegfs, none)
+* _sharedStorage_ : default is **none**. Allowed values are (nfsonmaster, beegfs, none)
 * _scheduler_ : default is **none**. Allowed values are (pbspro, none)
 * _computeNodeImage_ : OS to use for compute nodes. Default and recommended value is **CentOS_7.2**
 * _vmSSPrefix_ : 8 characters prefix to use to name the compute nodes. The naming pattern will be **prefixAABBBBBB** where _AA_ is two digit number of the scaleset and _BBBBBB_ is the 8 hexadecimal value inside the Scaleset
@@ -159,6 +163,8 @@ You have to provide these parameters to the template :
 After few minutes, once the provision succeed, you should see the new hosts added on the Ganglia monitoring page.
 
 If PBS Pro is used, SSH on the master and run the **pbsnodes -a** command to list all the registered nodes.
+
+If **nfsonmaster** is choosen the NFS mount point **/data** is automatically mounted.
 
 **Your cluster is now ready to host applications and run jobs**
 
