@@ -52,10 +52,11 @@
       "defaultValue": "none",
       "allowedValues": [
         "none",
-        "beegfs"
+        "beegfs",
+        "nfsonmaster"
       ],
       "metadata": {
-        "description": "specify the shared storage to be used"
+        "description": "specify the shared storage to be used. beegfs=> beegfs cluster, nfsonmaster=> nfs share on the master"
       }
     },
     "scheduler": {

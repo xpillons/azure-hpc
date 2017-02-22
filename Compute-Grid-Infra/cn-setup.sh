@@ -4,6 +4,8 @@ export MOUNT_POINT=/mnt/azure
 # Shares
 SHARE_HOME=/share/home
 SHARE_SCRATCH=/share/scratch
+NFS_ON_MASTER=/data
+NFS_MOUNT=/data
 
 # User
 HPC_USER=hpcuser
@@ -17,7 +19,7 @@ log()
 	echo "$1"
 }
 
-usage() { echo "Usage: $0 [-a <azure storage account>] [-k <azure storage key>] [-m <masterName>] [-s <pbspro>] [-S <beegfs>]" 1>&2; exit 1; }
+usage() { echo "Usage: $0 [-a <azure storage account>] [-k <azure storage key>] [-m <masterName>] [-s <pbspro>] [-S <beegfs, nfsonmaster>]" 1>&2; exit 1; }
 
 while getopts :a:k:m:S:s: optname; do
   log "Option $optname set with value ${OPTARG}"
@@ -32,7 +34,7 @@ while getopts :a:k:m:S:s: optname; do
     m)  # master name
 		export MASTER_NAME=${OPTARG}
 		;;
-    S)  # Shared Storage (beegfs)
+    S)  # Shared Storage (beegfs, nfsonmaster)
 		export SHARED_STORAGE=${OPTARG}
 		;;
     s)  # Scheduler (pbspro)
@@ -89,13 +91,13 @@ mount_nfs()
 
 	yum -y install nfs-utils nfs-utils-lib
 	
-	mkdir -p /apps
+	mkdir -p ${NFS_MOUNT}
 
 	log "mounting NFS on " ${MASTER_NAME}
 	showmount -e ${MASTER_NAME}
-	mount -t nfs ${MASTER_NAME}:/nfsdata/apps /apps/	 
+	mount -t nfs ${MASTER_NAME}:${NFS_ON_MASTER} ${NFS_MOUNT}
 	
-	echo "${MASTER_NAME}:/nfsdata/apps /apps nfs defaults  0 0" >> /etc/fstab
+	echo "${MASTER_NAME}:${NFS_ON_MASTER} ${NFS_MOUNT} nfs defaults,nofail  0 0" >> /etc/fstab
 }
 
 install_beegfs_client()
@@ -151,7 +153,6 @@ setenforce permissive
 
 #install_azure_cli
 #install_azure_files
-#mount_nfs
 #install_lsf
 #install_applications
 setup_user
@@ -163,6 +164,8 @@ fi
 
 if [ "$SHARED_STORAGE" == "beegfs" ]; then
 	install_beegfs_client
+elif [ "$SHARED_STORAGE" == "nfsonmaster" ]; then
+	mount_nfs
 fi
 
 # Create marker file so we know we're configured
