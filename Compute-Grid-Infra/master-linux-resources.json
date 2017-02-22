@@ -29,6 +29,48 @@
   },
   "variables": {
     "location": "[resourceGroup().location]",
+    "PremiumStorageMap": {
+      "none": {
+        "size": 0,
+        "nbDisk": 0
+      },
+      "P10": {
+        "size": 128,
+        "nbDisk": 1
+      },
+      "P20": {
+        "size": 512,
+        "nbDisk": 1
+      },
+      "P30": {
+        "size": 1023,
+        "nbDisk": 1
+      }
+    },
+    "nbDataDisks": "[variables('PremiumStorageMap')[parameters('masterSettings').dataDiskSize].nbDisk]",
+    "diskSize": "[variables('PremiumStorageMap')[parameters('masterSettings').dataDiskSize].size]",
+    "dataDiskArray": [
+      {
+        "diskSizeGB": "[variables('diskSize')]",
+        "lun": "0",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('diskSize')]",
+        "lun": "1",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('diskSize')]",
+        "lun": "2",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('diskSize')]",
+        "lun": "3",
+        "createOption": "Empty"
+      }
+    ],
     "sshKeyPath": "[concat('/home/',parameters('masterOSSettings').adminUserName,'/.ssh/authorized_keys')]",
     "StorageTemplateURIChoice": {
       "none": {
@@ -38,19 +80,23 @@
       "beegfs": {
         "uri": "[uri(deployment().properties.templateLink.uri, 'BeeGFS/beegfs-script.json')]",
         "params": "[concat(parameters('masterSettings').Name, ' client')]"
+      },
+      "nfsonmaster": {
+        "uri": "[uri(deployment().properties.templateLink.uri, 'nfs/nfsonmaster.json')]",
+        "params": ""
       }
     },
     "SchedulerTemplateURIChoice": {
       "none": {
-        "uri": "[uri(deployment().properties.templateLink.uri, 'scheduler-none.json')]",
+        "uri": "[uri(deployment().properties.templateLink.uri, 'scheduler-none.json')]"
       },
       "pbspro": {
-        "uri": "[uri(deployment().properties.templateLink.uri, 'PBSPro/pbspro.json')]",
+        "uri": "[uri(deployment().properties.templateLink.uri, 'PBSPro/pbspro.json')]"
       }
     },
     "gangliaTemplateURI": "[uri(deployment().properties.templateLink.uri, 'Ganglia/ganglia.json')]",
     "masterScriptTemplateURI": "[uri(deployment().properties.templateLink.uri, 'master-linux-script.json')]",
-    "computeApiVersion": "2016-03-30",
+    "computeApiVersion": "2016-04-30-preview",
     "deploymentApiVersion": "2016-09-01"
   },
   "resources": [
@@ -83,13 +129,10 @@
         "storageProfile": {
           "imageReference": "[parameters('masterOSSettings').imageReference]",
           "osDisk": {
-            "name": "[parameters('masterSettings').OSDiskName]",
-            "vhd": {
-              "uri": "[concat('http://',parameters('masterSettings').SAName,'.blob.core.windows.net/',parameters('masterSettings').VHDContainerName,'/',parameters('masterSettings').OSDiskName,'.vhd')]"
-            },
             "caching": "ReadOnly",
             "createOption": "FromImage"
-          }
+          },
+          "dataDisks": "[take(variables('dataDiskArray'),variables('nbDataDisks'))]"
         },
         "networkProfile": {
           "networkInterfaces": [

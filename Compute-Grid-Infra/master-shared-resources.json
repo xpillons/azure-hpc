@@ -23,15 +23,6 @@
   "resources": [
     {
       "type": "Microsoft.Storage/storageAccounts",
-      "name": "[parameters('masterSettings').SAName]",
-      "location": "[variables('location')]",
-      "apiVersion": "[variables('storageApiVersion')]",
-      "properties": {
-        "accountType": "[parameters('masterSettings').SAType]"
-      }
-    },
-    {
-      "type": "Microsoft.Storage/storageAccounts",
       "name": "[parameters('masterSettings').DiagSAName]",
       "location": "[variables('location')]",
       "apiVersion": "[variables('storageApiVersion')]",

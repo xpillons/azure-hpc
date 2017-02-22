@@ -52,6 +52,9 @@
       "none": {
         "params": ""
       },
+      "nfsonmaster": {
+        "params": " -S nfsonmaster"
+      },
       "beegfs": {
         "params": " -S beegfs"
       },

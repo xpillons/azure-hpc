@@ -38,10 +38,24 @@
       "defaultValue": "none",
       "allowedValues": [
         "none",
-        "beegfs"
+        "beegfs",
+        "nfsonmaster"
       ],
       "metadata": {
-        "description": "specify the shared storage to be used"
+        "description": "specify the shared storage to be used. beegfs=> beegfs cluster, nfsonmaster=> nfs share on the master"
+      }
+    },
+    "dataDiskSize": {
+      "type": "string",
+      "defaultValue": "none",
+      "allowedValues": [
+        "none",
+        "P10",
+        "P20",
+        "P30"
+      ],
+      "metadata": {
+        "description": "Premium storage disk size to attach"
       }
     },
     "scheduler": {
@@ -102,18 +116,15 @@
     "masterBoxName": "[concat(variables('longNamingInfix'), 'master')]",
     "masterSettings": {
       "Name": "[variables('masterBoxName')]",
-      "SAType": "Premium_LRS",
-      "SAName": "[concat(uniqueString(concat(resourceGroup().id, variables('newStorageAccountSuffix'), 'masterboxsa')), 'master')]",
       "DiagSAName": "[concat(uniqueString(concat(resourceGroup().id, variables('newStorageAccountSuffix'), 'masterboxsadiag')), 'diag')]",
-      "OSDiskName": "[concat(variables('masterBoxName'), 'osdisk')]",
-      "VHDContainerName": "[concat(variables('masterBoxName'), 'vhd')]",
       "IPConfigName": "[concat(variables('masterBoxName'), 'ipconfig')]",
       "NicName": "[concat(variables('masterBoxName'), 'nic')]",
       "VMsku": "[parameters('VMsku')]",
       "publicIPAddressName": "[concat(variables('masterBoxName'), 'pip')]",
       "publicIPDomainName": "[variables('namingInfix')]",
       "sharedStorage": "[parameters('sharedStorage')]",
-      "scheduler": "[parameters('scheduler')]"
+      "scheduler": "[parameters('scheduler')]",
+      "dataDiskSize": "[parameters('dataDiskSize')]"
     },
     "masterOSSettings": {
       "osType": "[variables('osTypes')[parameters('masterImage')]]",
