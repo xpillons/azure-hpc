@@ -32,6 +32,7 @@ HPC_GID=7007
 
 MASTER_NAME=`hostname`
 
+######################################################################
 setup_disks()
 {
     mkdir -p $SHARE_HOME
@@ -41,6 +42,7 @@ setup_disks()
 	chown $HPC_USER:$HPC_GROUP $SHARE_APPS
 }
 
+######################################################################
 setup_user()
 {
     # disable selinux
@@ -81,6 +83,7 @@ setup_user()
 	chown $HPC_USER:$HPC_GROUP $SHARE_SCRATCH
 }
 
+######################################################################
 mount_nfs()
 {
 	log "install NFS"
@@ -124,23 +127,12 @@ install_azure_files()
 	
 }
 
-install_beegfs()
+######################################################################
+setup_blobxfer()
 {
-	yum -y install wget
-    wget -O install_beegfs_mgmt.sh https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/BeeGFS/install_beegfs_mgmt.sh
-    wget -O install_beegfs_client.sh https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/BeeGFS/install_beegfs_client.sh
-
-	bash install_beegfs_mgmt.sh ${MASTER_NAME}
-	bash install_beegfs_client.sh ${MASTER_NAME}
-}
-
-install_ganglia()
-{
-	yum -y install wget
-    wget -O install_gmond.sh https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/Ganglia/install_gmond.sh
-    wget -O install_gmetad.sh https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/Ganglia/install_gmetad.sh
-	bash install_gmetad.sh
-	bash install_gmond.sh ${MASTER_NAME} "Master" 8649
+	yum install -y gcc openssl-devel libffi-devel python-devel
+	curl https://bootstrap.pypa.io/get-pip.py | sudo python
+	pip install --upgrade blobxfer
 }
 
 SETUP_MARKER=/var/tmp/master-setup.marker
@@ -154,8 +146,7 @@ fi
 setup_disks
 mount_nfs
 setup_user
-#install_ganglia
-#install_beegfs
+setup_blobxfer
 
 # Create marker file so we know we're configured
 touch $SETUP_MARKER
