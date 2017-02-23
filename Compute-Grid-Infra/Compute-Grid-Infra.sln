@@ -97,6 +97,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "star-ccm", "star-ccm", "{93
 	ProjectSection(SolutionItems) = preProject
 		apps\star-ccm\getmodel.sh = apps\star-ccm\getmodel.sh
 		apps\star-ccm\install-starccm.sh = apps\star-ccm\install-starccm.sh
+		apps\star-ccm\qsubstar.sh = apps\star-ccm\qsubstar.sh
+		apps\star-ccm\starccm.sh = apps\star-ccm\starccm.sh
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pallas", "pallas", "{609213A0-3270-4DD3-ABB4-B99F03772D16}"
