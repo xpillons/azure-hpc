@@ -115,6 +115,13 @@ install_pbspro()
 	bash install_pbspro.sh ${MASTER_NAME}
 }
 
+install_blobxfer()
+{
+	yum install -y gcc openssl-devel libffi-devel python-devel
+	curl https://bootstrap.pypa.io/get-pip.py | python
+	pip install --upgrade blobxfer
+}
+
 setup_user()
 {
 	yum -y install nfs-utils nfs-utils-lib
@@ -168,6 +175,7 @@ elif [ "$SHARED_STORAGE" == "nfsonmaster" ]; then
 	mount_nfs
 fi
 
+install_blobxfer
 # Create marker file so we know we're configured
 touch $SETUP_MARKER
 
