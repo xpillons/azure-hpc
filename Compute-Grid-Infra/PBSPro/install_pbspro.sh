@@ -7,7 +7,7 @@ if [[ $(id -u) -ne 0 ]] ; then
     exit 1
 fi
 
-if [ $# != 1 ]; then
+if [ $# -le 1 ]; then
     echo "Usage: $0 <MasterHostname> <queueName>"
     exit 1
 fi
@@ -106,7 +106,7 @@ EOF
 
 		# if queue name is set update the self register script
 		if [ -n "$QNAME" ]; then
-			sed -i '/qname=/ s/=.*/=$QNAME/' /etc/init.d/pbs_selfregister
+			sed -i '/qname=/ s/=.*/='$QNAME'/' /etc/init.d/pbs_selfregister
 		fi
 
 		# register node
