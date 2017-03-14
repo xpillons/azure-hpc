@@ -19,7 +19,7 @@ log()
 	echo "$1"
 }
 
-usage() { echo "Usage: $0 [-a <azure storage account>] [-k <azure storage key>] [-m <masterName>] [-s <pbspro>] [-S <beegfs, nfsonmaster>]" 1>&2; exit 1; }
+usage() { echo "Usage: $0 [-a <azure storage account>] [-k <azure storage key>] [-m <masterName>] [-s <pbspro>] [-q <queuename>] [-S <beegfs, nfsonmaster>]" 1>&2; exit 1; }
 
 while getopts :a:k:m:S:s: optname; do
   log "Option $optname set with value ${OPTARG}"
@@ -39,6 +39,9 @@ while getopts :a:k:m:S:s: optname; do
 		;;
     s)  # Scheduler (pbspro)
 		export SCHEDULER=${OPTARG}
+		;;
+    q)  # queue name
+		export QNAME=${OPTARG}
 		;;
 	*)
 		usage
@@ -112,7 +115,7 @@ install_ganglia()
 
 install_pbspro()
 {
-	bash install_pbspro.sh ${MASTER_NAME}
+	bash install_pbspro.sh ${MASTER_NAME} ${QNAME}
 }
 
 install_blobxfer()

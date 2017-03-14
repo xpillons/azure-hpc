@@ -8,12 +8,15 @@ if [[ $(id -u) -ne 0 ]] ; then
 fi
 
 if [ $# != 1 ]; then
-    echo "Usage: $0 <MasterHostname>"
+    echo "Usage: $0 <MasterHostname> <queueName>"
     exit 1
 fi
 
 # Set user args
 MASTER_HOSTNAME=$1
+if [ -n "$2" ]; then
+	QNAME=$2
+fi
 PBS_MANAGER=hpcuser
 
 # Returns 0 if this node is the master node.
@@ -100,6 +103,11 @@ EOF
 		chmod +x /etc/init.d/pbs_selfregister
 		chown root /etc/init.d/pbs_selfregister
 		chkconfig --add pbs_selfregister
+
+		# if queue name is set update the self register script
+		if [ -n "$QNAME" ]; then
+			sed -i '/qname=/ s/=.*/=$QNAME/' /etc/init.d/pbs_selfregister
+		fi
 
 		# register node
 		/etc/init.d/pbs_selfregister start

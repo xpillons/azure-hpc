@@ -59,7 +59,7 @@
         "params": " -S beegfs"
       },
       "pbspro": {
-        "params": " -s pbspro"
+        "params": "[concat(' -s pbspro -q ', parameters('vmssName'))]"
       },
       "master": {
         "params": "[concat(' -m ', parameters('nodeSettings').MasterName)]"
