@@ -15,7 +15,8 @@ fi
 # Set user args
 MASTER_HOSTNAME=$1
 if [ -n "$2" ]; then
-	QNAME=$2
+	#enforce qname to be lowercase
+	QNAME="$(echo ${2,,})"
 fi
 PBS_MANAGER=hpcuser
 
