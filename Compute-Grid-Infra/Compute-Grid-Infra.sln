@@ -95,10 +95,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "apps", "apps", "{871F1DE3-B
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "star-ccm", "star-ccm", "{93F12BE7-FD27-4B7E-9A3B-9331AAC21929}"
 	ProjectSection(SolutionItems) = preProject
-		apps\star-ccm\getmodel.sh = apps\star-ccm\getmodel.sh
+		apps\star-ccm\copydata.pbs = apps\star-ccm\copydata.pbs
+		apps\star-ccm\download.pbs = apps\star-ccm\download.pbs
 		apps\star-ccm\install-starccm.sh = apps\star-ccm\install-starccm.sh
 		apps\star-ccm\qsubstar.sh = apps\star-ccm\qsubstar.sh
-		apps\star-ccm\starccm.sh = apps\star-ccm\starccm.sh
+		apps\star-ccm\starccm.pbs = apps\star-ccm\starccm.pbs
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pallas", "pallas", "{609213A0-3270-4DD3-ABB4-B99F03772D16}"
