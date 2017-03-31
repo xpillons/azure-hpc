@@ -7,18 +7,20 @@ if [[ $(id -u) -ne 0 ]] ; then
     exit 1
 fi
 
-if [ $# -le 1 ]; then
+if [ $# -lt 1 ]; then
     echo "Usage: $0 <MasterHostname> <queueName>"
     exit 1
 fi
 
 # Set user args
 MASTER_HOSTNAME=$1
+QNAME=workq
+PBS_MANAGER=hpcuser
+
 if [ -n "$2" ]; then
 	#enforce qname to be lowercase
 	QNAME="$(echo ${2,,})"
 fi
-PBS_MANAGER=hpcuser
 
 # Returns 0 if this node is the master node.
 #
