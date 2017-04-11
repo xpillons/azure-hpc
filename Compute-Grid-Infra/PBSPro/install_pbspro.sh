@@ -51,7 +51,9 @@ install_pkgs()
 #
 install_pbspro()
 {
-    
+ 
+	yum install -y libXt-devel libXext
+
     wget -O /mnt/CentOS_7.zip  http://wpc.23a7.iotacdn.net/8023A7/origin2/rl/PBS-Open/CentOS_7.zip
     unzip /mnt/CentOS_7.zip -d /mnt
        
@@ -59,7 +61,7 @@ install_pbspro()
 		enable_kernel_update
 		install_pkgs
 
-		yum install -y gcc make rpm-build libtool hwloc-devel libX11-devel libXt-devel libedit-devel libical-devel ncurses-devel perl postgresql-devel python-devel tcl-devel tk-devel swig expat-devel openssl-devel libXext libXft autoconf automake expat libedit postgresql-server python sendmail tcl tk libical perl-Env perl-Switch
+		yum install -y gcc make rpm-build libtool hwloc-devel libX11-devel libedit-devel libical-devel ncurses-devel perl postgresql-devel python-devel tcl-devel tk-devel swig expat-devel openssl-devel libXft autoconf automake expat libedit postgresql-server python sendmail tcl tk libical perl-Env perl-Switch
     
 		# Required on 7.2 as the libical lib changed
 		ln -s /usr/lib64/libical.so.1 /usr/lib64/libical.so.0
