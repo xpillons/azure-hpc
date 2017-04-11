@@ -44,19 +44,19 @@ install_pkgs()
 # the mom agent on worker nodes.
 #
 install_pbspro()
-{
-    yum install -y gcc make rpm-build libtool hwloc-devel libX11-devel libXt-devel libedit-devel libical-devel ncurses-devel perl postgresql-devel python-devel tcl-devel tk-devel swig expat-devel openssl-devel libXext libXft autoconf automake expat libedit postgresql-server python sendmail tcl tk libical perl-Env perl-Switch
-    
-    # Required on 7.2 as the libical lib changed
-    ln -s /usr/lib64/libical.so.1 /usr/lib64/libical.so.0
-    
+{    
     wget -O /mnt/CentOS_7.zip  http://wpc.23a7.iotacdn.net/8023A7/origin2/rl/PBS-Open/CentOS_7.zip
     unzip /mnt/CentOS_7.zip -d /mnt
        
     if is_master; then
     	enable_kernel_update
 	install_pkgs
-	    rpm -ivh --nodeps /mnt/CentOS_7/pbspro-server-14.1.0-13.1.x86_64.rpm
+	
+    	yum install -y gcc make rpm-build libtool hwloc-devel libX11-devel libXt-devel libedit-devel libical-devel ncurses-devel perl postgresql-devel python-devel tcl-devel tk-devel swig expat-devel openssl-devel libXext libXft autoconf automake expat libedit postgresql-server python sendmail tcl tk libical perl-Env perl-Switch
+    	# Required on 7.2 as the libical lib changed
+    	ln -s /usr/lib64/libical.so.1 /usr/lib64/libical.so.0
+
+	rpm -ivh --nodeps /mnt/CentOS_7/pbspro-server-14.1.0-13.1.x86_64.rpm
 
         cat > /etc/pbs.conf << EOF
 PBS_SERVER=$MASTER_HOSTNAME
