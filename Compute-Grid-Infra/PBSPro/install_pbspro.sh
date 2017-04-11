@@ -54,6 +54,8 @@ install_pbspro()
     unzip /mnt/CentOS_7.zip -d /mnt
        
     if is_master; then
+    	enable_kernel_update
+	install_pkgs
 	    rpm -ivh --nodeps /mnt/CentOS_7/pbspro-server-14.1.0-13.1.x86_64.rpm
 
         cat > /etc/pbs.conf << EOF
@@ -78,6 +80,7 @@ EOF
         /opt/pbs/bin/qmgr -c "s s managers = $PBS_MANAGER@*"
 
     else
+    	yum install -y hwloc-devel expat-devel tcl-devel expat
 	    rpm -ivh --nodeps /mnt/CentOS_7/pbspro-execution-14.1.0-13.1.x86_64.rpm
 
         cat > /etc/pbs.conf << EOF
@@ -118,9 +121,6 @@ if [ -e "$SETUP_MARKER" ]; then
     exit 0
 fi
 
-
-enable_kernel_update
-install_pkgs
 install_pbspro
 
 # Create marker file so we know we're configured
