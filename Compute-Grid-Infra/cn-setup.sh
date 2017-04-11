@@ -116,7 +116,6 @@ sed -i 's/enforcing/disabled/g' /etc/selinux/config
 setenforce permissive
 
 setup_user
-exit 0
 install_ganglia
 
 if [ "$SCHEDULER" == "pbspro" ]; then
