@@ -89,7 +89,7 @@ EOF
 
     else
 
-		yum install hwloc-devel expat-devel tcl-devel expat
+		yum install -y hwloc-devel expat-devel tcl-devel expat
 
 	    rpm -ivh --nodeps /mnt/CentOS_7/pbspro-execution-14.1.0-13.1.x86_64.rpm
 
