@@ -145,6 +145,9 @@
           "name": "DockerExtension",
           "apiVersion": "[variables('extensionApiVersion')]",
           "location": "[resourceGroup().location]",
+          "dependsOn": [
+            "[concat('Microsoft.Compute/virtualMachines/', variables('vmSettings').name)]"
+          ],
           "properties": {
             "publisher": "Microsoft.Azure.Extensions",
             "type": "DockerExtension",
