@@ -138,30 +138,29 @@
             }
           ]
         }
-      }
-    },
-    {
-      "type": "Microsoft.Compute/virtualMachines/extensions",
-      "name": "DockerExtension",
-      "apiVersion": "[variables('extensionApiVersion')]",
-      "location": "[resourceGroup().location]",
-      "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachines/', variables('vmSettings').name)]"
-      ],
-      "properties": {
-        "publisher": "Microsoft.Azure.Extensions",
-        "type": "DockerExtension",
-        "typeHandlerVersion": "1.0",
-        "autoUpgradeMinorVersion": true,
-        "settings": {}
-      }
+      },
+      "resources": [
+        {
+          "type": "Microsoft.Compute/virtualMachines/extensions",
+          "name": "DockerExtension",
+          "apiVersion": "[variables('extensionApiVersion')]",
+          "location": "[resourceGroup().location]",
+          "properties": {
+            "publisher": "Microsoft.Azure.Extensions",
+            "type": "DockerExtension",
+            "typeHandlerVersion": "1.0",
+            "autoUpgradeMinorVersion": true,
+            "settings": {}
+          }
+        }
+      ]
     },
     {
       "name": "ScriptExtension",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "[variables('deploymentApiVersion')]",
       "dependsOn": [
-        "DockerExtension"
+        "[concat('Microsoft.Compute/virtualMachines/', variables('vmSettings').name)]"
       ],
       "properties": {
         "mode": "Incremental",
