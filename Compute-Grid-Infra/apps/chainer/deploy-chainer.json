@@ -141,7 +141,7 @@
       },
       "resources": [
         {
-          "type": "Microsoft.Compute/virtualMachines/extensions",
+          "type": "extensions",
           "name": "DockerExtension",
           "apiVersion": "[variables('extensionApiVersion')]",
           "location": "[resourceGroup().location]",
