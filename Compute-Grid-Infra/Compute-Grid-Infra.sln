@@ -108,6 +108,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pallas", "pallas", "{609213
 		apps\pallas\mpipingpong.sh = apps\pallas\mpipingpong.sh
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "chainer", "chainer", "{5289AA12-6F9D-408E-BA3B-1CEFE2843CF4}"
+	ProjectSection(SolutionItems) = preProject
+		apps\chainer\chainer-script.json = apps\chainer\chainer-script.json
+		apps\chainer\deploy-chainer.json = apps\chainer\deploy-chainer.json
+		apps\chainer\install-chainer.sh = apps\chainer\install-chainer.sh
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -124,5 +131,6 @@ Global
 		{871F1DE3-BD9A-4EF6-BB10-D911B1392336} = {E3BE2F83-EF47-465C-8066-915F86E2D5C6}
 		{93F12BE7-FD27-4B7E-9A3B-9331AAC21929} = {871F1DE3-BD9A-4EF6-BB10-D911B1392336}
 		{609213A0-3270-4DD3-ABB4-B99F03772D16} = {871F1DE3-BD9A-4EF6-BB10-D911B1392336}
+		{5289AA12-6F9D-408E-BA3B-1CEFE2843CF4} = {871F1DE3-BD9A-4EF6-BB10-D911B1392336}
 	EndGlobalSection
 EndGlobal
