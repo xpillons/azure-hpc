@@ -163,7 +163,8 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "[variables('deploymentApiVersion')]",
       "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachines/', variables('vmSettings').name)]"
+        "[concat('Microsoft.Compute/virtualMachines/', variables('vmSettings').name)]",
+        "DockerExtension"
       ],
       "properties": {
         "mode": "Incremental",
