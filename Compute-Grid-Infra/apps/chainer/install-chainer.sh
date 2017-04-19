@@ -31,7 +31,7 @@ setup_python_ubuntu()
 {
 	log "setup_python_ubuntu"
 	apt-get install -y python3-pip
-	echo "alias python=/usr/bin/python3" >> ~/.bash_aliases
+	#echo "alias python=/usr/bin/python3" >> ~/.bash_aliases
 	apt-get install -y build-essential libssl-dev libffi-dev python3-dev
 	pip3 install --upgrade pip
 }
@@ -47,8 +47,8 @@ setup_cuda8_ubuntu()
 
 	nvidia-smi
 
-	echo "export CUDA_PATH=/usr/local/cuda" >> ~/.bashrc
-	echo "export PATH=/usr/local/cuda/bin${PATH:+:${PATH}}" >> ~/.bashrc
+	echo "export CUDA_PATH=/usr/local/cuda" >> /etc/profile.d/cuda.sh
+	echo "export PATH=/usr/local/cuda/bin\${PATH:+:\${PATH}}" >> /etc/profile.d/cuda.sh
 }
 
 setup_numpy()
