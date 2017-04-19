@@ -94,6 +94,7 @@ if [ -e "$SETUP_MARKER" ]; then
     exit 0
 fi
 
+exit 0
 nvidia_drivers_ubuntu
 check_docker
 
