@@ -107,7 +107,7 @@ setup_cuda8_centos()
 	curl -O http://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64/${CUDA_RPM}
 	rpm -i ${CUDA_RPM}
 	yum clean expire-cache
-	yum -y install cuda -x cuda-samples-8-0 -x cuda-visual-tools-8-0
+	yum -y install cuda
 
 	nvidia-smi
 }
