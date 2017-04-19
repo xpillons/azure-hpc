@@ -54,7 +54,7 @@ setup_cuda8_ubuntu()
 setup_numpy()
 {
 	log "setup_numpy"
-	pip3 install --user numpy
+	pip3 install numpy
 }
 
 setup_cudnn()
