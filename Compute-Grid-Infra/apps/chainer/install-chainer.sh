@@ -137,7 +137,6 @@ nvidia_drivers()
 	log "nvidia_drivers"
 	if is_ubuntu; then
 		nvidia_drivers_ubuntu
-	elif is_centos; then
 	fi
 }
 
