@@ -5,6 +5,18 @@ log()
 	echo "$1"
 }
 
+is_ubuntu()
+{
+	python -mplatform | grep -qi Ubuntu
+	return $?
+}
+
+is_centos()
+{
+	python -mplatform | grep -qi CentOS
+	return $?
+}
+
 check_docker()
 {
 	log "check if docker is installed"
@@ -17,25 +29,68 @@ check_docker()
 	fi
 }
 
-base_pkgs_ubuntu()
+base_pkgs()
 {
 	log "base_pkgs"
+	if is_ubuntu; then
+		base_pkgs_ubuntu
+	elif is_centos; then
+		base_pkgs_centos
+	fi
+}
+
+base_pkgs_ubuntu()
+{
 	apt-get update
 	apt-get install -y g++
 }
 
+base_pkgs_centos()
+{
+	yum -y update
+	yum -y install gcc-c++
+}
+
+setup_python()
+{
+	log "setup_python"
+	if is_ubuntu; then
+		setup_python_ubuntu
+	elif is_centos; then
+		setup_python_centos
+	fi
+}
+
 setup_python_ubuntu()
 {
-	log "setup_python_ubuntu"
 	apt-get install -y python3-pip
-	#echo "alias python=/usr/bin/python3" >> ~/.bash_aliases
 	apt-get install -y build-essential libssl-dev libffi-dev python3-dev
 	pip3 install --upgrade pip
 }
 
+setup_python_centos()
+{
+	yum -y install epel-release
+	yum -y install python34 python34-devel
+	curl -O https://bootstrap.pypa.io/get-pip.py
+	python3 get-pip.py
+}
+
+setup_cuda8()
+{
+	log "setup_cuda8"
+	if is_ubuntu; then
+		setup_cuda8_ubuntu
+	elif is_centos; then
+		setup_cuda8_centos
+	fi
+
+	echo "export CUDA_PATH=/usr/local/cuda" >> /etc/profile.d/cuda.sh
+	echo "export PATH=/usr/local/cuda/bin\${PATH:+:\${PATH}}" >> /etc/profile.d/cuda.sh
+}
+
 setup_cuda8_ubuntu()
 {
-	log "setup_cuda8_ubuntu"
 	apt-get install -y linux-headers-$(uname -r)
 	curl -O http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/cuda-repo-ubuntu1604_8.0.61-1_amd64.deb
 	dpkg -i cuda-repo-ubuntu1604_8.0.61-1_amd64.deb
@@ -43,9 +98,18 @@ setup_cuda8_ubuntu()
 	apt-get install -y cuda
 
 	nvidia-smi
+}
 
-	echo "export CUDA_PATH=/usr/local/cuda" >> /etc/profile.d/cuda.sh
-	echo "export PATH=/usr/local/cuda/bin\${PATH:+:\${PATH}}" >> /etc/profile.d/cuda.sh
+setup_cuda8_centos()
+{
+	yum -y install kernel-devel-$(uname -r) kernel-headers-$(uname -r)
+	CUDA_RPM=cuda-repo-rhel7-8.0.61-1.x86_64.rpm
+	curl -O http://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64/${CUDA_RPM}
+	rpm -i ${CUDA_RPM}
+	yum clean expire-cache
+	yum -y install cuda -x cuda-samples-8-0 -x cuda-visual-tools-8-0
+
+	nvidia-smi
 }
 
 setup_numpy()
@@ -68,21 +132,45 @@ setup_chainer()
 	pip3 install chainer -vvvv
 }
 
-# from https://github.com/NVIDIA/nvidia-docker/wiki/Deploy-on-Azure
+nvidia_drivers()
+{
+	log "nvidia_drivers"
+	if is_ubuntu; then
+		nvidia_drivers_ubuntu
+	elif is_centos; then
+	fi
+}
+
 nvidia_drivers_ubuntu()
 {
-	log "nvidia_drivers_ubuntu"
 	# Install official NVIDIA driver package
 	apt-key adv --fetch-keys http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64/7fa2af80.pub
 	sh -c 'echo "deb http://developer.download.nvidia.com/compute/cuda/repos/ubuntu1604/x86_64 /" > /etc/apt/sources.list.d/cuda.list'
 	apt-get update && apt-get install -y --no-install-recommends cuda-drivers
 }
 
-
-# from https://github.com/NVIDIA/nvidia-docker/wiki/Deploy-on-Azure
 nvidia_docker()
 {
 	log "nvidia_docker"
+	if is_ubuntu; then
+		nvidia_docker_ubuntu
+	elif is_centos; then
+		nvidia_docker_centos
+	fi
+}
+
+# from https://github.com/NVIDIA/nvidia-docker/wiki/Deploy-on-Azure
+nvidia_docker_centos()
+{
+	# Install nvidia-docker and nvidia-docker-plugin
+	wget -P /tmp https://github.com/NVIDIA/nvidia-docker/releases/download/v1.0.1/nvidia-docker-1.0.1-1.x86_64.rpm
+	rpm -i /tmp/nvidia-docker*.rpm && rm /tmp/nvidia-docker*.rpm
+	systemctl start nvidia-docker
+}
+
+# from https://github.com/NVIDIA/nvidia-docker/wiki/Deploy-on-Azure
+nvidia_docker_ubuntu()
+{
 	# Install nvidia-docker and nvidia-docker-plugin
 	wget -P /tmp https://github.com/NVIDIA/nvidia-docker/releases/download/v1.0.1/nvidia-docker_1.0.1-1_amd64.deb
 	dpkg -i /tmp/nvidia-docker*.deb && rm /tmp/nvidia-docker*.deb
@@ -94,16 +182,15 @@ if [ -e "$SETUP_MARKER" ]; then
     exit 0
 fi
 
-exit 0
-nvidia_drivers_ubuntu
+nvidia_drivers
 check_docker
 
 if [ "$CHAINERONDOCKER" == "1" ]; then
-	nvidia_docker
+	nvidia_docker_ubuntu
 else
-	base_pkgs_ubuntu
-	setup_python_ubuntu
-	setup_cuda8_ubuntu
+	base_pkgs
+	setup_python
+	setup_cuda8
 	setup_numpy
 	setup_cudnn
 	setup_chainer
