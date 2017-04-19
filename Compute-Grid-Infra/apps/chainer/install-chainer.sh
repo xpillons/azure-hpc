@@ -186,7 +186,7 @@ nvidia_drivers
 check_docker
 
 if [ "$CHAINERONDOCKER" == "1" ]; then
-	nvidia_docker_ubuntu
+	nvidia_docker
 else
 	base_pkgs
 	setup_python
