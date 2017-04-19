@@ -140,22 +140,22 @@
         }
       },
       "resources": [
-        {
-          "type": "extensions",
-          "name": "DockerExtension",
-          "apiVersion": "[variables('extensionApiVersion')]",
-          "location": "[resourceGroup().location]",
-          "dependsOn": [
-            "[concat('Microsoft.Compute/virtualMachines/', variables('vmSettings').name)]"
-          ],
-          "properties": {
-            "publisher": "Microsoft.Azure.Extensions",
-            "type": "DockerExtension",
-            "typeHandlerVersion": "1.0",
-            "autoUpgradeMinorVersion": true,
-            "settings": {}
-          }
-        }
+        //{
+        //  "type": "extensions",
+        //  "name": "DockerExtension",
+        //  "apiVersion": "[variables('extensionApiVersion')]",
+        //  "location": "[resourceGroup().location]",
+        //  "dependsOn": [
+        //    "[concat('Microsoft.Compute/virtualMachines/', variables('vmSettings').name)]"
+        //  ],
+        //  "properties": {
+        //    "publisher": "Microsoft.Azure.Extensions",
+        //    "type": "DockerExtension",
+        //    "typeHandlerVersion": "1.0",
+        //    "autoUpgradeMinorVersion": true,
+        //    "settings": {}
+        //  }
+        //}
       ]
     },
     {
@@ -163,8 +163,8 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "[variables('deploymentApiVersion')]",
       "dependsOn": [
-        "[concat('Microsoft.Compute/virtualMachines/', variables('vmSettings').name)]",
-        "DockerExtension"
+        "[concat('Microsoft.Compute/virtualMachines/', variables('vmSettings').name)]"
+        //"DockerExtension"
       ],
       "properties": {
         "mode": "Incremental",
