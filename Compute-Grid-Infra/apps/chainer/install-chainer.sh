@@ -5,20 +5,17 @@ log()
 	echo "$1"
 }
 
-usage() { echo "Usage: $0 [-d <0|1>]" 1>&2; exit 1; }
-
-while getopts :d: optname; do
-  log "Option $optname set with value ${OPTARG}"
-  
-  case $optname in
-    d)  # docker
-		export CHAINERONDOCKER=${OPTARG}
-		;;
-	*)
-		usage
-		;;
-  esac
-done
+check_docker()
+{
+	log "check if docker is installed"
+	docker
+	if [ $? -eq 0 ]
+	then
+		export CHAINERONDOCKER=1
+	else
+		export CHAINERONDOCKER=0
+	fi
+}
 
 base_pkgs_ubuntu()
 {
@@ -98,6 +95,7 @@ if [ -e "$SETUP_MARKER" ]; then
 fi
 
 nvidia_drivers_ubuntu
+check_docker
 
 if [ "$CHAINERONDOCKER" == "1" ]; then
 	nvidia_docker

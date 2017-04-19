@@ -111,6 +111,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "chainer", "chainer", "{5289AA12-6F9D-408E-BA3B-1CEFE2843CF4}"
 	ProjectSection(SolutionItems) = preProject
 		apps\chainer\chainer-script.json = apps\chainer\chainer-script.json
+		apps\chainer\deploy-chainer-docker.json = apps\chainer\deploy-chainer-docker.json
 		apps\chainer\deploy-chainer.json = apps\chainer\deploy-chainer.json
 		apps\chainer\install-chainer.sh = apps\chainer\install-chainer.sh
 	EndProjectSection
