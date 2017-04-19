@@ -47,7 +47,7 @@ base_pkgs_ubuntu()
 
 base_pkgs_centos()
 {
-	yum -y update -x WALinuxAgent
+	yum -x WALinuxAgent -y update
 	yum -y install gcc-c++
 }
 
