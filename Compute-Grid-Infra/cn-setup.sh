@@ -19,18 +19,12 @@ log()
 	echo "$1"
 }
 
-usage() { echo "Usage: $0 [-a <azure storage account>] [-k <azure storage key>] [-m <masterName>] [-s <pbspro>] [-S <beegfs, nfsonmaster>]" 1>&2; exit 1; }
+usage() { echo "Usage: $0 [-m <masterName>] [-s <pbspro>] [-q <queuename>] [-S <beegfs, nfsonmaster>]" 1>&2; exit 1; }
 
-while getopts :a:k:m:S:s: optname; do
+while getopts :m:S:s:q: optname; do
   log "Option $optname set with value ${OPTARG}"
   
   case $optname in
-    a)  # storage account
-		export AZURE_STORAGE_ACCOUNT=${OPTARG}
-		;;
-    k)  # storage key
-		export AZURE_STORAGE_ACCESS_KEY=${OPTARG}
-		;;
     m)  # master name
 		export MASTER_NAME=${OPTARG}
 		;;
@@ -40,50 +34,15 @@ while getopts :a:k:m:S:s: optname; do
     s)  # Scheduler (pbspro)
 		export SCHEDULER=${OPTARG}
 		;;
+    q)  # queue name
+		export QNAME=${OPTARG}
+		;;
 	*)
 		usage
 		;;
   esac
 done
 
-
-######################################################################
-install_azure_cli()
-{
-	curl --silent --location https://rpm.nodesource.com/setup_4.x | bash -
-	yum -y install nodejs
-
-	[[ -z "$HOME" || ! -d "$HOME" ]] && { echo 'fixing $HOME'; HOME=/root; } 
-	export HOME
-	
-	npm install -g azure-cli
-	azure telemetry --disable
-}
-
-######################################################################
-install_azure_files()
-{
-	log "install samba and cifs utils"
-	yum -y install samba-client samba-common cifs-utils
-	mkdir -p ${MOUNT_POINT}
-	
-	log "mount share"
-	mount -t cifs //$AZURE_STORAGE_ACCOUNT.file.core.windows.net/lsf /mnt/azure -o vers=3.0,username=$AZURE_STORAGE_ACCOUNT,password=''${AZURE_STORAGE_ACCESS_KEY}'',dir_mode=0777,file_mode=0777
-	echo //$AZURE_STORAGE_ACCOUNT.file.core.windows.net/lsf /mnt/azure cifs vers=3.0,username=$AZURE_STORAGE_ACCOUNT,password=''${AZURE_STORAGE_ACCESS_KEY}'',dir_mode=0777,file_mode=0777 >> /etc/fstab
-	
-}
-
-install_lsf()
-{
-	log "install lsf"
-	/apps/Azure/deployment.pex /apps/Azure/plays/setup_clients.yml
-}
-
-install_applications()
-{
-	log "install applications"		
-	/apps/Azure/deployment.pex /apps/Azure/plays/setup_software.yml
-}
 
 mount_nfs()
 {
@@ -112,7 +71,14 @@ install_ganglia()
 
 install_pbspro()
 {
-	bash install_pbspro.sh ${MASTER_NAME}
+	bash install_pbspro.sh ${MASTER_NAME} ${QNAME}
+}
+
+install_blobxfer()
+{
+	yum install -y gcc openssl-devel libffi-devel python-devel
+	curl https://bootstrap.pypa.io/get-pip.py | python
+	pip install --upgrade blobxfer
 }
 
 setup_user()
@@ -139,8 +105,6 @@ setup_user()
     chown $HPC_USER:$HPC_GROUP $SHARE_SCRATCH	
 }
 
-#install_applications
-
 SETUP_MARKER=/var/local/cn-setup.marker
 if [ -e "$SETUP_MARKER" ]; then
     echo "We're already configured, exiting..."
@@ -151,10 +115,6 @@ fi
 sed -i 's/enforcing/disabled/g' /etc/selinux/config
 setenforce permissive
 
-#install_azure_cli
-#install_azure_files
-#install_lsf
-#install_applications
 setup_user
 install_ganglia
 
@@ -168,6 +128,7 @@ elif [ "$SHARED_STORAGE" == "nfsonmaster" ]; then
 	mount_nfs
 fi
 
+install_blobxfer
 # Create marker file so we know we're configured
 touch $SETUP_MARKER
 

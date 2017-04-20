@@ -43,6 +43,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BeeGFS", "BeeGFS", "{61C5DC
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PBSPro", "PBSPro", "{992206B4-5289-43B8-8E4B-529FCCEDA380}"
 	ProjectSection(SolutionItems) = preProject
+		PBSPro\createqueue.sh = PBSPro\createqueue.sh
 		PBSPro\delete_nodes_down.sh = PBSPro\delete_nodes_down.sh
 		PBSPro\install_pbspro.sh = PBSPro\install_pbspro.sh
 		PBSPro\pbs_selfregister.sh = PBSPro\pbs_selfregister.sh
@@ -91,6 +92,30 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NFS", "NFS", "{7088833E-68F
 		nfs\nfsonmaster.json = nfs\nfsonmaster.json
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "apps", "apps", "{871F1DE3-BD9A-4EF6-BB10-D911B1392336}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "star-ccm", "star-ccm", "{93F12BE7-FD27-4B7E-9A3B-9331AAC21929}"
+	ProjectSection(SolutionItems) = preProject
+		apps\star-ccm\copydata.pbs = apps\star-ccm\copydata.pbs
+		apps\star-ccm\download.pbs = apps\star-ccm\download.pbs
+		apps\star-ccm\install-starccm.sh = apps\star-ccm\install-starccm.sh
+		apps\star-ccm\qsubstar.sh = apps\star-ccm\qsubstar.sh
+		apps\star-ccm\starccm.pbs = apps\star-ccm\starccm.pbs
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pallas", "pallas", "{609213A0-3270-4DD3-ABB4-B99F03772D16}"
+	ProjectSection(SolutionItems) = preProject
+		apps\pallas\mpipingpong.sh = apps\pallas\mpipingpong.sh
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "chainer", "chainer", "{5289AA12-6F9D-408E-BA3B-1CEFE2843CF4}"
+	ProjectSection(SolutionItems) = preProject
+		apps\chainer\chainer-script.json = apps\chainer\chainer-script.json
+		apps\chainer\deploy-chainer-docker.json = apps\chainer\deploy-chainer-docker.json
+		apps\chainer\deploy-chainer.json = apps\chainer\deploy-chainer.json
+		apps\chainer\install-chainer.sh = apps\chainer\install-chainer.sh
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -104,5 +129,9 @@ Global
 		{39C4279A-A9CF-4D1F-9916-B68AFBC534FD} = {E3BE2F83-EF47-465C-8066-915F86E2D5C6}
 		{DF994C48-E6A9-41C0-9C46-1E1D7982B0BB} = {39C4279A-A9CF-4D1F-9916-B68AFBC534FD}
 		{7088833E-68FB-4F71-A856-D4B17BD603AC} = {E3BE2F83-EF47-465C-8066-915F86E2D5C6}
+		{871F1DE3-BD9A-4EF6-BB10-D911B1392336} = {E3BE2F83-EF47-465C-8066-915F86E2D5C6}
+		{93F12BE7-FD27-4B7E-9A3B-9331AAC21929} = {871F1DE3-BD9A-4EF6-BB10-D911B1392336}
+		{609213A0-3270-4DD3-ABB4-B99F03772D16} = {871F1DE3-BD9A-4EF6-BB10-D911B1392336}
+		{5289AA12-6F9D-408E-BA3B-1CEFE2843CF4} = {871F1DE3-BD9A-4EF6-BB10-D911B1392336}
 	EndGlobalSection
 EndGlobal
