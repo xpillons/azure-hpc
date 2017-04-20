@@ -4,10 +4,12 @@
   "parameters": {
     "virtualMachineSize": {
       "type": "string",
+      "defaultValue": "Standard_NC6",
       "allowedValues": [
         "Standard_NC6",
         "Standard_NC12",
-        "Standard_NC24"
+        "Standard_NC24",
+        "Standard_NC24r"
       ],
       "metadata": {
         "description": "GPU VM sku to use for the VM"
@@ -154,7 +156,8 @@
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
-          "vmName": { "value": "[variables('vmSettings').name]" }
+          "vmName": { "value": "[variables('vmSettings').name]" },
+          "options": {"value": "multiple"}
         }
       }
     },

@@ -5,6 +5,21 @@ log()
 	echo "$1"
 }
 
+usage() { echo "Usage: $0 [-m ] " 1>&2; exit 1; }
+
+while getopts :m: optname; do
+  log "Option $optname set with value ${OPTARG}"
+  
+  case $optname in
+    m)  # master name
+		export CHAINER_MN=1
+		;;
+	*)
+		usage
+		;;
+  esac
+done
+
 is_ubuntu()
 {
 	python -mplatform | grep -qi Ubuntu
@@ -181,6 +196,10 @@ SETUP_MARKER=/var/local/chainer-setup.marker
 if [ -e "$SETUP_MARKER" ]; then
     echo "We're already configured, exiting..."
     exit 0
+fi
+
+if [ "CHAINER_MN" == "1" ]; then
+	exit 0
 fi
 
 nvidia_drivers
