@@ -41,7 +41,8 @@ base_pkgs()
 
 base_pkgs_ubuntu()
 {
-	apt-get update
+	DEBIAN_FRONTEND=noninteractive apt-mark hold walinuxagent
+	DEBIAN_FRONTEND=noninteractive apt-get update
 	apt-get install -y g++
 }
 
@@ -183,6 +184,8 @@ fi
 
 nvidia_drivers
 check_docker
+
+exit 0
 
 if [ "$CHAINERONDOCKER" == "1" ]; then
 	nvidia_docker
