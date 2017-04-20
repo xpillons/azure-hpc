@@ -54,10 +54,12 @@ install_pbspro()
  
 	yum install -y libXt-devel libXext
 
+
     wget -O /mnt/CentOS_7.zip  http://wpc.23a7.iotacdn.net/8023A7/origin2/rl/PBS-Open/CentOS_7.zip
     unzip /mnt/CentOS_7.zip -d /mnt
        
     if is_master; then
+
 		enable_kernel_update
 		install_pkgs
 
@@ -67,6 +69,7 @@ install_pbspro()
 		ln -s /usr/lib64/libical.so.1 /usr/lib64/libical.so.0
 
 	    rpm -ivh --nodeps /mnt/CentOS_7/pbspro-server-14.1.0-13.1.x86_64.rpm
+
 
         cat > /etc/pbs.conf << EOF
 PBS_SERVER=$MASTER_HOSTNAME
@@ -91,7 +94,9 @@ EOF
 
     else
 
+
 		yum install -y hwloc-devel expat-devel tcl-devel expat
+
 
 	    rpm -ivh --nodeps /mnt/CentOS_7/pbspro-execution-14.1.0-13.1.x86_64.rpm
 
@@ -137,8 +142,6 @@ if [ -e "$SETUP_MARKER" ]; then
     echo "We're already configured, exiting..."
     exit 0
 fi
-
-
 
 install_pbspro
 
