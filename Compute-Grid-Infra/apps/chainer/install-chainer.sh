@@ -48,7 +48,8 @@ base_pkgs_ubuntu()
 
 base_pkgs_centos()
 {
-	yum -x WALinuxAgent -y update
+	# don't do update as it will break the NVidia drivers
+	#yum -x WALinuxAgent -y update
 	yum -y install gcc-c++
 }
 
@@ -184,8 +185,6 @@ fi
 
 nvidia_drivers
 check_docker
-
-exit 0
 
 if [ "$CHAINERONDOCKER" == "1" ]; then
 	nvidia_docker
