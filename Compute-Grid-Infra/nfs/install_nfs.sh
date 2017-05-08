@@ -29,7 +29,6 @@ is_suse()
 	return $?
 }
 
-
 # Installs all required packages.
 #
 install_pkgs_centos()
@@ -67,12 +66,29 @@ EOF
         createdPartitions="$createdPartitions /dev/${disk}1"
     done
     
-    sleep 10
+    # Create RAID-0 volume
+    if [ -n "$createdPartitions" ]; then
+        devices=`echo $createdPartitions | wc -w`
+        mdadm --create /dev/$raidDevice --level 0 --raid-devices $devices $createdPartitions
+        
+        sleep 10
+        
+        mdadm /dev/$raidDevice
 
-	mkfs -t $filesystem $createdPartitions
-	echo "$createdPartitions $mountPoint $filesystem defaults,nofail 0 2" >> /etc/fstab
-	
-	mount $createdPartitions
+        if [ "$filesystem" == "xfs" ]; then
+            mkfs -t $filesystem /dev/$raidDevice
+            echo "/dev/$raidDevice $mountPoint $filesystem rw,noatime,attr2,inode64,nobarrier,sunit=1024,swidth=4096,nofail 0 2" >> /etc/fstab
+        else
+            mkfs.ext4 -i 2048 -I 512 -J size=400 -Odir_index,filetype /dev/$raidDevice
+            sleep 5
+            tune2fs -o user_xattr /dev/$raidDevice
+            echo "/dev/$raidDevice $mountPoint $filesystem noatime,nodiratime,nobarrier,nofail 0 2" >> /etc/fstab
+        fi
+        
+        sleep 10
+        
+        mount /dev/$raidDevice
+    fi
 }
 
 setup_disks()
