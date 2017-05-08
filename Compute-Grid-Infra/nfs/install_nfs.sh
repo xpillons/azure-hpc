@@ -17,11 +17,29 @@ HPC_UID=7007
 HPC_GROUP=hpc
 HPC_GID=7007
 
+is_centos()
+{
+	python -mplatform | grep -qi CentOS
+	return $?
+}
+
+is_suse()
+{
+	python -mplatform | grep -qi Suse
+	return $?
+}
+
+
 # Installs all required packages.
 #
-install_pkgs()
+install_pkgs_centos()
 {
 	yum -y install nfs-utils nfs-utils-lib
+}
+
+install_pkgs_suse()
+{
+	zypper -n install nfs-client nfs-kernel-server
 }
 
 # Partitions all data disks attached to the VM 
@@ -98,8 +116,12 @@ if [ -e "$SETUP_MARKER" ]; then
     exit 0
 fi
 
+if is_centos; then
+	install_pkgs_centos
+elif is_suse; then
+	install_pkgs_suse
+fi
 
-install_pkgs
 setup_disks
 
 # Create marker file so we know we're configured
