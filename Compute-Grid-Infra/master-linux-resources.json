@@ -150,7 +150,15 @@
         "uri": "[uri(deployment().properties.templateLink.uri, 'PBSPro/pbspro.json')]"
       }
     },
-    "gangliaTemplateURI": "[uri(deployment().properties.templateLink.uri, 'Ganglia/ganglia.json')]",
+    "MonitoringTemplateURIChoice": {
+      "none": {
+        "uri": "[uri(deployment().properties.templateLink.uri, 'monitoring-none.json')]"
+      },
+      "ganglia": {
+        "uri": "[uri(deployment().properties.templateLink.uri, 'ganglia/ganglia.json')]"
+      }
+    },
+    //"gangliaTemplateURI": "[uri(deployment().properties.templateLink.uri, 'Ganglia/ganglia.json')]",
     "masterScriptTemplateURI": "[uri(deployment().properties.templateLink.uri, 'master-linux-script.json')]",
     "computeApiVersion": "2016-04-30-preview",
     "deploymentApiVersion": "2016-09-01"
@@ -224,7 +232,7 @@
       }
     },
     {
-      "name": "ganglia",
+      "name": "monitoring",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "[variables('deploymentApiVersion')]",
       "dependsOn": [
@@ -233,7 +241,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[variables('gangliaTemplateURI')]",
+          "uri": "[variables('MonitoringTemplateURIChoice')[parameters('masterSettings').monitoring].uri]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -247,7 +255,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "[variables('deploymentApiVersion')]",
       "dependsOn": [
-        "ganglia"
+        "monitoring"
       ],
       "properties": {
         "mode": "Incremental",

@@ -39,7 +39,6 @@ setup_disks()
     mkdir -p $SHARE_SCRATCH
 	mkdir -p $SHARE_APPS
 
-	chown $HPC_USER:$HPC_GROUP $SHARE_APPS
 }
 
 ######################################################################
@@ -81,6 +80,7 @@ setup_user()
 	chmod 644 $SHARE_HOME/$HPC_USER/.ssh/id_rsa.pub
 	
 	chown $HPC_USER:$HPC_GROUP $SHARE_SCRATCH
+	chown $HPC_USER:$HPC_GROUP $SHARE_APPS
 }
 
 ######################################################################

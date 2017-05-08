@@ -67,6 +67,17 @@
       "defaultValue": 1,
       "maxValue": 16
     },
+    "monitoring": {
+      "type": "string",
+      "defaultValue": "none",
+      "allowedValues": [
+        "none",
+        "ganglia"
+      ],
+      "metadata": {
+        "description": "specify the monitoring to use"
+      }
+    },
     "scheduler": {
       "type": "string",
       "defaultValue": "none",
@@ -132,9 +143,10 @@
       "publicIPAddressName": "[concat(variables('masterBoxName'), 'pip')]",
       "publicIPDomainName": "[variables('namingInfix')]",
       "sharedStorage": "[parameters('sharedStorage')]",
+      "monitoring": "[parameters('monitoring')]",
       "scheduler": "[parameters('scheduler')]",
       "dataDiskSize": "[parameters('dataDiskSize')]",
-      "nbDataDisks":  "[parameters('nbDataDisks')]"
+      "nbDataDisks": "[parameters('nbDataDisks')]"
     },
     "masterOSSettings": {
       "osType": "[variables('osTypes')[parameters('masterImage')]]",
@@ -193,7 +205,6 @@
       }
     },
     "deploymentApiVersion": "2015-01-01",
-
     "sharedTemplateUrl": "[uri(deployment().properties.templateLink.uri, 'shared-resources.json')]",
     "master-sharedTemplateUrl": "[uri(deployment().properties.templateLink.uri, 'master-shared-resources.json')]",
     "master-OSTemplateUrl": "[uri(deployment().properties.templateLink.uri, concat('master-', variables('masterOSSettings').osType.os, '-resources.json'))]",
