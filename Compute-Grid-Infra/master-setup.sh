@@ -163,14 +163,14 @@ setup_centos()
     sed -i 's/enforcing/disabled/g' /etc/selinux/config
     setenforce permissive
 
-	mount_nfs_suse
+	mount_nfs
 	setup_user
 	setup_blobxfer
 }
 
 setup_suse()
 {
-	mount_nfs
+	mount_nfs_suse
 	setup_user
 }
 
