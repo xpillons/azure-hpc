@@ -27,6 +27,7 @@
         "CentOS_6.7",
         "CentOS_7.2",
         "RHEL_7.2",
+        "SLES12",
         "W2012R2"
       ],
       "metadata": {
@@ -57,6 +58,14 @@
       "metadata": {
         "description": "Premium storage disk size to attach"
       }
+    },
+    "nbDataDisks": {
+      "type": "int",
+      "metadata": {
+        "description": "Number of data disks to attach to the master"
+      },
+      "defaultValue": 1,
+      "maxValue": 16
     },
     "scheduler": {
       "type": "string",
@@ -124,7 +133,8 @@
       "publicIPDomainName": "[variables('namingInfix')]",
       "sharedStorage": "[parameters('sharedStorage')]",
       "scheduler": "[parameters('scheduler')]",
-      "dataDiskSize": "[parameters('dataDiskSize')]"
+      "dataDiskSize": "[parameters('dataDiskSize')]",
+      "nbDataDisks":  "[parameters('nbDataDisks')]"
     },
     "masterOSSettings": {
       "osType": "[variables('osTypes')[parameters('masterImage')]]",
@@ -141,6 +151,9 @@
         "os": "linux"
       },
       "RHEL_7.2": {
+        "os": "linux"
+      },
+      "SLES12": {
         "os": "linux"
       },
       "W2012R2": {
@@ -164,6 +177,12 @@
         "publisher": "RedHat",
         "offer": "RHEL",
         "sku": "7.2",
+        "version": "latest"
+      },
+      "SLES12": {
+        "publisher": "SUSE",
+        "offer": "SLES",
+        "sku": "12-SP1",
         "version": "latest"
       },
       "W2012R2": {
