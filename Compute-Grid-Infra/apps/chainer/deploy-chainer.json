@@ -38,8 +38,16 @@
         "description": "User name for the Virtual Machine."
       }
     },
+    "adminPassword": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "User password for the Virtual Machine."
+      }
+    },
     "sshKeyData": {
       "type": "string",
+      "defaultValue": "",
       "metadata": {
         "description": "SSH rsa public key file as a string."
       }
@@ -108,9 +116,10 @@
       "properties": {
         "osProfile": {
           "adminUsername": "[variables('vmOSSettings').adminUsername]",
+          "adminPassword": "[parameters('adminPassword')]",
           "computerName": "[variables('vmSettings').name]",
           "linuxConfiguration": {
-            "disablePasswordAuthentication": "true",
+            "disablePasswordAuthentication": "false",
             "ssh": {
               "publicKeys": [
                 {
