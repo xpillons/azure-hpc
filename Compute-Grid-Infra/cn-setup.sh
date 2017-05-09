@@ -1,5 +1,4 @@
 #!/bin/bash
-export MOUNT_POINT=/mnt/azure
 
 # Shares
 SHARE_HOME=/share/home
@@ -19,9 +18,9 @@ log()
 	echo "$1"
 }
 
-usage() { echo "Usage: $0 [-m <masterName>] [-s <pbspro>] [-q <queuename>] [-S <beegfs, nfsonmaster>]" 1>&2; exit 1; }
+usage() { echo "Usage: $0 [-m <masterName>] [-s <pbspro>] [-q <queuename>] [-S <beegfs, nfsonmaster>] [-n <ganglia>]" 1>&2; exit 1; }
 
-while getopts :m:S:s:q: optname; do
+while getopts :m:S:s:q:n: optname; do
   log "Option $optname set with value ${OPTARG}"
   
   case $optname in
@@ -34,6 +33,9 @@ while getopts :m:S:s:q: optname; do
     s)  # Scheduler (pbspro)
 		export SCHEDULER=${OPTARG}
 		;;
+    n)  # monitoring
+		export MONITORING=${OPTARG}
+		;;
     q)  # queue name
 		export QNAME=${OPTARG}
 		;;
@@ -43,12 +45,27 @@ while getopts :m:S:s:q: optname; do
   esac
 done
 
+is_centos()
+{
+	python -mplatform | grep -qi CentOS
+	return $?
+}
+
+is_suse()
+{
+	python -mplatform | grep -qi Suse
+	return $?
+}
 
 mount_nfs()
 {
 	log "install NFS"
 
-	yum -y install nfs-utils nfs-utils-lib
+	if is_centos; then
+		yum -y install nfs-utils nfs-utils-lib
+	elif is_suse; then
+		zypper -n install nfs-client
+	fi
 	
 	mkdir -p ${NFS_MOUNT}
 
@@ -76,14 +93,20 @@ install_pbspro()
 
 install_blobxfer()
 {
-	yum install -y gcc openssl-devel libffi-devel python-devel
-	curl https://bootstrap.pypa.io/get-pip.py | python
-	pip install --upgrade blobxfer
+	if is_centos; then
+		yum install -y gcc openssl-devel libffi-devel python-devel
+		curl https://bootstrap.pypa.io/get-pip.py | python
+		pip install --upgrade blobxfer
+	fi
 }
 
 setup_user()
 {
-	yum -y install nfs-utils nfs-utils-lib
+	if is_centos; then
+		yum -y install nfs-utils nfs-utils-lib
+	elif is_suse; then
+		zypper -n install nfs-client
+	fi
 
     mkdir -p $SHARE_HOME
     mkdir -p $SHARE_SCRATCH
@@ -105,18 +128,22 @@ setup_user()
     chown $HPC_USER:$HPC_GROUP $SHARE_SCRATCH	
 }
 
-SETUP_MARKER=/var/local/cn-setup.marker
+SETUP_MARKER=/var/tmp/cn-setup.marker
 if [ -e "$SETUP_MARKER" ]; then
     echo "We're already configured, exiting..."
     exit 0
 fi
 
-# disable selinux
-sed -i 's/enforcing/disabled/g' /etc/selinux/config
-setenforce permissive
+if is_centos; then
+	# disable selinux
+	sed -i 's/enforcing/disabled/g' /etc/selinux/config
+	setenforce permissive
+fi
 
 setup_user
-install_ganglia
+if [ "$MONITORING" == "ganglia" ]; then
+	install_ganglia
+fi
 
 if [ "$SCHEDULER" == "pbspro" ]; then
 	install_pbspro

@@ -70,6 +70,17 @@
         "description": "specify the job scheduler to be used"
       }
     },
+    "monitoring": {
+      "type": "string",
+      "defaultValue": "none",
+      "allowedValues": [
+        "none",
+        "ganglia"
+      ],
+      "metadata": {
+        "description": "specify the monitoring to use"
+      }
+    },
     "computeNodeImage": {
       "type": "string",
       "defaultValue": "CentOS_7.2",
@@ -77,6 +88,7 @@
         "CentOS_6.7",
         "CentOS_7.2",
         "CentOS-HPC_7.1",
+        "SLES12-HPC",
         "RHEL_7.2",
         "W2012R2"
       ],
@@ -151,7 +163,8 @@
       "MasterName": "[parameters('masterName')]",
       "storageAccountType": "Standard_LRS",
       "sharedStorage": "[parameters('sharedStorage')]",
-      "scheduler": "[parameters('scheduler')]"
+      "scheduler": "[parameters('scheduler')]",
+      "monitoring": "[parameters('monitoring')]"
     },
     "osTypes": {
       "CentOS_6.7": {
@@ -161,6 +174,9 @@
         "os": "linux"
       },
       "CentOS-HPC_7.1": {
+        "os": "linux"
+      },
+      "SLES12-HPC": {
         "os": "linux"
       },
       "RHEL_7.2": {
@@ -193,6 +209,12 @@
         "publisher": "RedHat",
         "offer": "RHEL",
         "sku": "7.2",
+        "version": "latest"
+      },
+      "SLES12-HPC": {
+        "publisher": "SUSE",
+        "offer": "SLES-HPC",
+        "sku": "12-SP1",
         "version": "latest"
       },
       "W2012R2": {
