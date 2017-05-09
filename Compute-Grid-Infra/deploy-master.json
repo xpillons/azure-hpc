@@ -125,11 +125,11 @@
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
     "networkSettings": {
       "virtualNetworkName": "[variables('virtualNetworkName')]",
-      "addressPrefix": "172.0.0.0/20",
-      "computeSubnetPrefix": "172.0.0.0/21",
-      "storageSubnetPrefix": "172.0.10.0/25",
-      "infraSubnetPrefix": "172.0.8.0/28",
-      "gatewaySubnetPrefix": "172.0.9.0/29",
+      "addressPrefix": "10.0.0.0/20",
+      "computeSubnetPrefix": "10.0.0.0/21",
+      "storageSubnetPrefix": "10.0.10.0/25",
+      "infraSubnetPrefix": "10.0.8.0/28",
+      "gatewaySubnetPrefix": "10.0.9.0/29",
       "infraSubnetRef": "[concat(variables('vnetID'),'/subnets/infraSubnet/')]",
       "nsgName": "nsg-master"
     },
