@@ -149,6 +149,13 @@
       "metadata": {
         "description": "Name of master VM name"
       }
+    },
+    "postInstallCommand": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "post install command to run as a post script install"
+      }
     }
   },
   "variables": {
@@ -267,6 +274,9 @@
           },
           "adminPassword": {
             "value": "[parameters('adminPassword')]"
+          },
+          "postInstallCommand": {
+            "value": "[parameters('postInstallCommand')]"
           }
         }
       }

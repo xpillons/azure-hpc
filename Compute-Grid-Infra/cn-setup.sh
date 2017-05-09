@@ -18,9 +18,9 @@ log()
 	echo "$1"
 }
 
-usage() { echo "Usage: $0 [-m <masterName>] [-s <pbspro>] [-q <queuename>] [-S <beegfs, nfsonmaster>] [-n <ganglia>]" 1>&2; exit 1; }
+usage() { echo "Usage: $0 [-m <masterName>] [-s <pbspro>] [-q <queuename>] [-S <beegfs, nfsonmaster>] [-n <ganglia>] [-c <postInstallCommand>]" 1>&2; exit 1; }
 
-while getopts :m:S:s:q:n: optname; do
+while getopts :m:S:s:q:n:c: optname; do
   log "Option $optname set with value ${OPTARG}"
   
   case $optname in
@@ -35,6 +35,9 @@ while getopts :m:S:s:q:n: optname; do
 		;;
     n)  # monitoring
 		export MONITORING=${OPTARG}
+		;;
+    c)  # post install command
+		export POST_INSTALL_COMMAND=${OPTARG}
 		;;
     q)  # queue name
 		export QNAME=${OPTARG}
@@ -169,6 +172,11 @@ fi
 
 setup_intel_mpi
 install_blobxfer
+
+if [ -n "$POST_INSTALL_COMMAND" ]; then
+	echo "running $POST_INSTALL_COMMAND"
+	eval $POST_INSTALL_COMMAND
+fi
 # Create marker file so we know we're configured
 touch $SETUP_MARKER
 
