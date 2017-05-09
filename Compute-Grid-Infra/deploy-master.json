@@ -64,7 +64,7 @@
       "metadata": {
         "description": "Number of data disks to attach to the master"
       },
-      "defaultValue": 1,
+      "defaultValue": 2,
       "maxValue": 16
     },
     "monitoring": {
