@@ -38,7 +38,7 @@ install_pkgs_centos()
 
 install_pkgs_suse()
 {
-	zypper -n install nfs-client nfs-kernel-server
+	zypper -n install nfs-client nfs-kernel-server mdadm
 }
 
 # Partitions all data disks attached to the VM 
@@ -115,7 +115,7 @@ setup_disks()
 	dataDevices="`fdisk -l | grep '^Disk /dev/' | grep $dataDiskSize | awk '{print $2}' | awk -F: '{print $1}' | sort | head -$nbDisks | tr '\n' ' ' | sed 's|/dev/||g'`"
 
 	mkdir -p $NFS_DATA
-	setup_data_disks $NFS_DATA "xfs" "$dataDevices" "nfsdata"
+	setup_data_disks $NFS_DATA "xfs" "$dataDevices" "md10"
 
     chown $HPC_USER:$HPC_GROUP $NFS_DATA
 	
@@ -126,7 +126,7 @@ setup_disks()
 }
 
 
-SETUP_MARKER=/var/local/install_nfs.marker
+SETUP_MARKER=/var/tmp/install_nfs.marker
 if [ -e "$SETUP_MARKER" ]; then
     echo "We're already configured, exiting..."
     exit 0
