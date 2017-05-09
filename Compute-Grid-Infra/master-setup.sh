@@ -174,6 +174,7 @@ setup_suse()
 	setup_user
 }
 
+exit 0
 
 SETUP_MARKER=/var/tmp/master-setup.marker
 if [ -e "$SETUP_MARKER" ]; then
