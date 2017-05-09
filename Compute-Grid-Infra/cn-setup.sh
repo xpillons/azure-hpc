@@ -128,6 +128,18 @@ setup_user()
     chown $HPC_USER:$HPC_GROUP $SHARE_SCRATCH	
 }
 
+setup_intel_mpi()
+{
+	if is_suse; then
+		if [ -d "/opt/intelMPI" ]; then
+			rpm -v -i --nodeps /opt/intelMPI/intel_mpi_packages/*.rpm
+			impi_version=`ls /opt/intel/impi`
+			ln -s /opt/intel/impi/${impi_version}/intel64/bin/ /opt/intel/impi/${impi_version}/bin
+			ln -s /opt/intel/impi/${impi_version}/lib64/ /opt/intel/impi/${impi_version}/lib
+		fi		
+	fi
+}
+
 SETUP_MARKER=/var/tmp/cn-setup.marker
 if [ -e "$SETUP_MARKER" ]; then
     echo "We're already configured, exiting..."
@@ -155,6 +167,7 @@ elif [ "$SHARED_STORAGE" == "nfsonmaster" ]; then
 	mount_nfs
 fi
 
+setup_intel_mpi
 install_blobxfer
 # Create marker file so we know we're configured
 touch $SETUP_MARKER
