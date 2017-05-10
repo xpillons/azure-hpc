@@ -72,7 +72,7 @@
     },
     "monitoring": {
       "type": "string",
-      "defaultValue": "none",
+      "defaultValue": "ganglia",
       "allowedValues": [
         "none",
         "ganglia"
