@@ -7,14 +7,33 @@
       "metadata": {
         "Description": "vmName to apply the script"
       }
+    },
+    "options": {
+      "type": "string",
+      "defaultValue": "none",
+      "allowedValues": [
+        "none",
+        "multiple"
+      ],
+      "metadata": {
+        "Description": "script options"
+      }
     }
   },
   "variables": {
+    "scriptsOptions": {
+      "none": {
+        "params": ""
+      },
+      "multiple": {
+        "params": " -m "
+      }
+    },
     "vmScripts": {
       "scriptsToDownload": [
         "[uri(deployment().properties.templateLink.uri, 'install-chainer.sh')]"
       ],
-      "commandToExecute": "bash install-chainer.sh"
+      "commandToExecute": "[concat('bash install-chainer.sh ', variables('scriptsOptions')[parameters('options')].params)]"
     },
     "extensionApiVersion": "2015-06-15"
   },

@@ -18,6 +18,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		master-setup.sh = master-setup.sh
 		master-shared-resources.json = master-shared-resources.json
 		master-windows-resources.json = master-windows-resources.json
+		monitoring-none.json = monitoring-none.json
 		nodes-linux-resources-md.json = nodes-linux-resources-md.json
 		nodes-linux-resources.json = nodes-linux-resources.json
 		nodes-windows-resources.json = nodes-windows-resources.json
@@ -113,6 +114,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "chainer", "chainer", "{5289
 		apps\chainer\chainer-script.json = apps\chainer\chainer-script.json
 		apps\chainer\deploy-chainer-docker.json = apps\chainer\deploy-chainer-docker.json
 		apps\chainer\deploy-chainer.json = apps\chainer\deploy-chainer.json
+		apps\chainer\deploy-chainermn.json = apps\chainer\deploy-chainermn.json
 		apps\chainer\install-chainer.sh = apps\chainer\install-chainer.sh
 	EndProjectSection
 EndProject

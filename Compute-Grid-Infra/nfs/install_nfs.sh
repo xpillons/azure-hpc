@@ -17,11 +17,28 @@ HPC_UID=7007
 HPC_GROUP=hpc
 HPC_GID=7007
 
+is_centos()
+{
+	python -mplatform | grep -qi CentOS
+	return $?
+}
+
+is_suse()
+{
+	python -mplatform | grep -qi Suse
+	return $?
+}
+
 # Installs all required packages.
 #
-install_pkgs()
+install_pkgs_centos()
 {
 	yum -y install nfs-utils nfs-utils-lib
+}
+
+install_pkgs_suse()
+{
+	zypper -n install nfs-client nfs-kernel-server mdadm
 }
 
 # Partitions all data disks attached to the VM 
@@ -49,12 +66,29 @@ EOF
         createdPartitions="$createdPartitions /dev/${disk}1"
     done
     
-    sleep 10
+    # Create RAID-0 volume
+    if [ -n "$createdPartitions" ]; then
+        devices=`echo $createdPartitions | wc -w`
+        mdadm --create /dev/$raidDevice --level 0 --raid-devices $devices $createdPartitions
+        
+        sleep 10
+        
+        mdadm /dev/$raidDevice
 
-	mkfs -t $filesystem $createdPartitions
-	echo "$createdPartitions $mountPoint $filesystem defaults,nofail 0 2" >> /etc/fstab
-	
-	mount $createdPartitions
+        if [ "$filesystem" == "xfs" ]; then
+            mkfs -t $filesystem /dev/$raidDevice
+            echo "/dev/$raidDevice $mountPoint $filesystem rw,noatime,attr2,inode64,nobarrier,sunit=1024,swidth=4096,nofail 0 2" >> /etc/fstab
+        else
+            mkfs.ext4 -i 2048 -I 512 -J size=400 -Odir_index,filetype /dev/$raidDevice
+            sleep 5
+            tune2fs -o user_xattr /dev/$raidDevice
+            echo "/dev/$raidDevice $mountPoint $filesystem noatime,nodiratime,nobarrier,nofail 0 2" >> /etc/fstab
+        fi
+        
+        sleep 10
+        
+        mount /dev/$raidDevice
+    fi
 }
 
 setup_disks()
@@ -81,7 +115,7 @@ setup_disks()
 	dataDevices="`fdisk -l | grep '^Disk /dev/' | grep $dataDiskSize | awk '{print $2}' | awk -F: '{print $1}' | sort | head -$nbDisks | tr '\n' ' ' | sed 's|/dev/||g'`"
 
 	mkdir -p $NFS_DATA
-	setup_data_disks $NFS_DATA "xfs" "$dataDevices" "nfsdata"
+	setup_data_disks $NFS_DATA "xfs" "$dataDevices" "md10"
 
     chown $HPC_USER:$HPC_GROUP $NFS_DATA
 	
@@ -92,14 +126,18 @@ setup_disks()
 }
 
 
-SETUP_MARKER=/var/local/install_nfs.marker
+SETUP_MARKER=/var/tmp/install_nfs.marker
 if [ -e "$SETUP_MARKER" ]; then
     echo "We're already configured, exiting..."
     exit 0
 fi
 
+if is_centos; then
+	install_pkgs_centos
+elif is_suse; then
+	install_pkgs_suse
+fi
 
-install_pkgs
 setup_disks
 
 # Create marker file so we know we're configured

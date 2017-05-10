@@ -31,23 +31,19 @@
     "location": "[resourceGroup().location]",
     "PremiumStorageMap": {
       "none": {
-        "size": 0,
-        "nbDisk": 0
+        "size": 0
       },
       "P10": {
-        "size": 128,
-        "nbDisk": 1
+        "size": 128
       },
       "P20": {
-        "size": 512,
-        "nbDisk": 1
+        "size": 512
       },
       "P30": {
-        "size": 1023,
-        "nbDisk": 1
+        "size": 1023
       }
     },
-    "nbDataDisks": "[variables('PremiumStorageMap')[parameters('masterSettings').dataDiskSize].nbDisk]",
+    "nbDataDisks": "[parameters('masterSettings').nbDataDisks]",
     "diskSize": "[variables('PremiumStorageMap')[parameters('masterSettings').dataDiskSize].size]",
     "dataDiskArray": [
       {
@@ -68,6 +64,66 @@
       {
         "diskSizeGB": "[variables('diskSize')]",
         "lun": "3",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('diskSize')]",
+        "lun": "4",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('diskSize')]",
+        "lun": "5",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('diskSize')]",
+        "lun": "6",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('diskSize')]",
+        "lun": "7",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('diskSize')]",
+        "lun": "8",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('diskSize')]",
+        "lun": "9",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('diskSize')]",
+        "lun": "10",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('diskSize')]",
+        "lun": "11",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('diskSize')]",
+        "lun": "12",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('diskSize')]",
+        "lun": "13",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('diskSize')]",
+        "lun": "14",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('diskSize')]",
+        "lun": "15",
         "createOption": "Empty"
       }
     ],
@@ -94,7 +150,14 @@
         "uri": "[uri(deployment().properties.templateLink.uri, 'PBSPro/pbspro.json')]"
       }
     },
-    "gangliaTemplateURI": "[uri(deployment().properties.templateLink.uri, 'Ganglia/ganglia.json')]",
+    "MonitoringTemplateURIChoice": {
+      "none": {
+        "uri": "[uri(deployment().properties.templateLink.uri, 'monitoring-none.json')]"
+      },
+      "ganglia": {
+        "uri": "[uri(deployment().properties.templateLink.uri, 'ganglia/ganglia.json')]"
+      }
+    },
     "masterScriptTemplateURI": "[uri(deployment().properties.templateLink.uri, 'master-linux-script.json')]",
     "computeApiVersion": "2016-04-30-preview",
     "deploymentApiVersion": "2016-09-01"
@@ -168,7 +231,7 @@
       }
     },
     {
-      "name": "ganglia",
+      "name": "monitoring",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "[variables('deploymentApiVersion')]",
       "dependsOn": [
@@ -177,7 +240,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[variables('gangliaTemplateURI')]",
+          "uri": "[variables('MonitoringTemplateURIChoice')[parameters('masterSettings').monitoring].uri]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -191,7 +254,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "[variables('deploymentApiVersion')]",
       "dependsOn": [
-        "ganglia"
+        "monitoring"
       ],
       "properties": {
         "mode": "Incremental",

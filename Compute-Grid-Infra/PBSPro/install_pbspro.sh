@@ -137,7 +137,7 @@ EOF
     cd ..
 }
 
-SETUP_MARKER=/var/local/install_pbspro.marker
+SETUP_MARKER=/var/tmp/install_pbspro.marker
 if [ -e "$SETUP_MARKER" ]; then
     echo "We're already configured, exiting..."
     exit 0

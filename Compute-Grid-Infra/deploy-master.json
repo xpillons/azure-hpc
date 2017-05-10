@@ -27,6 +27,7 @@
         "CentOS_6.7",
         "CentOS_7.2",
         "RHEL_7.2",
+        "SLES12",
         "W2012R2"
       ],
       "metadata": {
@@ -56,6 +57,25 @@
       ],
       "metadata": {
         "description": "Premium storage disk size to attach"
+      }
+    },
+    "nbDataDisks": {
+      "type": "int",
+      "metadata": {
+        "description": "Number of data disks to attach to the master"
+      },
+      "defaultValue": 2,
+      "maxValue": 16
+    },
+    "monitoring": {
+      "type": "string",
+      "defaultValue": "none",
+      "allowedValues": [
+        "none",
+        "ganglia"
+      ],
+      "metadata": {
+        "description": "specify the monitoring to use"
       }
     },
     "scheduler": {
@@ -105,11 +125,11 @@
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
     "networkSettings": {
       "virtualNetworkName": "[variables('virtualNetworkName')]",
-      "addressPrefix": "172.0.0.0/20",
-      "computeSubnetPrefix": "172.0.0.0/21",
-      "storageSubnetPrefix": "172.0.10.0/25",
-      "infraSubnetPrefix": "172.0.8.0/28",
-      "gatewaySubnetPrefix": "172.0.9.0/29",
+      "addressPrefix": "10.0.0.0/20",
+      "computeSubnetPrefix": "10.0.0.0/21",
+      "storageSubnetPrefix": "10.0.10.0/25",
+      "infraSubnetPrefix": "10.0.8.0/28",
+      "gatewaySubnetPrefix": "10.0.9.0/29",
       "infraSubnetRef": "[concat(variables('vnetID'),'/subnets/infraSubnet/')]",
       "nsgName": "nsg-master"
     },
@@ -123,8 +143,10 @@
       "publicIPAddressName": "[concat(variables('masterBoxName'), 'pip')]",
       "publicIPDomainName": "[variables('namingInfix')]",
       "sharedStorage": "[parameters('sharedStorage')]",
+      "monitoring": "[parameters('monitoring')]",
       "scheduler": "[parameters('scheduler')]",
-      "dataDiskSize": "[parameters('dataDiskSize')]"
+      "dataDiskSize": "[parameters('dataDiskSize')]",
+      "nbDataDisks": "[parameters('nbDataDisks')]"
     },
     "masterOSSettings": {
       "osType": "[variables('osTypes')[parameters('masterImage')]]",
@@ -141,6 +163,9 @@
         "os": "linux"
       },
       "RHEL_7.2": {
+        "os": "linux"
+      },
+      "SLES12": {
         "os": "linux"
       },
       "W2012R2": {
@@ -166,6 +191,12 @@
         "sku": "7.2",
         "version": "latest"
       },
+      "SLES12": {
+        "publisher": "SUSE",
+        "offer": "SLES",
+        "sku": "12-SP1",
+        "version": "latest"
+      },
       "W2012R2": {
         "publisher": "MicrosoftWindowsServer",
         "offer": "WindowsServer",
@@ -174,7 +205,6 @@
       }
     },
     "deploymentApiVersion": "2015-01-01",
-
     "sharedTemplateUrl": "[uri(deployment().properties.templateLink.uri, 'shared-resources.json')]",
     "master-sharedTemplateUrl": "[uri(deployment().properties.templateLink.uri, 'master-shared-resources.json')]",
     "master-OSTemplateUrl": "[uri(deployment().properties.templateLink.uri, concat('master-', variables('masterOSSettings').osType.os, '-resources.json'))]",
