@@ -198,7 +198,7 @@ if [ -e "$SETUP_MARKER" ]; then
     exit 0
 fi
 
-if [ "CHAINER_MN" == "1" ]; then
+if [ "$CHAINER_MN" == "1" ]; then
 	exit 0
 fi
 
