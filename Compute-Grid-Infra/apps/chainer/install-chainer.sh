@@ -14,6 +14,9 @@ while getopts :m: optname; do
     m)  # master name
 		export CHAINER_MN=${OPTARG}
 		;;
+	*)
+		usage
+		;;
   esac
 done
 
