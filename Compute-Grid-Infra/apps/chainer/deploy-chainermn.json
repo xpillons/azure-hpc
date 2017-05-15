@@ -190,7 +190,7 @@
           "networkProfile": {
             "networkInterfaceConfigurations": [
               {
-                "name": "variables('vmSettings').nicName",
+                "name": "[variables('vmSettings').nicName]",
                 "properties": {
                   "primary": "true",
                   "ipConfigurations": [
