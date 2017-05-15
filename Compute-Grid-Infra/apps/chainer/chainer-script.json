@@ -23,10 +23,10 @@
   "variables": {
     "scriptsOptions": {
       "none": {
-        "params": ""
+        "params": " -m 0"
       },
       "multiple": {
-        "params": " -m "
+        "params": " -m 1"
       }
     },
     "vmScripts": {

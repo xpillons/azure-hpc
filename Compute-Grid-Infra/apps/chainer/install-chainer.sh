@@ -12,7 +12,7 @@ while getopts :m: optname; do
   
   case $optname in
     m)  # master name
-		export CHAINER_MN=1
+		export CHAINER_MN=${OPTARG}
 		;;
 	*)
 		usage
