@@ -44,13 +44,6 @@
         "description": "User name for the Virtual Machine."
       }
     },
-    "adminPassword": {
-      "type": "securestring",
-      "defaultValue": "",
-      "metadata": {
-        "description": "password for the Virtual Machine."
-      }
-    },
     "sshKeyData": {
       "type": "string",
       "metadata": {
@@ -221,9 +214,8 @@
           "osProfile": {
             "computerNamePrefix": "[variables('namingInfix')]",
             "adminUsername": "[parameters('adminUserName')]",
-            "adminPassword": "[parameters('adminPassword')]",
             "linuxConfiguration": {
-              "disablePasswordAuthentication": "false",
+              "disablePasswordAuthentication": "true",
               "ssh": {
                 "publicKeys": [
                   {
