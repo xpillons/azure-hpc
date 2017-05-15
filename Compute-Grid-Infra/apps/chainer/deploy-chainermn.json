@@ -17,6 +17,7 @@
       "defaultValue": "Ubuntu_16.04",
       "allowedValues": [
         "CentOS_7.3",
+        "CentOS-HPC_7.1",
         "Ubuntu_16.04"
       ],
       "metadata": {
@@ -92,6 +93,12 @@
         "publisher": "OpenLogic",
         "offer": "CentOS",
         "sku": "7.3",
+        "version": "latest"
+      },
+      "CentOS-HPC_7.1": {
+        "publisher": "OpenLogic",
+        "offer": "CentOS-HPC",
+        "sku": "7.1",
         "version": "latest"
       },
       "Ubuntu_16.04": {
