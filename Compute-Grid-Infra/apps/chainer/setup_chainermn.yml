@@ -1,0 +1,85 @@
+- hosts: 127.0.0.1
+  remote_user: hpcuser
+  tasks:
+  - name: Setup pyenv
+    shell: >
+      git clone https://github.com/yyuu/pyenv.git ~/.pyenv && \
+      echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc && \
+      echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc && \
+      echo 'eval "$(pyenv init -)"' >> ~/.bashrc
+      creates=~/.pyenv
+    args:
+      executable: /bin/bash
+  - name: Install anaconda3-4.3.1
+    shell: >
+      source ~/.bashrc && \
+      pyenv install anaconda3-4.3.1 && \
+      pyenv global anaconda3-4.3.1 && \
+      pyenv rehash
+      creates=~/.pyenv/versions/anaconda3-4.3.1
+    args:
+      executable: /bin/bash
+  - name: Install cudnnenv
+    shell: >
+      source ~/.bashrc && \
+      pip install cudnnenv && \
+      cudnnenv install v6-cuda8 && \
+      cudnnenv activate v6-cuda8 && \
+      echo 'export PATH="/usr/local/cuda/bin:$PATH"' >> ~/.bashrc && \
+      echo 'export CPATH="/usr/local/cuda/include:$CPATH"' >> ~/.bashrc && \
+      echo 'export LD_LIBRARY_PATH="/usr/local/cuda/lib64:$LD_LIBRARY_PATH"' >> ~/.bashrc && \
+      echo 'export LD_LIBRARY_PATH=~/.cudnn/active/cuda/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc && \
+      echo 'export CPATH=~/.cudnn/active/cuda/include:$CPATH' >> ~/.bashrc && \
+      echo 'export LIBRARY_PATH=~/.cudnn/active/cuda/lib64:$LIBRARY_PATH' >> ~/.bashrc
+      creates=~/.cudnn
+    args:
+      executable: /bin/bash
+  - name: Build NCCL
+    shell: >
+      source ~/.bashrc && \
+      mkdir -p lib && cd lib && \
+      git clone https://github.com/nvidia/nccl && \
+      cd nccl && make CUDA_HOME=/usr/local/cuda PREFIX=install install && \
+      echo 'export NCCL_ROOT={{ ansible_env.HOME }}/lib/nccl/install' >> ~/.bashrc && \
+      echo 'export CPATH=$NCCL_ROOT/include:$CPATH' >> ~/.bashrc && \
+      echo 'export LD_LIBRARY_PATH=$NCCL_ROOT/lib:$LD_LIBRARY_PATH' >> ~/.bashrc && \
+      echo 'export LIBRARY_PATH=$NCCL_ROOT/lib:$LIBRARY_PATH' >> ~/.bashrc
+      creates=~/lib/nccl
+    args:
+      executable: /bin/bash
+  - name: Build Chainer
+    shell: >
+      source ~/.bashrc && \
+      mkdir -p lib && cd lib && git clone https://github.com/pfnet/chainer && \
+      cd chainer && \
+      CFLAGS="-I{{ ansible_env.HOME }}/lib/nccl/install/include" \
+      LDFLAGS="-L{{ ansible_env.HOME }}/lib/nccl/install/lib" \
+      python setup.py install
+      creates=~/lib/chainer
+    args:
+      executable: /bin/bash
+  - name: Build CUDA-Aware MPI
+    shell: >
+      source ~/.bashrc && \
+      cd lib && \
+      curl -L -O https://www.open-mpi.org/software/ompi/v2.1/downloads/openmpi-2.1.0.tar.gz && \
+      tar zxvf openmpi-2.1.0.tar.gz && rm -rf openmpi-2.1.0.tar.gz && \
+      mv openmpi-2.1.0 openmpi && cd openmpi && \
+      ./configure --with-cuda --prefix=$PWD/install && \
+      make -j32 && make install && \
+      echo 'export MPI_ROOT={{ ansible_env.HOME }}/lib/openmpi/install' >> ~/.bashrc && \
+      echo 'export CPATH=$MPI_ROOT/include:$CPATH' >> ~/.bashrc && \
+      echo 'export LD_LIBRARY_PATH=$MPI_ROOT/lib:$LD_LIBRARY_PATH' >> ~/.bashrc && \
+      echo 'export LIBRARY_PATH=$MPI_ROOT/lib:$LIBRARY_PATH' >> ~/.bashrc && \
+      echo 'export PATH=$MPI_ROOT/bin:$PATH' >> ~/.bashrc
+      creates=~/lib/openmpi
+    args:
+      executable: /bin/bash
+  - name: Build ChainerMN
+    shell: >
+      source ~/.bashrc && \
+      cd lib && git clone https://github.com/pfnet/chainermn.git && \
+      cd chainermn && python setup.py install
+      creates=~/lib/chainermn
+    args:
+      executable: /bin/bash

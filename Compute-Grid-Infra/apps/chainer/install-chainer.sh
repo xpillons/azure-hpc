@@ -192,6 +192,20 @@ nvidia_docker_ubuntu()
 	dpkg -i /tmp/nvidia-docker*.deb && rm /tmp/nvidia-docker*.deb
 }
 
+setup_chainermn()
+{
+	nvidia_drivers
+	setup_cuda8
+
+	if is_ubuntu; then
+		apt install -y ansible build-essential unzip
+	elif is_centos; then
+		;
+	fi
+
+	ansible-playbook -i "localhost," -c local setup_chainermn.yml -vv
+}
+
 SETUP_MARKER=/var/local/chainer-setup.marker
 if [ -e "$SETUP_MARKER" ]; then
     echo "We're already configured, exiting..."

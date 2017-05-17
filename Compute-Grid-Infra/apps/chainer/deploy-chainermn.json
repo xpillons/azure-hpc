@@ -4,8 +4,11 @@
   "parameters": {
     "virtualMachineSize": {
       "type": "string",
-      "defaultValue": "Standard_NC24r",
+      "defaultValue": "Standard_NC6",
       "allowedValues": [
+        "Standard_NC6",
+        "Standard_NC12",
+        "Standard_NC24",
         "Standard_NC24r"
       ],
       "metadata": {
@@ -112,7 +115,8 @@
     "networkApiVersion": "2016-03-30",
     "sshKeyPath": "[concat('/home/',parameters('adminUserName'),'/.ssh/authorized_keys')]",
     "scriptsToDownload": [
-      "[uri(deployment().properties.templateLink.uri, 'install-chainer.sh')]"
+      "[uri(deployment().properties.templateLink.uri, 'install-chainer.sh')]",
+      "[uri(deployment().properties.templateLink.uri, 'setup_chainermn.yml')]"
     ],
     "commandToExecute": "bash install-chainer.sh -m 1"
   },
