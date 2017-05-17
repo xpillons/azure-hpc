@@ -154,7 +154,7 @@
     },
     "postInstallCommand": {
       "type": "string",
-      "defaultValue": "",
+      "defaultValue": "hostname",
       "metadata": {
         "description": "post install command to run as a post script install"
       }
