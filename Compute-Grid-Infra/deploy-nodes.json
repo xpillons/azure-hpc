@@ -90,7 +90,9 @@
         "CentOS-HPC_7.1",
         "SLES12-HPC",
         "RHEL_7.2",
-        "W2012R2"
+        "W2012R2",
+        "CustomLinux",
+        "CustomWindows"
       ],
       "metadata": {
         "description": "The VM image of the compute nodes"
@@ -156,6 +158,13 @@
       "metadata": {
         "description": "post install command to run as a post script install"
       }
+    },
+    "imageId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "image Id to the custom image to use, format is /subscriptions/{SubscriptionId}/resourceGroups/{ResourceGroup}/providers/Microsoft.Compute/images/{ImageName}"
+      }
     }
   },
   "variables": {
@@ -189,7 +198,13 @@
       "RHEL_7.2": {
         "os": "linux"
       },
+      "CustomLinux": {
+        "os": "linux"
+      },
       "W2012R2": {
+        "os": "windows"
+      },
+      "CustomWindows": {
         "os": "windows"
       }
     },
@@ -229,6 +244,12 @@
         "offer": "WindowsServer",
         "sku": "2012-R2-Datacenter",
         "version": "latest"
+      },
+      "CustomLinux": {
+        "id": "[parameters('imageId')]"
+      },
+      "CustomWindows": {
+        "id": "[parameters('imageId')]"
       }
     },
     "nodeOSSettings": {
