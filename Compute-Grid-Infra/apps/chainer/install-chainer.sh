@@ -200,6 +200,7 @@ setup_chainermn()
 		apt install -y ansible build-essential unzip
 	fi
 
+	wget https://raw.githubusercontent.com/xpillons/azure-hpc/dev/Compute-Grid-Infra/apps/chainer/setup_chainermn.yml
 	ansible-playbook -i "localhost," -c local setup_chainermn.yml -vv
 }
 
