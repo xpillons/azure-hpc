@@ -1,5 +1,7 @@
 # Custom Image deployment at scale
 
+> Please note that with the support of Managed Disks and custom images, these steps are no longer needed. Instead capture an image and provide its resource ID, available in Azure Portal, to the template parameter.
+
 These templates comes in addition to the Grid Infrastructure to allow large scale deployment of custom image thru VM scalesets. There are two main steps when doing this :
 * Copy the master image on each storage accounts being used by each VM scalesets
 * Provision VM scalesets
