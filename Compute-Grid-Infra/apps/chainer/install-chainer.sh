@@ -194,7 +194,6 @@ nvidia_docker_ubuntu()
 
 setup_chainermn()
 {
-	nvidia_drivers
 	setup_cuda8
 
 	if is_ubuntu; then
@@ -212,22 +211,22 @@ if [ -e "$SETUP_MARKER" ]; then
     exit 0
 fi
 
-if [ "$CHAINER_MN" == "1" ]; then
-	exit 0
-fi
-
 nvidia_drivers
 check_docker
 
-if [ "$CHAINERONDOCKER" == "1" ]; then
-	nvidia_docker
+if [ "$CHAINER_MN" == "1" ]; then
+	setup_chainermn
 else
-	base_pkgs
-	setup_python
-	setup_cuda8
-	setup_numpy
-	setup_cudnn
-	setup_chainer
+	if [ "$CHAINERONDOCKER" == "1" ]; then
+		nvidia_docker
+	else
+		base_pkgs
+		setup_python
+		setup_cuda8
+		setup_numpy
+		setup_cudnn
+		setup_chainer
+	fi
 fi
 
 # Create marker file so we know we're configured
