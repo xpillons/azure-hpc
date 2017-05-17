@@ -198,8 +198,6 @@ setup_chainermn()
 
 	if is_ubuntu; then
 		apt install -y ansible build-essential unzip
-	elif is_centos; then
-		;
 	fi
 
 	ansible-playbook -i "localhost," -c local setup_chainermn.yml -vv
