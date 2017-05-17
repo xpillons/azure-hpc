@@ -147,10 +147,7 @@
             "imageReference": "[parameters('nodeOSSettings').imageReference]",
             "osDisk": {
               "createOption": "FromImage",
-              "caching": "ReadOnly",
-              "managedDisk": {
-                "storageAccountType": "Premium_LRS"
-              }
+              "caching": "ReadOnly"
             },
             "dataDisks": []
           },
