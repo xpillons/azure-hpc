@@ -22,10 +22,11 @@
     },
     "masterImage": {
       "type": "string",
-      "defaultValue": "CentOS_7.2",
+      "defaultValue": "CentOS_7.3",
       "allowedValues": [
         "CentOS_6.7",
         "CentOS_7.2",
+        "CentOS_7.3",
         "RHEL_7.2",
         "SLES12",
         "W2012R2"
@@ -162,6 +163,9 @@
       "CentOS_7.2": {
         "os": "linux"
       },
+      "CentOS_7.3": {
+        "os": "linux"
+      },
       "RHEL_7.2": {
         "os": "linux"
       },
@@ -183,6 +187,12 @@
         "publisher": "OpenLogic",
         "offer": "CentOS",
         "sku": "7.2",
+        "version": "latest"
+      },
+      "CentOS_7.3": {
+        "publisher": "OpenLogic",
+        "offer": "CentOS",
+        "sku": "7.3",
         "version": "latest"
       },
       "RHEL_7.2": {

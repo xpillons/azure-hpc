@@ -60,6 +60,12 @@ is_suse()
 	return $?
 }
 
+is_ubuntu()
+{
+	python -mplatform | grep -qi Ubuntu
+	return $?
+}
+
 mount_nfs()
 {
 	log "install NFS"
@@ -68,6 +74,8 @@ mount_nfs()
 		yum -y install nfs-utils nfs-utils-lib
 	elif is_suse; then
 		zypper -n install nfs-client
+	elif is_ubuntu; then
+		apt-get -qy install nfs-common 
 	fi
 	
 	mkdir -p ${NFS_MOUNT}
@@ -109,6 +117,8 @@ setup_user()
 		yum -y install nfs-utils nfs-utils-lib
 	elif is_suse; then
 		zypper -n install nfs-client
+	elif is_ubuntu; then
+		apt-get -qy install nfs-common 
 	fi
 
     mkdir -p $SHARE_HOME
