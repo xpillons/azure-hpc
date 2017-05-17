@@ -163,10 +163,10 @@
       "CentOS_7.2": {
         "os": "linux"
       },
-      "RHEL_7.2": {
+      "CentOS_7.3": {
         "os": "linux"
       },
-      "RHEL_7.3": {
+      "RHEL_7.2": {
         "os": "linux"
       },
       "SLES12": {
