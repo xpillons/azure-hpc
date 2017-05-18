@@ -174,7 +174,8 @@ setup_suse()
 	setup_user
 }
 
-SETUP_MARKER=/var/tmp/master-setup.marker
+mkdir -p /var/local
+SETUP_MARKER=/var/local/master-setup.marker
 if [ -e "$SETUP_MARKER" ]; then
     echo "We're already configured, exiting..."
     exit 0
