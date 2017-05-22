@@ -75,7 +75,7 @@ mount_nfs()
 	elif is_suse; then
 		zypper -n install nfs-client
 	elif is_ubuntu; then
-		apt-get -qy install nfs-common 
+		apt -qy install nfs-common 
 	fi
 	
 	mkdir -p ${NFS_MOUNT}
@@ -164,6 +164,19 @@ if is_centos; then
 	# disable selinux
 	sed -i 's/enforcing/disabled/g' /etc/selinux/config
 	setenforce permissive
+fi
+
+if Ubuntu; then
+	# there is an issue here because apt may be already running the first time the machine is booted
+	while true;
+	do
+		if [[ $(ps -A | grep -c apt)  -ne 1 ]]; then
+				echo "apt is running, wait 1m"
+		else
+				break
+		fi
+		sleep 1m
+	done
 fi
 
 setup_user
