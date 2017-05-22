@@ -171,9 +171,9 @@ if Ubuntu; then
 	while true;
 	do
 		if [[ $(ps -A | grep -c apt)  -ne 1 ]]; then
-				echo "apt is running, wait 1m"
+			echo "apt is running, wait 1m"
 		else
-				break
+			break
 		fi
 		sleep 1m
 	done
