@@ -89,9 +89,14 @@ EOF
         /opt/pbs/bin/qmgr -c "s s job_history_enable = true"
         /opt/pbs/bin/qmgr -c "s s job_history_duration = 336:0:0"
 
+		# change job scheduler iteration from 10 minutes to 2
+        /opt/pbs/bin/qmgr -c "set server scheduler_iteration = 120"
+
 		# add hpcuser as manager
         /opt/pbs/bin/qmgr -c "s s managers = $PBS_MANAGER@*"
 
+		# list settings
+		/opt/pbs/bin/qmgr -c 'list server'
     else
 
 
