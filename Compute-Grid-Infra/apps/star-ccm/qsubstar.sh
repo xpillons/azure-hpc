@@ -55,9 +55,9 @@ echo "package is $package"
 model=`echo $package | awk -F'[.]' '{print $1}'`
 echo "model is $model" 
 
-GETJOBID=`qsub -o $jobdir -j oe -N "get-$package" -q $QNAME -v "jobdir=$jobdir, az_account=$account, container=$container, saskey=$saskey, package=$package" $DIR/download.pbs` 
+GETJOBID=`qsub -f -o $jobdir -j oe -N "get-$package" -q $QNAME -v "jobdir=$jobdir, az_account=$account, container=$container, saskey=$saskey, package=$package" $DIR/download.pbs` 
 
-RUNJOBID=`qsub -o $jobdir -j oe -N $model -q $QNAME -l nodes=$NB_NODES:ppn=$CORES_PER_NODE -W depend=afterany:$GETJOBID -v "jobdir=$jobdir, MODEL=$model, JAVARUNNER=$JAVA_RUNNER, PODKEY=$PODKEY" $DIR/starccm.pbs`
+RUNJOBID=`qsub -f -o $jobdir -j oe -N $model -q $QNAME -l nodes=$NB_NODES:ppn=$CORES_PER_NODE -W depend=afterany:$GETJOBID -v "jobdir=$jobdir, MODEL=$model, JAVARUNNER=$JAVA_RUNNER, PODKEY=$PODKEY" $DIR/starccm.pbs`
 
-UPLOADJOBID=`qsub -o $OUTDIR -j oe -N "copy-$RUNJOBID" -q $QNAME -W depend=afterany:$RUNJOBID -v "jobdir=$jobdir, JOBID=$RUNJOBID" $DIR/copydata.pbs`
+UPLOADJOBID=`qsub -f -o $OUTDIR -j oe -N "copy-$RUNJOBID" -q $QNAME -W depend=afterany:$RUNJOBID -v "jobdir=$jobdir, JOBID=$RUNJOBID" $DIR/copydata.pbs`
 echo $RUNJOBID

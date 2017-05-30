@@ -192,28 +192,40 @@ nvidia_docker_ubuntu()
 	dpkg -i /tmp/nvidia-docker*.deb && rm /tmp/nvidia-docker*.deb
 }
 
+setup_chainermn()
+{
+	setup_cuda8
+
+	if is_ubuntu; then
+		apt install -y ansible build-essential unzip
+	fi
+
+	wget https://raw.githubusercontent.com/xpillons/azure-hpc/dev/Compute-Grid-Infra/apps/chainer/setup_chainermn.yml
+	ansible-playbook -i "localhost," -c local setup_chainermn.yml -vv
+}
+
 SETUP_MARKER=/var/local/chainer-setup.marker
 if [ -e "$SETUP_MARKER" ]; then
     echo "We're already configured, exiting..."
     exit 0
 fi
 
-if [ "$CHAINER_MN" == "1" ]; then
-	exit 0
-fi
-
 nvidia_drivers
 check_docker
 
-if [ "$CHAINERONDOCKER" == "1" ]; then
-	nvidia_docker
+if [ "$CHAINER_MN" == "1" ]; then
+	setup_chainermn
 else
-	base_pkgs
-	setup_python
-	setup_cuda8
-	setup_numpy
-	setup_cudnn
-	setup_chainer
+	if [ "$CHAINERONDOCKER" == "1" ]; then
+		nvidia_docker
+	else
+		base_pkgs
+		setup_python
+		setup_cuda8
+		setup_numpy
+		setup_cudnn
+		setup_chainer
+	fi
 fi
 
 # Create marker file so we know we're configured

@@ -155,7 +155,7 @@
         "uri": "[uri(deployment().properties.templateLink.uri, 'monitoring-none.json')]"
       },
       "ganglia": {
-        "uri": "[uri(deployment().properties.templateLink.uri, 'ganglia/ganglia.json')]"
+        "uri": "[uri(deployment().properties.templateLink.uri, 'Ganglia/ganglia.json')]"
       }
     },
     "masterScriptTemplateURI": "[uri(deployment().properties.templateLink.uri, 'master-linux-script.json')]",

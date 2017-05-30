@@ -126,7 +126,8 @@ setup_disks()
 }
 
 
-SETUP_MARKER=/var/tmp/install_nfs.marker
+mkdir -p /var/local
+SETUP_MARKER=/var/local/install_nfs.marker
 if [ -e "$SETUP_MARKER" ]; then
     echo "We're already configured, exiting..."
     exit 0
