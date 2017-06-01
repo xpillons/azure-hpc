@@ -1,0 +1,11 @@
+#!/bin/bash
+
+joboutfile=${JOBID}.OU
+
+cd $jobdir 
+tail -n 25 log.* >> $joboutfile 
+
+blobxfer pintawe results $joboutfile --storageaccountkey $key
+
+cd ..
+rm -rfd $jobdir
