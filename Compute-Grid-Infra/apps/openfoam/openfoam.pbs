@@ -5,6 +5,6 @@ source /data/apps/OpenFOAM/OpenFOAM-4.x/etc/bashrc
 
 export MPI_ARGS='-genv I_MPI_FABRICS shm:dapl -genv I_MPI_DAPL_PROVIDER ofa-v2-ib0 -genv I_MPI_DYNAMIC_CONNECTION 0 -genv I_MPI_FALLBACK_DEVICE 0 -genv I_MPI_DAPL_TRANSLATION_CACHE 0'
 
-nproc=`cat $PBS_NODEFILE | wc -l`
-$jobdir/$runner $nproc
+# nodes and ppn are provided in param
+$jobdir/$runner $nodes $ppn
 

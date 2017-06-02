@@ -123,6 +123,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "openfoam", "openfoam", "{9C
 	ProjectSection(SolutionItems) = preProject
 		apps\openfoam\copydata.pbs = apps\openfoam\copydata.pbs
 		apps\openfoam\download.pbs = apps\openfoam\download.pbs
+		apps\openfoam\install-openfoam.sh = apps\openfoam\install-openfoam.sh
 		apps\openfoam\openfoam.pbs = apps\openfoam\openfoam.pbs
 		apps\openfoam\qsubopenfoam.sh = apps\openfoam\qsubopenfoam.sh
 	EndProjectSection
