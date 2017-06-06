@@ -166,7 +166,7 @@ if is_centos; then
 	setenforce permissive
 fi
 
-if Ubuntu; then
+if is_ubuntu; then
 	# there is an issue here because apt may be already running the first time the machine is booted
 	while true;
 	do
@@ -195,7 +195,7 @@ elif [ "$SHARED_STORAGE" == "nfsonmaster" ]; then
 fi
 
 setup_intel_mpi
-install_blobxfer
+#install_blobxfer
 
 if [ -n "$POST_INSTALL_COMMAND" ]; then
 	echo "running $POST_INSTALL_COMMAND"
