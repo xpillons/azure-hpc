@@ -119,6 +119,15 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "chainer", "chainer", "{5289
 		apps\chainer\setup_chainermn.yml = apps\chainer\setup_chainermn.yml
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "openfoam", "openfoam", "{9C14DE8F-7CD4-4DD7-96C0-FB6EEAC53AC6}"
+	ProjectSection(SolutionItems) = preProject
+		apps\openfoam\copydata.pbs = apps\openfoam\copydata.pbs
+		apps\openfoam\download.pbs = apps\openfoam\download.pbs
+		apps\openfoam\install-openfoam.sh = apps\openfoam\install-openfoam.sh
+		apps\openfoam\openfoam.pbs = apps\openfoam\openfoam.pbs
+		apps\openfoam\qsubopenfoam.sh = apps\openfoam\qsubopenfoam.sh
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -136,5 +145,6 @@ Global
 		{93F12BE7-FD27-4B7E-9A3B-9331AAC21929} = {871F1DE3-BD9A-4EF6-BB10-D911B1392336}
 		{609213A0-3270-4DD3-ABB4-B99F03772D16} = {871F1DE3-BD9A-4EF6-BB10-D911B1392336}
 		{5289AA12-6F9D-408E-BA3B-1CEFE2843CF4} = {871F1DE3-BD9A-4EF6-BB10-D911B1392336}
+		{9C14DE8F-7CD4-4DD7-96C0-FB6EEAC53AC6} = {871F1DE3-BD9A-4EF6-BB10-D911B1392336}
 	EndGlobalSection
 EndGlobal

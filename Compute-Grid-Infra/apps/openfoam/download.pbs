@@ -1,0 +1,7 @@
+#!/bin/bash
+
+blobxfer --download --saskey=''$saskey'' $az_account $container --remoteresource=$package $jobdir 
+
+tar -k -axvf $jobdir/$package -C $jobdir/
+
+rm -f $jobdir/$package 
