@@ -1,5 +1,6 @@
 #!/bin/bash
-source /opt/intel/impi/5.1.3.181/bin64/mpivars.sh
+impi_version=`ls /opt/intel/impi`
+source /opt/intel/impi/${impi_version}/bin64/mpivars.sh
 export MPI_ROOT=$I_MPI_ROOT
 source /data/apps/OpenFOAM/OpenFOAM-4.x/etc/bashrc
 

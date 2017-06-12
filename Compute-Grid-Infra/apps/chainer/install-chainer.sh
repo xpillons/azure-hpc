@@ -119,7 +119,9 @@ setup_cuda8_ubuntu()
 
 setup_cuda8_centos()
 {
-	yum -y install kernel-devel-$(uname -r) kernel-headers-$(uname -r)
+	yum -y install kernel-devel-$(uname -r) kernel-headers-$(uname -r) --disableexcludes=all
+	rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+	yum -y install dkms
 	CUDA_RPM=cuda-repo-rhel7-8.0.61-1.x86_64.rpm
 	curl -O http://developer.download.nvidia.com/compute/cuda/repos/rhel7/x86_64/${CUDA_RPM}
 	rpm -i ${CUDA_RPM}
@@ -196,14 +198,20 @@ setup_chainermn()
 {
 	setup_cuda8
 
-	if is_ubuntu; then
-		apt install -y ansible build-essential unzip
+	if is_centos; then
+		yum reinstall -y /opt/microsoft/rdma/rhel73/kmod-microsoft-hyper-v-rdma-4.2.0.144-20170426.x86_64.rpm
 	fi
 
-	wget https://raw.githubusercontent.com/xpillons/azure-hpc/dev/Compute-Grid-Infra/apps/chainer/setup_chainermn.yml
-	ansible-playbook -i "localhost," -c local setup_chainermn.yml -vv
+	if is_ubuntu; then
+		apt install -y ansible build-essential unzip python-pip
+	fi
+	pip install --upgrade pip
+
+	#wget https://raw.githubusercontent.com/xpillons/azure-hpc/dev/Compute-Grid-Infra/apps/chainer/setup_chainermn.yml
+	#ansible-playbook -i "localhost," -c local setup_chainermn.yml -vv
 }
 
+mkdir -p /var/local
 SETUP_MARKER=/var/local/chainer-setup.marker
 if [ -e "$SETUP_MARKER" ]; then
     echo "We're already configured, exiting..."
