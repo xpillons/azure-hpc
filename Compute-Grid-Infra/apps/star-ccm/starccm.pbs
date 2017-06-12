@@ -2,7 +2,8 @@
 STAR_ROOT=/data/apps/star
 export PATH=$STAR_ROOT/STAR-CCM+11.04.012-R8/star/bin:$PATH
 
-source /opt/intel/impi/5.1.3.181/bin64/mpivars.sh
+impi_version=`ls /opt/intel/impi`
+source /opt/intel/impi/${impi_version}/bin64/mpivars.sh
 
 export CDLMD_LICENSE_FILE=1999@flex.cd-adapco.com 
 
