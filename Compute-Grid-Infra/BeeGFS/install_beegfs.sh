@@ -19,7 +19,7 @@ CUSTOMDOMAIN=$4
 
 # Shares
 SHARE_HOME=/share/home
-SHARE_SCRATCH=/share/scratch
+SHARE_SCRATCH=/share/beegfs
 if [ -n "$3" ]; then
 	SHARE_SCRATCH=$3
 fi
