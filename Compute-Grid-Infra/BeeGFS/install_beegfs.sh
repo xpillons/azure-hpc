@@ -268,6 +268,9 @@ install_beegfs()
 		$BEEGFS_SBIN/beegfs-setup-client -m $MGMT_HOSTNAME
 
 		#sed -i 's/^sysMgmtdHost.*/sysMgmtdHost = '$MGMT_HOSTNAME'/g' /etc/beegfs/beegfs-client.conf
+
+		# disable RDMA
+		sed -i 's/^connUseRDMA.*/connUseRDMA = false/g' /etc/beegfs/beegfs-client.conf
 		echo "$SHARE_SCRATCH /etc/beegfs/beegfs-client.conf" > /etc/beegfs/beegfs-mounts.conf
 	
 		systemctl daemon-reload
