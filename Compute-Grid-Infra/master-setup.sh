@@ -32,21 +32,30 @@ HPC_GID=7007
 
 MASTER_NAME=`hostname`
 
+is_centos()
+{
+	python -mplatform | grep -qi CentOS
+	return $?
+}
+
+is_suse()
+{
+	python -mplatform | grep -qi Suse
+	return $?
+}
+
+######################################################################
 setup_disks()
 {
     mkdir -p $SHARE_HOME
     mkdir -p $SHARE_SCRATCH
 	mkdir -p $SHARE_APPS
 
-	chown $HPC_USER:$HPC_GROUP $SHARE_APPS
 }
 
+######################################################################
 setup_user()
-{
-    # disable selinux
-    sed -i 's/enforcing/disabled/g' /etc/selinux/config
-    setenforce permissive
-    
+{ 
     groupadd -g $HPC_GID $HPC_GROUP
 
     # Don't require password for HPC user sudo
@@ -79,13 +88,29 @@ setup_user()
 	chmod 644 $SHARE_HOME/$HPC_USER/.ssh/id_rsa.pub
 	
 	chown $HPC_USER:$HPC_GROUP $SHARE_SCRATCH
+	chown $HPC_USER:$HPC_GROUP $SHARE_APPS
 }
 
+######################################################################
 mount_nfs()
 {
 	log "install NFS"
 
 	yum -y install nfs-utils nfs-utils-lib
+
+    echo "$SHARE_HOME    *(rw,async)" >> /etc/exports
+    systemctl enable rpcbind || echo "Already enabled"
+    systemctl enable nfs-server || echo "Already enabled"
+    systemctl start rpcbind || echo "Already enabled"
+    systemctl start nfs-server || echo "Already enabled"
+		
+}
+
+mount_nfs_suse()
+{
+	log "install NFS"
+
+	zypper -n install nfs-client nfs-kernel-server
 
     echo "$SHARE_HOME    *(rw,async)" >> /etc/exports
     systemctl enable rpcbind || echo "Already enabled"
@@ -124,38 +149,45 @@ install_azure_files()
 	
 }
 
-install_beegfs()
+######################################################################
+setup_blobxfer()
 {
-	yum -y install wget
-    wget -O install_beegfs_mgmt.sh https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/BeeGFS/install_beegfs_mgmt.sh
-    wget -O install_beegfs_client.sh https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/BeeGFS/install_beegfs_client.sh
-
-	bash install_beegfs_mgmt.sh ${MASTER_NAME}
-	bash install_beegfs_client.sh ${MASTER_NAME}
+	yum install -y gcc openssl-devel libffi-devel python-devel
+	curl https://bootstrap.pypa.io/get-pip.py | sudo python
+	pip install --upgrade blobxfer
 }
 
-install_ganglia()
+setup_centos()
 {
-	yum -y install wget
-    wget -O install_gmond.sh https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/Ganglia/install_gmond.sh
-    wget -O install_gmetad.sh https://raw.githubusercontent.com/xpillons/azure-hpc/master/Compute-Grid-Infra/Ganglia/install_gmetad.sh
-	bash install_gmetad.sh
-	bash install_gmond.sh ${MASTER_NAME} "Master" 8649
+    # disable selinux
+    sed -i 's/enforcing/disabled/g' /etc/selinux/config
+    setenforce permissive
+
+	mount_nfs
+	setup_user
+	setup_blobxfer
 }
 
-SETUP_MARKER=/var/tmp/master-setup.marker
+setup_suse()
+{
+	mount_nfs_suse
+	setup_user
+}
+
+mkdir -p /var/local
+SETUP_MARKER=/var/local/master-setup.marker
 if [ -e "$SETUP_MARKER" ]; then
     echo "We're already configured, exiting..."
     exit 0
 fi
 
-#install_azure_cli
-#install_azure_files
 setup_disks
-mount_nfs
-setup_user
-#install_ganglia
-#install_beegfs
+
+if is_centos; then
+	setup_centos
+elif is_suse; then
+	setup_suse
+fi
 
 # Create marker file so we know we're configured
 touch $SETUP_MARKER

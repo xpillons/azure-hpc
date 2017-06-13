@@ -5,3 +5,5 @@ Compute-Grid-Infra/deploy-win-nodes.param.json
 Compute-Grid-Infra/deploy-win-master.param.json
 Compute-Grid-Infra/deploy-master.param.json
 Compute-Grid-Infra/deploy-nodes.param.json
+/Compute-Grid-Infra/.vs/config/applicationhost.config
+/Compute-Grid-Infra/.vs/Compute-Grid-Infra/v14/.suo

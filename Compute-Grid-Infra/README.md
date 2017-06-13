@@ -17,7 +17,7 @@ Table of Contents
 
 # Compute grid in Azure
 
-These templates will build a compute grid made by a single master VMs running the management services, multiple VM Scaleset for deploying compute nodes, and optionally a set of nodes to run [BeeGFS](http://www.beegfs.com/) as a parallel shared file system. Ganglia is always setup by default on all VMs, and [PBS Pro](http://www.pbspro.org/) can optionally be setup for job scheduling.
+These templates will build a compute grid made by a single master VMs running the management services, multiple VM Scaleset for deploying compute nodes, and optionally a set of nodes to run [BeeGFS](http://www.beegfs.com/) as a parallel shared file system. Ganglia is an option for monitoring the cluster load, and [PBS Pro](http://www.pbspro.org/) can optionally be setup for job scheduling.
 
 
 # VM Infrastructure
@@ -27,11 +27,11 @@ The following diagram shows the overall Compute, Storage and Network infrastruct
 
 ### Network
 A single VNET (__grid-vnet__) is used in which four subnets are created, one for the infrastructure (__infra-subnet__), one for the compute nodes (__compute-subnet__), one for the storage (__storage-subnet__) and one for the VPN Gateway (__GatewaySubnet__). The following addresses range is used :
-* __grid-vnet 172.0.0.0/20__ allowing 4091 private IPs from 172.0.0.4 to 172.0.15.255
-* __compute-subnet 172.0.0.0/21__ allowing 2043 private IPs from 172.0.0.4 to 172.0.7.255
-* __infra-subnet 172.0.8.0/28__ allowing 11 private IPs from 172.0.8.4 to 172.0.8.15
-* __gatewaysubnet 172.0.9.0/29__ allowing 3 private IPs from 172.0.9.4 to 172.0.9.7
-* __storage-subnet 172.0.10.0/25__ allowing 251 private IPs from 172.0.10.4 to 172.0.10.255
+* __grid-vnet 10.0.0.0/20__ allowing 4091 private IPs from 10.0.0.4 to 10.0.15.255
+* __compute-subnet 10.0.0.0/21__ allowing 2043 private IPs from 10.0.0.4 to 10.0.7.255
+* __infra-subnet 10.0.8.0/28__ allowing 11 private IPs from 10.0.8.4 to 10.0.8.15
+* __gatewaysubnet 10.0.9.0/29__ allowing 3 private IPs from 10.0.9.4 to 10.0.9.7
+* __storage-subnet 10.0.10.0/25__ allowing 251 private IPs from 10.0.10.4 to 10.0.10.255
 
 Notice that Azure Network start each range at the x.x.x.4 address, reducing by 3 the number of available IPs in a subnet. So, this must be taken in account when designing your virtual network architecture.
 Infiniband is automatically provided when HPC Azure nodes are provisioned.
@@ -42,7 +42,8 @@ For DNS, the Azure DNS is used for name resolution on the private IPs.
 Compute nodes are deployed thru VM Scale sets and Managed Disks, made each by up to 100 VMs instances. They are all inside the compute-subnet.
 
 ### Storage
-Depending on the workload to run on the cluster, there is a need to build a scalable file system. BeeGFS is proposed as an option, each storage node will host the storage and metadata services. Several Premium Disks are configured in RAID0 to store the metadata in addition to the real store.
+Depending on the workload to run on the cluster, there may be a need to build a scalable file system. BeeGFS is proposed as an option, each storage node will host the storage and metadata services. Several Premium Disks are configured in RAID0 to store the metadata in addition to the real store.
+For a small size cluster, there is an option to use the master machine as an NFS server with data disk attached in a RAID0 volume.
 
 ### Management
 A dedicated VM (the master node) is used as a jumpbox, exposing an SSH endpoint, and hosting these services :
@@ -56,13 +57,13 @@ To build the compute grid, three main steps need to be executed :
 2. Optionally deploy the BeeGFS nodes
 3. Provision the compute nodes
 
-_The OS for this solution is CentOS 7.2. All scripts have been tested only for that version._
+_The OS for this solution is CentOS 7.2. All scripts have been tested only for that version. SLES 12 can be used for a plain raw cluster, without Ganglia, PBS Pro and BeeGFS._
 
-> Starting on February 8, 2017 Compute nodes and BeeGFS nodes are all provisioned using Managed Disks.
+> Starting on February 22, 2017 Master, Compute nodes and BeeGFS nodes are all provisioned using Managed Disks.
 
 
 ## Deploying using Azure CLI
-Azure CLI 2.0 preview setup instruction can be found [here](https://docs.microsoft.com/en-us/cli/azure/install-az-cli2)
+Azure CLI 2.0 setup instruction can be found [here](https://docs.microsoft.com/en-us/cli/azure/install-az-cli2)
 
 Below is an example on how to provision the templates. First you have to login with your credentials. If you have several subscriptions, make sure to make the one you want to deploy in the default. Then create a resource group providing the region and a name for it, and finally invoke the template passing your local parameter file. In the template URI make sure to use the RAW URI https://raw.githubusercontent.com/xpillons/azure-hpc/master/*** and not the github HTML link.
 
@@ -78,9 +79,12 @@ The template __deploy-master.json__ will provision the networking infrastructure
 
 You have to provide these parameters to the template :
 * _vmPrefix_ : a 8 characters prefix to be used to name your objects. The master VM will be named as **\[prefix\]master**
-* _sharedStorage_ : to specify the shared storage to use. Allowed values are : none, beegfs.
+* _sharedStorage_ : to specify the shared storage to use. Allowed values are : none, beegfs, nfsonmaster.
 * _scheduler_ : the job scheduler to be setup. Allowed values are : none, pbspro
+* _monitoring_ : the monitoring tools to be setup. Allowed values are : none, ganglia
 * _masterImage_ : the OS to be used. Should be CentOS_7.2
+* _dataDiskSize_ :  the size of the data disks to attached. Allowed values are : none, P10 (128GB), P20 (512GB), P30 (1023GB)
+* _nbDataDisks_ : Number of data disks to attach. Default is **2**, maximum is **16**.
 * _VMSku_ : This is to specify the instance size of the master VM. For example Standard_DS3_v2
 * _adminUsername_ : This is the name of the administrator account to create on the VM
 * _adminPassword_ : Password to associate to the administrator account. It is highly encourage to use SSH authentication and passwordless instead.
@@ -92,6 +96,8 @@ You have to provide these parameters to the template :
 Once the deployment succeed, use the output **masterFQDN** to retrieve the master name and SSH on it. The output **GangliaURI** contains the URI of the Ganglia monitoring page, which should display after few minutes graphs of the current load.
 
 To check if PBSPro is installed, run the command **pbsnodes -a** this should return no available nodes, but the command should run successfully.
+
+If **nfsonmaster** is choosen, an NFS mount point named **/data** will be created.
 
 BeeGFS will be checked later once the storage nodes will be deployed.
 
@@ -125,7 +131,7 @@ You have to provide these parameters to the template :
 
 ### Check your deployment
 Storage nodes will be named _beegfs000000 beegfs000001 ..._ .
-After few minutes, they should appear in the Ganglia monitoring web page.
+After few minutes, they should appear in the Ganglia monitoring web page if setup.
 
 To check that the nodes are well registered into the BeeGFS management service, SSH on the master VM and then run these commands :
 * to list the storage nodes : *beegfs-ctl --listnodes --nodetype=storage*
@@ -140,8 +146,9 @@ Compute nodes are provisioned using VM Scalesets, each set can have up to 100 VM
 
 You have to provide these parameters to the template :
 * _VMsku_ : Instance type to provision. Default is **Standard_D3_v2**
-* _sharedStorage_ : default is **none**. Allowed values are (beegfs, none)
+* _sharedStorage_ : default is **none**. Allowed values are (nfsonmaster, beegfs, none)
 * _scheduler_ : default is **none**. Allowed values are (pbspro, none)
+* _monitoring_ : default is **ganglia**. Allowed values are (ganglia, none)
 * _computeNodeImage_ : OS to use for compute nodes. Default and recommended value is **CentOS_7.2**
 * _vmSSPrefix_ : 8 characters prefix to use to name the compute nodes. The naming pattern will be **prefixAABBBBBB** where _AA_ is two digit number of the scaleset and _BBBBBB_ is the 8 hexadecimal value inside the Scaleset
 * _instanceCountPerVMSS_ : number of VMs instance inside a single scaleset. Default is 2, maximum is 100
@@ -151,14 +158,18 @@ You have to provide these parameters to the template :
 * _adminPassword_ : Password to associate to the administrator account. It is highly encourage to use SSH authentication and passwordless instead.
 * _sshKeyData_ : The public SSH key to associate with the administrator user. Format has to be on a single line 'ssh-rsa key'
 * _masterName_ : The short name of the Master VM
+* _postInstallCommand_ : a post installation command to launch after povisioning. This command needs to be encapsulated in quotes, for example **'bash /data/postinstall.sh'**.
+* _imageId_ : Specify the resource ID of the image to be used in the format **/subscriptions/{SubscriptionId}/resourceGroups/{ResourceGroup}/providers/Microsoft.Compute/images/{ImageName}** this value is only used when the _computeNodeImage_ is set to **CustomLinux** or **CustomWindows**
 
 
 [![Click to deploy template on Azure](http://azuredeploy.net/deploybutton.png "Click to deploy template on Azure")](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fxpillons%2Fazure-hpc%2Fmaster%2FCompute-Grid-Infra%2Fdeploy-nodes.json)  
 
 ### Check your deployment
-After few minutes, once the provision succeed, you should see the new hosts added on the Ganglia monitoring page.
+After few minutes, once the provision succeed, you should see the new hosts added on the Ganglia monitoring page if setup.
 
 If PBS Pro is used, SSH on the master and run the **pbsnodes -a** command to list all the registered nodes.
+
+If **nfsonmaster** is choosen the NFS mount point **/data** is automatically mounted.
 
 **Your cluster is now ready to host applications and run jobs**
 

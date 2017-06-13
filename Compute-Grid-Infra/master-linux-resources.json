@@ -29,6 +29,104 @@
   },
   "variables": {
     "location": "[resourceGroup().location]",
+    "PremiumStorageMap": {
+      "none": {
+        "size": 0
+      },
+      "P10": {
+        "size": 128
+      },
+      "P20": {
+        "size": 512
+      },
+      "P30": {
+        "size": 1023
+      }
+    },
+    "nbDataDisks": "[parameters('masterSettings').nbDataDisks]",
+    "diskSize": "[variables('PremiumStorageMap')[parameters('masterSettings').dataDiskSize].size]",
+    "dataDiskArray": [
+      {
+        "diskSizeGB": "[variables('diskSize')]",
+        "lun": "0",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('diskSize')]",
+        "lun": "1",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('diskSize')]",
+        "lun": "2",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('diskSize')]",
+        "lun": "3",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('diskSize')]",
+        "lun": "4",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('diskSize')]",
+        "lun": "5",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('diskSize')]",
+        "lun": "6",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('diskSize')]",
+        "lun": "7",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('diskSize')]",
+        "lun": "8",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('diskSize')]",
+        "lun": "9",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('diskSize')]",
+        "lun": "10",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('diskSize')]",
+        "lun": "11",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('diskSize')]",
+        "lun": "12",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('diskSize')]",
+        "lun": "13",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('diskSize')]",
+        "lun": "14",
+        "createOption": "Empty"
+      },
+      {
+        "diskSizeGB": "[variables('diskSize')]",
+        "lun": "15",
+        "createOption": "Empty"
+      }
+    ],
     "sshKeyPath": "[concat('/home/',parameters('masterOSSettings').adminUserName,'/.ssh/authorized_keys')]",
     "StorageTemplateURIChoice": {
       "none": {
@@ -38,19 +136,30 @@
       "beegfs": {
         "uri": "[uri(deployment().properties.templateLink.uri, 'BeeGFS/beegfs-script.json')]",
         "params": "[concat(parameters('masterSettings').Name, ' client')]"
+      },
+      "nfsonmaster": {
+        "uri": "[uri(deployment().properties.templateLink.uri, 'nfs/nfsonmaster.json')]",
+        "params": ""
       }
     },
     "SchedulerTemplateURIChoice": {
       "none": {
-        "uri": "[uri(deployment().properties.templateLink.uri, 'scheduler-none.json')]",
+        "uri": "[uri(deployment().properties.templateLink.uri, 'scheduler-none.json')]"
       },
       "pbspro": {
-        "uri": "[uri(deployment().properties.templateLink.uri, 'PBSPro/pbspro.json')]",
+        "uri": "[uri(deployment().properties.templateLink.uri, 'PBSPro/pbspro.json')]"
       }
     },
-    "gangliaTemplateURI": "[uri(deployment().properties.templateLink.uri, 'Ganglia/ganglia.json')]",
+    "MonitoringTemplateURIChoice": {
+      "none": {
+        "uri": "[uri(deployment().properties.templateLink.uri, 'monitoring-none.json')]"
+      },
+      "ganglia": {
+        "uri": "[uri(deployment().properties.templateLink.uri, 'Ganglia/ganglia.json')]"
+      }
+    },
     "masterScriptTemplateURI": "[uri(deployment().properties.templateLink.uri, 'master-linux-script.json')]",
-    "computeApiVersion": "2016-03-30",
+    "computeApiVersion": "2016-04-30-preview",
     "deploymentApiVersion": "2016-09-01"
   },
   "resources": [
@@ -83,13 +192,10 @@
         "storageProfile": {
           "imageReference": "[parameters('masterOSSettings').imageReference]",
           "osDisk": {
-            "name": "[parameters('masterSettings').OSDiskName]",
-            "vhd": {
-              "uri": "[concat('http://',parameters('masterSettings').SAName,'.blob.core.windows.net/',parameters('masterSettings').VHDContainerName,'/',parameters('masterSettings').OSDiskName,'.vhd')]"
-            },
             "caching": "ReadOnly",
             "createOption": "FromImage"
-          }
+          },
+          "dataDisks": "[take(variables('dataDiskArray'),variables('nbDataDisks'))]"
         },
         "networkProfile": {
           "networkInterfaces": [
@@ -125,7 +231,7 @@
       }
     },
     {
-      "name": "ganglia",
+      "name": "monitoring",
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "[variables('deploymentApiVersion')]",
       "dependsOn": [
@@ -134,7 +240,7 @@
       "properties": {
         "mode": "Incremental",
         "templateLink": {
-          "uri": "[variables('gangliaTemplateURI')]",
+          "uri": "[variables('MonitoringTemplateURIChoice')[parameters('masterSettings').monitoring].uri]",
           "contentVersion": "1.0.0.0"
         },
         "parameters": {
@@ -148,7 +254,7 @@
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "[variables('deploymentApiVersion')]",
       "dependsOn": [
-        "ganglia"
+        "monitoring"
       ],
       "properties": {
         "mode": "Incremental",

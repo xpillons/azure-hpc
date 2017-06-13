@@ -22,11 +22,13 @@
     },
     "masterImage": {
       "type": "string",
-      "defaultValue": "CentOS_7.2",
+      "defaultValue": "CentOS_7.3",
       "allowedValues": [
         "CentOS_6.7",
         "CentOS_7.2",
+        "CentOS_7.3",
         "RHEL_7.2",
+        "SLES12",
         "W2012R2"
       ],
       "metadata": {
@@ -38,10 +40,43 @@
       "defaultValue": "none",
       "allowedValues": [
         "none",
-        "beegfs"
+        "beegfs",
+        "nfsonmaster"
       ],
       "metadata": {
-        "description": "specify the shared storage to be used"
+        "description": "specify the shared storage to be used. beegfs=> beegfs cluster, nfsonmaster=> nfs share on the master"
+      }
+    },
+    "dataDiskSize": {
+      "type": "string",
+      "defaultValue": "none",
+      "allowedValues": [
+        "none",
+        "P10",
+        "P20",
+        "P30"
+      ],
+      "metadata": {
+        "description": "Premium storage disk size to attach"
+      }
+    },
+    "nbDataDisks": {
+      "type": "int",
+      "metadata": {
+        "description": "Number of data disks to attach to the master"
+      },
+      "defaultValue": 2,
+      "maxValue": 16
+    },
+    "monitoring": {
+      "type": "string",
+      "defaultValue": "ganglia",
+      "allowedValues": [
+        "none",
+        "ganglia"
+      ],
+      "metadata": {
+        "description": "specify the monitoring to use"
       }
     },
     "scheduler": {
@@ -91,29 +126,28 @@
     "vnetID": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
     "networkSettings": {
       "virtualNetworkName": "[variables('virtualNetworkName')]",
-      "addressPrefix": "172.0.0.0/20",
-      "computeSubnetPrefix": "172.0.0.0/21",
-      "storageSubnetPrefix": "172.0.10.0/25",
-      "infraSubnetPrefix": "172.0.8.0/28",
-      "gatewaySubnetPrefix": "172.0.9.0/29",
+      "addressPrefix": "10.0.0.0/20",
+      "computeSubnetPrefix": "10.0.0.0/21",
+      "storageSubnetPrefix": "10.0.10.0/25",
+      "infraSubnetPrefix": "10.0.8.0/28",
+      "gatewaySubnetPrefix": "10.0.9.0/29",
       "infraSubnetRef": "[concat(variables('vnetID'),'/subnets/infraSubnet/')]",
       "nsgName": "nsg-master"
     },
     "masterBoxName": "[concat(variables('longNamingInfix'), 'master')]",
     "masterSettings": {
       "Name": "[variables('masterBoxName')]",
-      "SAType": "Premium_LRS",
-      "SAName": "[concat(uniqueString(concat(resourceGroup().id, variables('newStorageAccountSuffix'), 'masterboxsa')), 'master')]",
       "DiagSAName": "[concat(uniqueString(concat(resourceGroup().id, variables('newStorageAccountSuffix'), 'masterboxsadiag')), 'diag')]",
-      "OSDiskName": "[concat(variables('masterBoxName'), 'osdisk')]",
-      "VHDContainerName": "[concat(variables('masterBoxName'), 'vhd')]",
       "IPConfigName": "[concat(variables('masterBoxName'), 'ipconfig')]",
       "NicName": "[concat(variables('masterBoxName'), 'nic')]",
       "VMsku": "[parameters('VMsku')]",
       "publicIPAddressName": "[concat(variables('masterBoxName'), 'pip')]",
       "publicIPDomainName": "[variables('namingInfix')]",
       "sharedStorage": "[parameters('sharedStorage')]",
-      "scheduler": "[parameters('scheduler')]"
+      "monitoring": "[parameters('monitoring')]",
+      "scheduler": "[parameters('scheduler')]",
+      "dataDiskSize": "[parameters('dataDiskSize')]",
+      "nbDataDisks": "[parameters('nbDataDisks')]"
     },
     "masterOSSettings": {
       "osType": "[variables('osTypes')[parameters('masterImage')]]",
@@ -129,7 +163,13 @@
       "CentOS_7.2": {
         "os": "linux"
       },
+      "CentOS_7.3": {
+        "os": "linux"
+      },
       "RHEL_7.2": {
+        "os": "linux"
+      },
+      "SLES12": {
         "os": "linux"
       },
       "W2012R2": {
@@ -149,10 +189,22 @@
         "sku": "7.2",
         "version": "latest"
       },
+      "CentOS_7.3": {
+        "publisher": "OpenLogic",
+        "offer": "CentOS",
+        "sku": "7.3",
+        "version": "latest"
+      },
       "RHEL_7.2": {
         "publisher": "RedHat",
         "offer": "RHEL",
         "sku": "7.2",
+        "version": "latest"
+      },
+      "SLES12": {
+        "publisher": "SUSE",
+        "offer": "SLES",
+        "sku": "12-SP1",
         "version": "latest"
       },
       "W2012R2": {
@@ -163,7 +215,6 @@
       }
     },
     "deploymentApiVersion": "2015-01-01",
-
     "sharedTemplateUrl": "[uri(deployment().properties.templateLink.uri, 'shared-resources.json')]",
     "master-sharedTemplateUrl": "[uri(deployment().properties.templateLink.uri, 'master-shared-resources.json')]",
     "master-OSTemplateUrl": "[uri(deployment().properties.templateLink.uri, concat('master-', variables('masterOSSettings').osType.os, '-resources.json'))]",

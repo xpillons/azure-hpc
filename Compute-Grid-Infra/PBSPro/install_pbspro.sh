@@ -7,14 +7,20 @@ if [[ $(id -u) -ne 0 ]] ; then
     exit 1
 fi
 
-if [ $# != 1 ]; then
-    echo "Usage: $0 <MasterHostname>"
+if [ $# -lt 1 ]; then
+    echo "Usage: $0 <MasterHostname> <queueName>"
     exit 1
 fi
 
 # Set user args
 MASTER_HOSTNAME=$1
+QNAME=workq
 PBS_MANAGER=hpcuser
+
+if [ -n "$2" ]; then
+	#enforce qname to be lowercase
+	QNAME="$(echo ${2,,})"
+fi
 
 # Returns 0 if this node is the master node.
 #
@@ -45,16 +51,25 @@ install_pkgs()
 #
 install_pbspro()
 {
-    yum install -y gcc make rpm-build libtool hwloc-devel libX11-devel libXt-devel libedit-devel libical-devel ncurses-devel perl postgresql-devel python-devel tcl-devel tk-devel swig expat-devel openssl-devel libXext libXft autoconf automake expat libedit postgresql-server python sendmail tcl tk libical perl-Env perl-Switch
-    
-    # Required on 7.2 as the libical lib changed
-    ln -s /usr/lib64/libical.so.1 /usr/lib64/libical.so.0
-    
+ 
+	yum install -y libXt-devel libXext
+
+
     wget -O /mnt/CentOS_7.zip  http://wpc.23a7.iotacdn.net/8023A7/origin2/rl/PBS-Open/CentOS_7.zip
     unzip /mnt/CentOS_7.zip -d /mnt
        
     if is_master; then
+
+		enable_kernel_update
+		install_pkgs
+
+		yum install -y gcc make rpm-build libtool hwloc-devel libX11-devel libedit-devel libical-devel ncurses-devel perl postgresql-devel python-devel tcl-devel tk-devel swig expat-devel openssl-devel libXft autoconf automake expat libedit postgresql-server python sendmail tcl tk libical perl-Env perl-Switch
+    
+		# Required on 7.2 as the libical lib changed
+		ln -s /usr/lib64/libical.so.1 /usr/lib64/libical.so.0
+
 	    rpm -ivh --nodeps /mnt/CentOS_7/pbspro-server-14.1.0-13.1.x86_64.rpm
+
 
         cat > /etc/pbs.conf << EOF
 PBS_SERVER=$MASTER_HOSTNAME
@@ -74,10 +89,20 @@ EOF
         /opt/pbs/bin/qmgr -c "s s job_history_enable = true"
         /opt/pbs/bin/qmgr -c "s s job_history_duration = 336:0:0"
 
+		# change job scheduler iteration from 10 minutes to 2
+        /opt/pbs/bin/qmgr -c "set server scheduler_iteration = 120"
+
 		# add hpcuser as manager
         /opt/pbs/bin/qmgr -c "s s managers = $PBS_MANAGER@*"
 
+		# list settings
+		/opt/pbs/bin/qmgr -c 'list server'
     else
+
+
+		yum install -y hwloc-devel expat-devel tcl-devel expat
+
+
 	    rpm -ivh --nodeps /mnt/CentOS_7/pbspro-execution-14.1.0-13.1.x86_64.rpm
 
         cat > /etc/pbs.conf << EOF
@@ -101,6 +126,11 @@ EOF
 		chown root /etc/init.d/pbs_selfregister
 		chkconfig --add pbs_selfregister
 
+		# if queue name is set update the self register script
+		if [ -n "$QNAME" ]; then
+			sed -i '/qname=/ s/=.*/='$QNAME'/' /etc/init.d/pbs_selfregister
+		fi
+
 		# register node
 		/etc/init.d/pbs_selfregister start
 
@@ -112,15 +142,13 @@ EOF
     cd ..
 }
 
+mkdir -p /var/local
 SETUP_MARKER=/var/local/install_pbspro.marker
 if [ -e "$SETUP_MARKER" ]; then
     echo "We're already configured, exiting..."
     exit 0
 fi
 
-
-enable_kernel_update
-install_pkgs
 install_pbspro
 
 # Create marker file so we know we're configured

@@ -52,10 +52,11 @@
       "defaultValue": "none",
       "allowedValues": [
         "none",
-        "beegfs"
+        "beegfs",
+        "nfsonmaster"
       ],
       "metadata": {
-        "description": "specify the shared storage to be used"
+        "description": "specify the shared storage to be used. beegfs=> beegfs cluster, nfsonmaster=> nfs share on the master"
       }
     },
     "scheduler": {
@@ -69,15 +70,32 @@
         "description": "specify the job scheduler to be used"
       }
     },
+    "monitoring": {
+      "type": "string",
+      "defaultValue": "ganglia",
+      "allowedValues": [
+        "none",
+        "ganglia"
+      ],
+      "metadata": {
+        "description": "specify the monitoring to use"
+      }
+    },
     "computeNodeImage": {
       "type": "string",
       "defaultValue": "CentOS_7.2",
       "allowedValues": [
+        "Ubuntu_16.04",
         "CentOS_6.7",
         "CentOS_7.2",
+        "CentOS_7.3",
         "CentOS-HPC_7.1",
+        "CentOS-HPC_7.3",
+        "SLES12-HPC",
         "RHEL_7.2",
-        "W2012R2"
+        "W2012R2",
+        "CustomLinux",
+        "CustomWindows"
       ],
       "metadata": {
         "description": "The VM image of the compute nodes"
@@ -136,6 +154,20 @@
       "metadata": {
         "description": "Name of master VM name"
       }
+    },
+    "postInstallCommand": {
+      "type": "string",
+      "defaultValue": "hostname",
+      "metadata": {
+        "description": "post install command to run as a post script install"
+      }
+    },
+    "imageId": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "image Id to the custom image to use, format is /subscriptions/{SubscriptionId}/resourceGroups/{ResourceGroup}/providers/Microsoft.Compute/images/{ImageName}"
+      }
     }
   },
   "variables": {
@@ -150,26 +182,51 @@
       "MasterName": "[parameters('masterName')]",
       "storageAccountType": "Standard_LRS",
       "sharedStorage": "[parameters('sharedStorage')]",
-      "scheduler": "[parameters('scheduler')]"
+      "scheduler": "[parameters('scheduler')]",
+      "monitoring": "[parameters('monitoring')]"
     },
     "osTypes": {
+      "Ubuntu_16.04": {
+        "os": "linux"
+      },
       "CentOS_6.7": {
         "os": "linux"
       },
       "CentOS_7.2": {
         "os": "linux"
       },
+      "CentOS_7.3": {
+        "os": "linux"
+      },
       "CentOS-HPC_7.1": {
+        "os": "linux"
+      },
+      "CentOS-HPC_7.3": {
+        "os": "linux"
+      },
+      "SLES12-HPC": {
         "os": "linux"
       },
       "RHEL_7.2": {
         "os": "linux"
       },
+      "CustomLinux": {
+        "os": "linux"
+      },
       "W2012R2": {
+        "os": "windows"
+      },
+      "CustomWindows": {
         "os": "windows"
       }
     },
     "computeNodeImages": {
+      "Ubuntu_16.04": {
+        "publisher": "Canonical",
+        "offer": "UbuntuServer",
+        "sku": "16.04-LTS",
+        "version": "latest"
+      },
       "CentOS_6.7": {
         "publisher": "OpenLogic",
         "offer": "CentOS",
@@ -182,10 +239,22 @@
         "sku": "7.1",
         "version": "latest"
       },
+      "CentOS-HPC_7.3": {
+        "publisher": "OpenLogic",
+        "offer": "CentOS-HPC",
+        "sku": "7.3",
+        "version": "latest"
+      },
       "CentOS_7.2": {
         "publisher": "OpenLogic",
         "offer": "CentOS",
         "sku": "7.2",
+        "version": "latest"
+      },
+      "CentOS_7.3": {
+        "publisher": "OpenLogic",
+        "offer": "CentOS",
+        "sku": "7.3",
         "version": "latest"
       },
       "RHEL_7.2": {
@@ -194,11 +263,23 @@
         "sku": "7.2",
         "version": "latest"
       },
+      "SLES12-HPC": {
+        "publisher": "SUSE",
+        "offer": "SLES-HPC",
+        "sku": "12-SP1",
+        "version": "latest"
+      },
       "W2012R2": {
         "publisher": "MicrosoftWindowsServer",
         "offer": "WindowsServer",
         "sku": "2012-R2-Datacenter",
         "version": "latest"
+      },
+      "CustomLinux": {
+        "id": "[parameters('imageId')]"
+      },
+      "CustomWindows": {
+        "id": "[parameters('imageId')]"
       }
     },
     "nodeOSSettings": {
@@ -244,6 +325,9 @@
           },
           "adminPassword": {
             "value": "[parameters('adminPassword')]"
+          },
+          "postInstallCommand": {
+            "value": "[parameters('postInstallCommand')]"
           }
         }
       }

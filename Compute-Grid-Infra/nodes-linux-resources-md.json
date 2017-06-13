@@ -37,6 +37,13 @@
       "metadata": {
         "description": "password for the Virtual Machine."
       }
+    },
+    "postInstallCommand": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "post install command to run as a post script install"
+      }
     }
   },
   "variables": {
@@ -52,14 +59,23 @@
       "none": {
         "params": ""
       },
+      "nfsonmaster": {
+        "params": " -S nfsonmaster"
+      },
       "beegfs": {
         "params": " -S beegfs"
       },
+      "ganglia": {
+        "params": " -n ganglia"
+      },
       "pbspro": {
-        "params": " -s pbspro"
+        "params": "[concat(' -s pbspro -q ', parameters('vmssName'))]"
       },
       "master": {
         "params": "[concat(' -m ', parameters('nodeSettings').MasterName)]"
+      },
+      "postinstall": {
+        "params": "[concat(' -c ', parameters('postInstallCommand'))]"
       }
     },
     "cnSetupScript": "cn-setup.sh",
@@ -71,7 +87,7 @@
         "[uri(deployment().properties.templateLink.uri, 'PBSPro/pbs_selfregister.sh')]",
         "[uri(deployment().properties.templateLink.uri, 'Ganglia/install_ganglia.sh')]"
       ],
-      "commandToExecute": "[concat('bash ', variables('cnSetupScript'), variables('ScriptsOptions')['master'].params, variables('ScriptsOptions')[parameters('nodeSettings').scheduler].params, variables('ScriptsOptions')[parameters('nodeSettings').sharedStorage].params)]"
+      "commandToExecute": "[concat('bash ', variables('cnSetupScript'), variables('ScriptsOptions')['master'].params, variables('ScriptsOptions')[parameters('nodeSettings').scheduler].params, variables('ScriptsOptions')[parameters('nodeSettings').sharedStorage].params, variables('ScriptsOptions')[parameters('nodeSettings').monitoring].params, variables('ScriptsOptions')['postinstall'].params)]"
     },
     "sshKeyPath": "[concat('/home/',parameters('nodeOSSettings').adminUserName,'/.ssh/authorized_keys')]"
   },

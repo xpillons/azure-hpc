@@ -1,0 +1,17 @@
+#!/bin/bash
+
+joboutfile=${JOBID}.OU
+key=<key>
+account=pintaprod
+container=results
+
+cd $jobdir
+tail -n 25 log.* >> $joboutfile
+blobxfer $account $container $joboutfile --storageaccountkey $key
+cd ..
+tar -czvf ${pintajobid}.tgz ${pintajobid}
+
+blobxfer $account $container ${pintajobid}.tgz --storageaccountkey $key
+
+rm ${pintajobid}.tgz
+rm -rfd $jobdir

@@ -1,0 +1,13 @@
+#!/bin/bash
+
+joboutfile=${JOBID}.OU
+
+cd $jobdir 
+
+# cleanup the podkey from the output file
+sed -i 's/-podkey\s*[^-]*//g' $joboutfile 
+
+blobxfer pintawe results $joboutfile --storageaccountkey $key
+
+cd ..
+rm -rfd $jobdir

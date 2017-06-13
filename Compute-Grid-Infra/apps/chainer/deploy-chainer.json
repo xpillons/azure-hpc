@@ -1,0 +1,268 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "virtualMachineSize": {
+      "type": "string",
+      "defaultValue": "Standard_NC6",
+      "allowedValues": [
+        "Standard_NC6",
+        "Standard_NC12",
+        "Standard_NC24"
+      ],
+      "metadata": {
+        "description": "GPU VM sku to use for the VM"
+      }
+    },
+    "vmImage": {
+      "type": "string",
+      "defaultValue": "Ubuntu_16.04",
+      "allowedValues": [
+        "CentOS_7.3",
+        "Ubuntu_16.04"
+      ],
+      "metadata": {
+        "description": "The VM OS image"
+      }
+    },
+    "vmName": {
+      "type": "string",
+      "metadata": {
+        "description": "Name of the VM"
+      },
+      "maxLength": 12
+    },
+    "adminUserName": {
+      "type": "string",
+      "metadata": {
+        "description": "User name for the Virtual Machine."
+      }
+    },
+    "adminPassword": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "User password for the Virtual Machine."
+      }
+    },
+    "sshKeyData": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "SSH rsa public key file as a string."
+      }
+    }
+  },
+  "variables": {
+    "location": "[resourceGroup().location]",
+
+    "namingInfix": "[toLower(substring(concat(parameters('vmName'), uniqueString(resourceGroup().id)), 0, 15))]",
+
+    "virtualNetworkName": "chainer-vnet",
+    "vnetID": "[resourceId('Microsoft.Network/virtualNetworks', variables('virtualNetworkName'))]",
+
+    "networkSettings": {
+      "virtualNetworkName": "[variables('virtualNetworkName')]",
+      "addressPrefix": "10.0.0.0/20",
+      "chainerSubnetPrefix": "10.0.0.0/21",
+      "chainerSubnetRef": "[concat(variables('vnetID'),'/subnets/chainerSubnet/')]",
+      "nsgName": "nsg-chainer"
+    },
+
+    "vmSettings": {
+      "name": "[variables('namingInfix')]",
+      "VMsku": "[parameters('virtualMachineSize')]",
+      "publicIPAddressName": "[concat(parameters('vmName'), 'pip')]",
+      "publicIPDomainName": "[variables('namingInfix')]",
+      "nicName": "[concat(parameters('vmName'), 'nic')]",
+      "ipConfigName": "[concat(parameters('vmName'), 'ipconfig')]"
+    },
+
+    "vmOSSettings": {
+      "adminUserName": "[parameters('adminUserName')]",
+      "sshKeyData": "[parameters('sshKeyData')]",
+      "imageReference": "[variables('computeImages')[parameters('vmImage')]]"
+    },
+    "computeImages": {
+      "CentOS_7.3": {
+        "publisher": "OpenLogic",
+        "offer": "CentOS",
+        "sku": "7.3",
+        "version": "latest"
+      },
+      "Ubuntu_16.04": {
+        "publisher": "Canonical",
+        "offer": "UbuntuServer",
+        "sku": "16.04-LTS",
+        "version": "latest"
+      }
+    },
+    "computeApiVersion": "2016-04-30-preview",
+    "networkApiVersion": "2016-03-30",
+    "extensionApiVersion": "2015-06-15",
+    "deploymentApiVersion": "2016-09-01",
+    "sshKeyPath": "[concat('/home/',parameters('adminUserName'),'/.ssh/authorized_keys')]",
+    "vmScriptTemplateURI": "[uri(deployment().properties.templateLink.uri, 'chainer-script.json')]"
+  },
+  "resources": [
+    {
+      "name": "[variables('vmSettings').name]",
+      "type": "Microsoft.Compute/virtualMachines",
+      "apiVersion": "[variables('computeApiVersion')]",
+      "location": "[variables('location')]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/networkInterfaces/', variables('vmSettings').nicName)]"
+      ],
+      "properties": {
+        "osProfile": {
+          "adminUsername": "[variables('vmOSSettings').adminUsername]",
+          "adminPassword": "[parameters('adminPassword')]",
+          "computerName": "[variables('vmSettings').name]",
+          "linuxConfiguration": {
+            "disablePasswordAuthentication": "false",
+            "ssh": {
+              "publicKeys": [
+                {
+                  "path": "[variables('sshKeyPath')]",
+                  "keyData": "[variables('vmOSSettings').sshKeyData]"
+                }
+              ]
+            }
+          }
+        },
+        "hardwareProfile": {
+          "vmSize": "[parameters('virtualMachineSize')]"
+        },
+        "storageProfile": {
+          "imageReference": "[variables('vmOSSettings').imageReference]",
+          "osDisk": {
+            "name": "[variables('vmSettings').name]",
+            "createOption": "FromImage"
+          },
+          "dataDisks": []
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('vmSettings').nicName)]"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "ScriptExtension",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "[variables('deploymentApiVersion')]",
+      "dependsOn": [
+        "[concat('Microsoft.Compute/virtualMachines/', variables('vmSettings').name)]"
+      ],
+      "properties": {
+        "mode": "Incremental",
+        "templateLink": {
+          "uri": "[variables('vmScriptTemplateURI')]",
+          "contentVersion": "1.0.0.0"
+        },
+        "parameters": {
+          "vmName": { "value": "[variables('vmSettings').name]" },
+          "options": {"value": "none"}
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "name": "[variables('networkSettings').virtualNetworkName]",
+      "location": "[resourceGroup().location]",
+      "apiVersion": "[variables('networkApiVersion')]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[variables('networkSettings').addressPrefix]"
+          ]
+        },
+        "subnets": [
+          {
+            "name": "chainerSubnet",
+            "properties": {
+              "addressPrefix": "[variables('networkSettings').chainerSubnetPrefix]"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/networkSecurityGroups",
+      "name": "[variables('networkSettings').nsgName]",
+      "apiVersion": "[variables('networkApiVersion')]",
+      "location": "[variables('location')]",
+      "properties": {
+        "securityRules": [
+          {
+            "name": "ssh-rule",
+            "properties": {
+              "description": "Allow SSH",
+              "protocol": "Tcp",
+              "sourcePortRange": "*",
+              "destinationPortRange": "22",
+              "sourceAddressPrefix": "*",
+              "destinationAddressPrefix": "*",
+              "access": "Allow",
+              "priority": 100,
+              "direction": "Inbound"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "name": "[variables('vmSettings').publicIPAddressName]",
+      "location": "[variables('location')]",
+      "apiVersion": "[variables('networkApiVersion')]",
+      "dependsOn": [
+        "[variables('networkSettings').virtualNetworkName]"
+      ],
+      "properties": {
+        "publicIPAllocationMethod": "Dynamic",
+        "dnsSettings": {
+          "domainNameLabel": "[variables('vmSettings').publicIPDomainName]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Network/networkInterfaces",
+      "name": "[variables('vmSettings').nicName]",
+      "location": "[variables('location')]",
+      "apiVersion": "[variables('networkApiVersion')]",
+      "dependsOn": [
+        "[concat('Microsoft.Network/publicIPAddresses/', variables('vmSettings').publicIPAddressName)]",
+        "[variables('networkSettings').nsgName]"
+      ],
+      "properties": {
+        "ipConfigurations": [
+          {
+            "name": "[variables('vmSettings').ipConfigName]",
+            "properties": {
+              "privateIPAllocationMethod": "Dynamic",
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIPAddresses',variables('vmSettings').publicIPAddressName)]"
+              },
+              "subnet": {
+                "id": "[variables('networkSettings').chainerSubnetRef]"
+              }
+            }
+          }
+        ],
+        "networkSecurityGroup": {
+          "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('networkSettings').nsgName)]"
+        }
+      }
+    }
+  ],
+  "outputs": {
+    "vmFQDN": {
+      "value": "[reference(variables('vmSettings').publicIPAddressName).dnsSettings.fqdn]",
+      "type": "string"
+    }
+  }
+}

@@ -35,6 +35,20 @@
   },
   "variables": {
     "location": "[resourceGroup().location]",
+    "PremiumStorageMap": {
+      "none": {
+        "size": 0
+      },
+      "P10": {
+        "size": 128
+      },
+      "P20": {
+        "size": 512
+      },
+      "P30": {
+        "size": 1023
+      }
+    },
     "vmScripts": {
       "scriptsToDownload": [
         "[uri(deployment().properties.templateLink.uri, 'master-setup.ps1')]"
@@ -42,7 +56,7 @@
       "commandToExecute": ""
     },
     "sharedAccountId": "[resourceId(parameters('commonSettings').RGStorageName, 'Microsoft.Storage/storageAccounts', parameters('commonSettings').DataSAName)]",
-    "computeApiVersion": "2016-03-30",
+    "computeApiVersion": "2016-04-30-preview",
     "storageApiVersion": "2015-06-15"
   },
   "resources": [
@@ -65,13 +79,16 @@
         "storageProfile": {
           "imageReference": "[parameters('masterOSSettings').imageReference]",
           "osDisk": {
-            "name": "[parameters('masterSettings').OSDiskName]",
-            "vhd": {
-              "uri": "[concat('http://',parameters('masterSettings').SAName,'.blob.core.windows.net/',parameters('masterSettings').VHDContainerName,'/',parameters('masterSettings').OSDiskName,'.vhd')]"
-            },
             "caching": "ReadOnly",
             "createOption": "FromImage"
-          }
+          },
+          "dataDisks": [
+            {
+              "diskSizeGB": "[variables('PremiumStorageMap')[parameters('masterSettings').dataDiskSize].size]",
+              "lun": "0",
+              "createOption": "Empty"
+            }
+          ]
         },
         "networkProfile": {
           "networkInterfaces": [

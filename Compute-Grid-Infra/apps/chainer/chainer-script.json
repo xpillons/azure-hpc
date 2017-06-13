@@ -1,0 +1,61 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vmName": {
+      "type": "string",
+      "metadata": {
+        "Description": "vmName to apply the script"
+      }
+    },
+    "options": {
+      "type": "string",
+      "defaultValue": "none",
+      "allowedValues": [
+        "none",
+        "multiple"
+      ],
+      "metadata": {
+        "Description": "script options"
+      }
+    }
+  },
+  "variables": {
+    "scriptsOptions": {
+      "none": {
+        "params": " -m 0"
+      },
+      "multiple": {
+        "params": " -m 1"
+      }
+    },
+    "vmScripts": {
+      "scriptsToDownload": [
+        "[uri(deployment().properties.templateLink.uri, 'install-chainer.sh')]"
+      ],
+      "commandToExecute": "[concat('bash install-chainer.sh ', variables('scriptsOptions')[parameters('options')].params)]"
+    },
+    "extensionApiVersion": "2015-06-15"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Compute/virtualMachines/extensions",
+      "name": "[concat(parameters('vmName'), '/ext')]",
+      "apiVersion": "[variables('extensionApiVersion')]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "publisher": "Microsoft.Azure.Extensions",
+        "type": "CustomScript",
+        "typeHandlerVersion": "2.0",
+        "autoUpgradeMinorVersion": true,
+        "settings": {
+          "fileUris": "[variables('vmScripts').scriptsToDownload]",
+          "timestamp": 12
+        },
+        "protectedSettings": {
+          "commandToExecute": "[variables('vmScripts').commandToExecute]"
+        }
+      }
+    }
+  ]
+}
