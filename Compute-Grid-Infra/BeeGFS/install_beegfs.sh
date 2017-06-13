@@ -24,8 +24,11 @@ if [ -n "$3" ]; then
 	SHARE_SCRATCH=$3
 fi
 
-BEEGFS_METADATA=/data/beegfs/meta
-BEEGFS_STORAGE=/data/beegfs/storage
+# BeeGFS 
+BEEGFS_SBIN=/opt/beegfs/sbin
+BEEGFS_METADATA=/var/beegfs/meta
+BEEGFS_STORAGE=/var/beegfs/storage
+BEEGFS_MGMT=/var/beegfs/mgmt
 
 # User
 HPC_USER=hpcuser
@@ -216,8 +219,11 @@ install_beegfs()
 	# setup metata data
     if is_metadatanode; then
 		yum install -y beegfs-meta
-		sed -i 's|^storeMetaDirectory.*|storeMetaDirectory = '$BEEGFS_METADATA'|g' /etc/beegfs/beegfs-meta.conf
-		sed -i 's/^sysMgmtdHost.*/sysMgmtdHost = '$MGMT_HOSTNAME'/g' /etc/beegfs/beegfs-meta.conf
+
+		$BEEGFS_SBIN/beegfs-setup-meta -p $BEEGFS_METADATA -s 2 -m $MGMT_HOSTNAME
+
+		#sed -i 's|^storeMetaDirectory.*|storeMetaDirectory = '$BEEGFS_METADATA'|g' /etc/beegfs/beegfs-meta.conf
+		#sed -i 's/^sysMgmtdHost.*/sysMgmtdHost = '$MGMT_HOSTNAME'/g' /etc/beegfs/beegfs-meta.conf
 
 		tune_meta
 
@@ -229,8 +235,11 @@ install_beegfs()
 	# setup storage
     if is_storagenode; then
 		yum install -y beegfs-storage
-		sed -i 's|^storeStorageDirectory.*|storeStorageDirectory = '$BEEGFS_STORAGE'|g' /etc/beegfs/beegfs-storage.conf
-		sed -i 's/^sysMgmtdHost.*/sysMgmtdHost = '$MGMT_HOSTNAME'/g' /etc/beegfs/beegfs-storage.conf
+
+		$BEEGFS_SBIN/beegfs-setup-storage -p $BEEGFS_STORAGE -m $MGMT_HOSTNAME
+
+		#sed -i 's|^storeStorageDirectory.*|storeStorageDirectory = '$BEEGFS_STORAGE'|g' /etc/beegfs/beegfs-storage.conf
+		#sed -i 's/^sysMgmtdHost.*/sysMgmtdHost = '$MGMT_HOSTNAME'/g' /etc/beegfs/beegfs-storage.conf
 
 		tune_storage
 
@@ -242,9 +251,11 @@ install_beegfs()
 	if is_management; then
 		yum install -y beegfs-mgmtd beegfs-helperd beegfs-utils beegfs-admon
         
-		# Install management server and client
-		mkdir -p /data/beegfs/mgmtd
-		sed -i 's|^storeMgmtdDirectory.*|storeMgmtdDirectory = /data/beegfs/mgmt|g' /etc/beegfs/beegfs-mgmtd.conf
+		# Install management server and admon
+		mkdir -p $BEEGFS_MGMT
+		$BEEGFS_SBIN/beegfs-setup-mgmtd -p $BEEGFS_MGMT
+
+		#sed -i 's|^storeMgmtdDirectory.*|storeMgmtdDirectory = '$BEEGFS_MGMT'|g' /etc/beegfs/beegfs-mgmtd.conf
 		sed -i 's/^sysMgmtdHost.*/sysMgmtdHost = '$MGMT_HOSTNAME'/g' /etc/beegfs/beegfs-admon.conf
 		systemctl daemon-reload
 		systemctl enable beegfs-mgmtd.service
@@ -254,7 +265,9 @@ install_beegfs()
 	if is_client; then
 		yum install -y beegfs-client beegfs-helperd beegfs-utils
 		# setup client
-		sed -i 's/^sysMgmtdHost.*/sysMgmtdHost = '$MGMT_HOSTNAME'/g' /etc/beegfs/beegfs-client.conf
+		$BEEGFS_SBIN/beegfs-setup-client -m $MGMT_HOSTNAME
+
+		#sed -i 's/^sysMgmtdHost.*/sysMgmtdHost = '$MGMT_HOSTNAME'/g' /etc/beegfs/beegfs-client.conf
 		echo "$SHARE_SCRATCH /etc/beegfs/beegfs-client.conf" > /etc/beegfs/beegfs-mounts.conf
 	
 		systemctl daemon-reload
@@ -308,28 +321,6 @@ setup_domain()
 	fi
 }
 
-setup_user()
-{
-    mkdir -p $SHARE_HOME
-    mkdir -p $SHARE_SCRATCH
-
-	echo "$MGMT_HOSTNAME:$SHARE_HOME $SHARE_HOME    nfs4    rw,auto,_netdev 0 0" >> /etc/exports
-	mount -a
-	mount
-   
-    groupadd -g $HPC_GID $HPC_GROUP
-
-    # Don't require password for HPC user sudo
-    echo "$HPC_USER ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
-    
-    # Disable tty requirement for sudo
-    sed -i 's/^Defaults[ ]*requiretty/# Defaults requiretty/g' /etc/sudoers
-
-	useradd -c "HPC User" -g $HPC_GROUP -d $SHARE_HOME/$HPC_USER -s /bin/bash -u $HPC_UID $HPC_USER
-
-    chown $HPC_USER:$HPC_GROUP $SHARE_SCRATCH	
-}
-
 
 SETUP_MARKER=/var/local/install_beegfs.marker
 if [ -e "$SETUP_MARKER" ]; then
@@ -346,7 +337,7 @@ setenforce 0
 
 install_pkgs
 setup_disks
-setup_user
+
 tune_tcp
 setup_domain
 install_beegfs_repo
