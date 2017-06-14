@@ -26,8 +26,8 @@ fi
 
 # BeeGFS 
 BEEGFS_SBIN=/opt/beegfs/sbin
-BEEGFS_METADATA=/var/beegfs/meta
-BEEGFS_STORAGE=/var/beegfs/storage
+BEEGFS_METADATA=/data/meta
+BEEGFS_STORAGE=/data/storage
 BEEGFS_MGMT=/var/beegfs/mgmt
 
 # User
