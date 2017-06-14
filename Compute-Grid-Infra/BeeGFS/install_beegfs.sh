@@ -271,6 +271,10 @@ install_beegfs()
 
 		# disable RDMA
 		sed -i 's/^connUseRDMA.*/connUseRDMA = false/g' /etc/beegfs/beegfs-client.conf
+
+		# increase the timeout of mount check to 30s
+		sed -i 's/^sysMountSanityCheckMS.*/sysMountSanityCheckMS = 30000/g' /etc/beegfs/beegfs-client.conf
+
 		echo "$SHARE_SCRATCH /etc/beegfs/beegfs-client.conf" > /etc/beegfs/beegfs-mounts.conf
 	
 		systemctl daemon-reload
