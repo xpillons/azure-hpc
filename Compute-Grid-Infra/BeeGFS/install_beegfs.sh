@@ -220,7 +220,7 @@ install_beegfs()
     if is_metadatanode; then
 		yum install -y beegfs-meta
 
-		$BEEGFS_SBIN/beegfs-setup-meta -p $BEEGFS_METADATA -m $MGMT_HOSTNAME
+		$BEEGFS_SBIN/beegfs-setup-meta -p $BEEGFS_METADATA -m $MGMT_HOSTNAME -f
 
 		#sed -i 's|^storeMetaDirectory.*|storeMetaDirectory = '$BEEGFS_METADATA'|g' /etc/beegfs/beegfs-meta.conf
 		#sed -i 's/^sysMgmtdHost.*/sysMgmtdHost = '$MGMT_HOSTNAME'/g' /etc/beegfs/beegfs-meta.conf
