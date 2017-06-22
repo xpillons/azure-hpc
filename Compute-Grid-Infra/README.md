@@ -182,7 +182,10 @@ To begin, you need first to ssh on the master and then switch to the **hpcuser**
 
 To run the 2 node pingpong test, execute the following command
 
-    mpirun -hosts <host1>,<host2> -ppn 1 -n 2 -env I_MPI_FABRICS=dapl -env I_MPI_DAPL_PROVIDER=ofa-v2-ib0 -env I_MPI_DYNAMIC_CONNECTION=0 IMB-MPI1 pingpong
+    impi_version=`ls /opt/intel/impi`
+    source /opt/intel/impi/${impi_version}/bin64/mpivars.sh
+
+    mpirun -hosts <host1>,<host2> -ppn 1 -n 2 -env I_MPI_FABRICS=shm:dapl -env I_MPI_DAPL_PROVIDER=ofa-v2-ib0 -env I_MPI_DYNAMIC_CONNECTION=0 -env I_MPI_FALLBACK_DEVICE=0 IMB-MPI1 pingpong
 
 You should expect an output as the one below
 
