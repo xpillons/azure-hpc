@@ -52,9 +52,16 @@
     "vnetID": "[resourceId(parameters('nodeSettings').vnetRG, 'Microsoft.Network/virtualNetworks', parameters('nodeSettings').vnetName)]",
     "subnetRef": "[concat(variables('vnetID'),'/subnets/', parameters('nodeSettings').subnetName)]",
     "nicName": "[concat(variables('namingInfix'), 'nic')]",
+    "lbName": "[concat(variables('namingInfix'), 'lb')]",
+    "pipName": "[concat(variables('namingInfix'), 'pip')]",
+    "lbID": "[resourceId('Microsoft.Network/loadBalancers/', variables('lbName'))]",
+
     "ipConfigName": "[concat(variables('namingInfix'), 'ipconfig')]",
     "computeApiVersion": "2016-04-30-preview",
     "networkApiVersion": "2016-03-30",
+    "natStartPort": 50000,
+    "natEndPort": 50119,
+    "natBackendPort": 22,
     "ScriptsOptions": {
       "none": {
         "params": ""
@@ -93,17 +100,73 @@
   },
   "resources": [
     {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "name": "[variables('pipName')]",
+      "apiVersion": "2016-12-01",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "publicIPAllocationMethod": "Dynamic",
+        "dnsSettings": {
+          "domainNameLabel": "[variables('pipName')]"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.Network/loadBalancers",
+      "name": "[variables('lbName')]",
+      "apiVersion": "2016-12-01",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "frontendIPConfigurations": [
+          {
+            "name": "LoadBalancerFrontEnd",
+            "properties": {
+              "publicIPAddress": {
+                "id": "[resourceId('Microsoft.Network/publicIpAddresses', variables('pipName'))]"
+              }
+            }
+          }
+        ],
+        "backendAddressPools": [
+          {
+            "name": "bepool"
+          }
+        ],
+        "inboundNatPools": [
+          {
+            "name": "natpool",
+            "properties": {
+              "frontendIPConfiguration": {
+                "id": "[concat(resourceId('Microsoft.Network/loadBalancers', variables('lbName')), '/frontendIPConfigurations/loadBalancerFrontEnd')]"
+              },
+              "protocol": "tcp",
+              "frontendPortRangeStart": "[variables('natStartPort')]",
+              "frontendPortRangeEnd": "[variables('natEndPort')]",
+              "backendPort": "[variables('natBackendPort')]"
+            }
+          }
+        ]
+      },
+      "dependsOn": [
+        "[variables('pipName')]"
+      ]
+    },
+    {
       "type": "Microsoft.Compute/virtualMachineScaleSets",
       "name": "[parameters('vmssName')]",
       "location": "[variables('location')]",
       "apiVersion": "[variables('computeApiVersion')]",
+      "dependsOn": [
+        "[variables('lbName')]"
+      ],
       "sku": {
         "name": "[parameters('nodeSettings').VMsku]",
         "tier": "Standard",
         "capacity": "[parameters('instanceCount')]"
       },
       "properties": {
-        "overprovision": "true",
+        "singlePlacementGroup": true,
+        "overprovision": true,
         "upgradePolicy": {
           "mode": "Manual"
         },
@@ -113,14 +176,24 @@
               {
                 "name": "[variables('nicName')]",
                 "properties": {
-                  "primary": "true",
+                  "primary": true,
                   "ipConfigurations": [
                     {
                       "name": "[variables('ipConfigName')]",
                       "properties": {
                         "subnet": {
                           "id": "[variables('subnetRef')]"
-                        }
+                        },
+                        "loadBalancerInboundNatPools": [
+                          {
+                            "id": "[concat(variables('lbID'), '/inboundNatPools/natPool1')]"
+                          }
+                        ],
+                        "loadBalancerBackendAddressPools": [
+                          {
+                            "id": "[concat(variables('lbID'), '/backendAddressPools/addressPool1')]"
+                          }
+                        ]
                       }
                     }
                   ]
