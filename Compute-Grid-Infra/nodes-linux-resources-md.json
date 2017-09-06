@@ -186,12 +186,12 @@
                         },
                         "loadBalancerInboundNatPools": [
                           {
-                            "id": "[concat(variables('lbID'), '/inboundNatPools/natPool1')]"
+                            "id": "[concat(variables('lbID'), '/inboundNatPools/natpool')]"
                           }
                         ],
                         "loadBalancerBackendAddressPools": [
                           {
-                            "id": "[concat(variables('lbID'), '/backendAddressPools/addressPool1')]"
+                            "id": "[concat(variables('lbID'), '/backendAddressPools/bepool')]"
                           }
                         ]
                       }
